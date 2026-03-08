@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>🐾 Cat Records</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #faf5ee; --cream2: #f2ead8;
+  --terra: #b85c38; --terra-light: #e8927c; --terra-dark: #8c3e22;
+  --sage: #5c7a63; --sage-light: #8aab91;
+  --sand: #c9a96e;
+  --lavender: #8474a8;
+  --warm-white: #fffdf9;
+  --text: #2c2118; --text-muted: #7a6a58;
+  --border: #e8dcc8;
+  --shadow: rgba(44,33,24,0.10);
+  --red: #c0392b; --orange: #d4700a; --green: #3a7d44;
+  --radius: 18px; --radius-sm: 10px; --nav-h: 72px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream); color: var(--text);
+  min-height: 100vh; max-width: 480px; margin: 0 auto;
+  position: relative; overflow-x: hidden;
+}
+body::before {
+  content: ''; position: fixed; inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(184,92,56,0.07) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(92,122,99,0.07) 0%, transparent 50%);
+  pointer-events: none; z-index: 0;
+}
+.app-header {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--warm-white); border-bottom: 1px solid var(--border);
+  padding: 14px 20px 12px;
+  display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 0 2px 12px var(--shadow);
+}
+.header-title { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 700; color: var(--terra-dark); letter-spacing: -0.02em; }
+.header-title span { color: var(--sand); }
+.header-add-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--terra); color: white; border: none; font-size: 1.4rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(184,92,56,0.4); transition: transform .15s;
+}
+.header-add-btn:active { transform: scale(0.93); }
+.main { padding: 16px 16px calc(var(--nav-h) + 20px); position: relative; z-index: 1; }
+.bottom-nav {
+  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 480px; height: var(--nav-h);
+  background: var(--warm-white); border-top: 1px solid var(--border);
+  display: flex; z-index: 200; box-shadow: 0 -4px 20px var(--shadow);
+}
+.nav-tab {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px; cursor: pointer; border: none; background: none;
+  color: var(--text-muted); font-family: 'DM Sans', sans-serif;
+  font-size: 0.62rem; font-weight: 500; letter-spacing: 0.02em;
+  transition: color .2s; padding: 8px 2px; text-transform: uppercase;
+}
+.nav-tab .nav-icon { font-size: 1.35rem; transition: transform .2s; }
+.nav-tab.active { color: var(--terra); }
+.nav-tab.active .nav-icon { transform: translateY(-2px); }
+.section { display: none; }
+.section.active { display: block; }
+
+/* CATS */
+.cats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.cat-card {
+  background: var(--warm-white); border-radius: var(--radius);
+  padding: 18px 14px 14px; cursor: pointer;
+  border: 1.5px solid var(--border); box-shadow: 0 2px 10px var(--shadow);
+  transition: transform .15s; position: relative; overflow: hidden;
+}
+.cat-card:active { transform: scale(0.97); }
+.cat-emoji { font-size: 2.4rem; display: block; margin-bottom: 8px; }
+.cat-name { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 700; margin-bottom: 2px; }
+.cat-age { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 6px; }
+.cat-weight-badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
+.cat-visits-count { position: absolute; top: 12px; right: 12px; background: var(--cream2); color: var(--text-muted); border-radius: 20px; padding: 2px 7px; font-size: 0.65rem; font-weight: 600; }
+.cat-next-badge { display: block; margin-top: 6px; font-size: 0.68rem; color: var(--orange); font-weight: 600; }
+
+/* CAT DETAIL */
+.detail-view { display: none; }
+.detail-view.active { display: block; }
+.cats-list-view.hidden { display: none; }
+.detail-header { display: flex; align-items: center; gap: 12px; background: var(--warm-white); border-radius: var(--radius); padding: 18px 16px; margin-bottom: 14px; border: 1.5px solid var(--border); box-shadow: 0 2px 10px var(--shadow); }
+.detail-emoji { font-size: 3rem; cursor: pointer; }
+.detail-cat-name { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 700; cursor: pointer; }
+.detail-cat-meta { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+.detail-cat-weight { font-size: 0.85rem; font-weight: 600; margin-top: 4px; }
+.cat-name-input { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 700; border: none; border-bottom: 2px solid var(--terra); background: transparent; color: var(--text); outline: none; width: 100%; }
+.editable-dob { cursor: pointer; border-bottom: 1px dashed var(--border); padding-bottom: 1px; transition: border-color .15s; }
+.editable-dob:hover { border-color: var(--terra); color: var(--terra); }
+.back-btn { display: flex; align-items: center; gap: 6px; background: none; border: none; color: var(--terra); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; cursor: pointer; padding: 0; margin-bottom: 12px; }
+.add-visit-btn { width: 100%; padding: 12px; background: var(--terra); color: white; border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 600; cursor: pointer; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 3px 10px rgba(184,92,56,0.35); transition: transform .15s; }
+.add-visit-btn:active { transform: scale(0.98); }
+
+/* TIMELINE */
+.timeline { position: relative; padding-left: 24px; }
+.timeline::before { content: ''; position: absolute; left: 6px; top: 6px; bottom: 0; width: 2px; background: var(--border); border-radius: 2px; }
+.visit-card { position: relative; margin-bottom: 12px; background: var(--warm-white); border-radius: var(--radius-sm); padding: 14px; border: 1.5px solid var(--border); box-shadow: 0 1px 6px var(--shadow); }
+.visit-card::before { content: ''; position: absolute; left: -21px; top: 16px; width: 10px; height: 10px; border-radius: 50%; background: var(--terra); border: 2px solid var(--cream); box-shadow: 0 0 0 2px var(--terra); }
+.visit-date { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--terra); margin-bottom: 6px; }
+.visit-weight { display: inline-block; background: var(--cream2); color: var(--text-muted); border-radius: 20px; padding: 2px 8px; font-size: 0.75rem; font-weight: 600; margin-bottom: 6px; }
+.visit-treatments { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; }
+.visit-treatment-tag { display: inline-flex; align-items: center; gap: 3px; background: rgba(184,92,56,0.10); color: var(--terra-dark); border-radius: 20px; padding: 2px 9px; font-size: 0.72rem; font-weight: 600; }
+.visit-notes { font-size: 0.82rem; color: var(--text); line-height: 1.55; white-space: pre-line; margin-bottom: 4px; }
+.visit-cost { display: inline-block; margin-top: 4px; background: rgba(92,122,99,0.12); color: var(--sage); border-radius: 20px; padding: 2px 8px; font-size: 0.72rem; font-weight: 600; }
+.visit-actions { display: flex; gap: 6px; margin-top: 10px; }
+.btn-edit, .btn-delete { flex: 1; padding: 6px; border-radius: 8px; font-size: 0.75rem; font-weight: 500; cursor: pointer; border: 1.5px solid var(--border); background: var(--cream); color: var(--text-muted); transition: background .15s; }
+.btn-delete { color: var(--red); border-color: rgba(192,57,43,0.2); }
+.btn-edit:hover { background: var(--cream2); }
+.btn-delete:hover { background: rgba(192,57,43,0.08); }
+
+/* TREATMENT PICKER */
+.treatment-picker { display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow-y: auto; padding: 2px; }
+.treatment-check-row { display: flex; align-items: center; justify-content: space-between; background: var(--cream); border: 1.5px solid var(--border); border-radius: 8px; padding: 9px 12px; cursor: pointer; transition: border-color .15s, background .15s; user-select: none; }
+.treatment-check-row.selected { border-color: var(--terra); background: rgba(184,92,56,0.07); }
+.t-name { font-size: 0.88rem; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+.t-price { font-size: 0.8rem; font-weight: 700; color: var(--sage); }
+.t-check { width: 18px; height: 18px; border-radius: 5px; border: 2px solid var(--border); background: white; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: white; flex-shrink: 0; transition: background .15s, border-color .15s; }
+.treatment-check-row.selected .t-check { background: var(--terra); border-color: var(--terra); color: white; }
+.cost-summary { display: flex; justify-content: space-between; align-items: center; background: var(--cream2); border-radius: 8px; padding: 8px 12px; margin-top: 6px; }
+.cost-summary-label { font-size: 0.78rem; color: var(--text-muted); font-weight: 500; }
+.cost-summary-total { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 700; color: var(--sage); }
+
+/* MODAL */
+.modal-overlay { position: fixed; inset: 0; z-index: 500; background: rgba(44,33,24,0.55); display: none; align-items: flex-end; justify-content: center; backdrop-filter: blur(4px); }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--warm-white); border-radius: 24px 24px 0 0; padding: 24px 20px 36px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.modal-handle { width: 36px; height: 4px; border-radius: 2px; background: var(--border); margin: 0 auto 20px; }
+.modal-title { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 700; color: var(--text); margin-bottom: 18px; }
+
+/* FORM */
+.form-group { margin-bottom: 14px; }
+.form-label { display: block; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 6px; }
+.form-input, .form-textarea, .form-select { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); background: var(--cream); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; color: var(--text); outline: none; transition: border-color .2s; }
+.form-input:focus, .form-textarea:focus, .form-select:focus { border-color: var(--terra); background: var(--warm-white); }
+.form-textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.form-submit { width: 100%; padding: 13px; background: var(--terra); color: white; border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 600; cursor: pointer; margin-top: 6px; box-shadow: 0 3px 10px rgba(184,92,56,0.35); }
+.form-cancel { width: 100%; padding: 11px; background: none; color: var(--text-muted); border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; cursor: pointer; margin-top: 8px; }
+
+/* ══ VET SCHEDULE ══ */
+.vet-section-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin: 20px 0 8px; display: flex; align-items: center; gap: 6px; }
+.vet-section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* Price Dashboard */
+.dashboard-panel { background: var(--warm-white); border: 1.5px solid var(--border); border-radius: var(--radius); margin-bottom: 6px; box-shadow: 0 2px 10px var(--shadow); overflow: hidden; }
+.dashboard-toggle { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; background: none; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.dashboard-toggle-left { display: flex; align-items: center; gap: 8px; }
+.dashboard-toggle-label { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+.dashboard-chevron { font-size: 0.75rem; color: var(--text-muted); transition: transform .2s; }
+.dashboard-panel.open .dashboard-chevron { transform: rotate(180deg); }
+.dashboard-body { display: none; border-top: 1px solid var(--border); padding: 10px 14px 14px; }
+.dashboard-panel.open .dashboard-body { display: block; }
+.treatment-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--cream2); }
+.treatment-row:last-child { border-bottom: none; }
+.treatment-row-left { display: flex; align-items: center; gap: 8px; }
+.treatment-row-name { font-size: 0.88rem; font-weight: 500; }
+.treatment-row-price { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 700; color: var(--sage); margin-right: 4px; }
+.treatment-row-actions { display: flex; gap: 5px; align-items: center; }
+.icon-btn { width: 26px; height: 26px; border-radius: 7px; border: 1.5px solid var(--border); background: var(--cream); color: var(--text-muted); cursor: pointer; font-size: 0.72rem; display: flex; align-items: center; justify-content: center; transition: background .15s; }
+.icon-btn:hover { background: var(--cream2); }
+.icon-btn.del { color: var(--red); border-color: rgba(192,57,43,0.2); }
+.repeat-picker { display: flex; gap: 8px; }
+.repeat-count-sel { width: 80px; flex-shrink: 0; }
+.repeat-unit-sel { flex: 1; }
+.treatment-repeat-badge {
+  font-size: 0.67rem; color: var(--text-muted);
+  background: var(--cream2); border-radius: 20px;
+  padding: 1px 7px; font-weight: 500; white-space: nowrap;
+}
+.add-treatment-row { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+.add-treatment-input { flex: 1; min-width: 100px; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 8px; background: var(--cream); font-family: 'DM Sans', sans-serif; font-size: 0.85rem; color: var(--text); outline: none; }
+.add-treatment-input:focus { border-color: var(--terra); }
+.add-treatment-price { width: 68px; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 8px; background: var(--cream); font-family: 'DM Sans', sans-serif; font-size: 0.85rem; color: var(--text); outline: none; }
+.add-treatment-price:focus { border-color: var(--terra); }
+.add-treatment-btn { padding: 8px 14px; background: var(--terra); color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; }
+
+/* Per-cat schedule */
+.vet-cat-block { background: var(--warm-white); border: 1.5px solid var(--border); border-radius: var(--radius); margin-bottom: 14px; box-shadow: 0 2px 10px var(--shadow); overflow: hidden; }
+.vet-cat-block-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 12px; border-bottom: 1px solid var(--cream2); }
+.vet-cat-block-title { display: flex; align-items: center; gap: 8px; font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 700; }
+.vet-cat-block-meta { display: flex; align-items: center; gap: 8px; }
+.vet-cat-est { font-size: 0.75rem; font-weight: 700; color: var(--sage); background: rgba(92,122,99,0.1); border-radius: 20px; padding: 3px 10px; }
+.vet-cat-body { padding: 10px 12px 4px; }
+.schedule-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 6px; border-bottom: 1px solid var(--cream2); }
+.schedule-item:last-child { border-bottom: none; }
+.schedule-check-btn { width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0; margin-top: 1px; border: 2px solid var(--border); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; transition: all .15s; }
+.schedule-check-btn.checked { background: var(--sage); border-color: var(--sage); color: white; }
+.schedule-item-body { flex: 1; min-width: 0; }
+.schedule-item-name { font-size: 0.88rem; font-weight: 600; display: flex; align-items: center; gap: 5px; flex-wrap: wrap; margin-bottom: 2px; }
+.schedule-item-date { font-size: 0.72rem; color: var(--text-muted); }
+.schedule-item-notes { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; font-style: italic; }
+.schedule-item.done .schedule-item-name, .schedule-item.done .schedule-item-date { opacity: 0.45; text-decoration: line-through; }
+.schedule-item-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+.schedule-item-price { font-size: 0.82rem; font-weight: 700; color: var(--sage); }
+.schedule-item-btns { display: flex; gap: 4px; }
+.status-pill { border-radius: 20px; padding: 2px 7px; font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+.status-overdue { background: rgba(192,57,43,0.12); color: var(--red); }
+.status-soon { background: rgba(212,112,10,0.12); color: var(--orange); }
+.status-upcoming { background: rgba(58,125,68,0.10); color: var(--green); }
+.status-done { background: var(--cream2); color: var(--text-muted); }
+.add-sched-btn { width: 100%; padding: 9px; background: none; color: var(--terra); border: 1.5px dashed var(--terra-light); border-radius: 0 0 var(--radius) var(--radius); font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: background .15s; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.add-sched-btn:hover { background: rgba(184,92,56,0.05); }
+
+/* UPCOMING SECTION */
+.upcoming-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin: 22px 0 10px;
+}
+.upcoming-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.25rem; font-weight: 700; color: var(--text);
+}
+.upcoming-total {
+  font-size: 0.75rem; font-weight: 700; color: var(--sage);
+  background: rgba(92,122,99,0.10); border-radius: 20px; padding: 3px 10px;
+}
+.upcoming-item {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--warm-white); border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm); padding: 11px 12px;
+  margin-bottom: 7px; box-shadow: 0 1px 6px var(--shadow);
+  cursor: pointer; transition: transform .12s;
+  position: relative; overflow: hidden;
+}
+.upcoming-item::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px; border-radius: 3px 0 0 3px;
+}
+.upcoming-item:active { transform: scale(0.985); }
+.upcoming-cat-avatar { flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
+.upcoming-body { flex: 1; min-width: 0; }
+.upcoming-treatment { font-size: 0.88rem; font-weight: 600; display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.upcoming-cat-name { font-size: 0.72rem; color: var(--text-muted); margin-top: 1px; }
+.upcoming-right { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; flex-shrink: 0; }
+.upcoming-date { font-size: 0.72rem; color: var(--text-muted); white-space: nowrap; }
+.upcoming-price { font-size: 0.82rem; font-weight: 700; color: var(--sage); }
+.upcoming-empty { text-align: center; padding: 18px; color: var(--text-muted); font-size: 0.85rem; background: var(--warm-white); border-radius: var(--radius-sm); border: 1.5px solid var(--border); }
+
+/* ONE-TIME FOLLOW-UPS */
+.onetime-section { border: 1.5px dashed var(--border); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 14px; background: var(--cream); }
+.onetime-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 10px; }
+.onetime-title { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+.onetime-hint { font-size: 0.68rem; color: var(--text-muted); font-style: italic; }
+.onetime-list-item { display: flex; align-items: center; justify-content: space-between; background: var(--warm-white); border: 1.5px solid var(--border); border-radius: 8px; padding: 7px 10px; margin-bottom: 6px; }
+.onetime-list-item-left { font-size: 0.82rem; font-weight: 500; }
+.onetime-list-item-right { display: flex; align-items: center; gap: 6px; }
+.onetime-list-item-badge { font-size: 0.68rem; background: rgba(184,92,56,0.10); color: var(--terra-dark); border-radius: 20px; padding: 2px 8px; font-weight: 600; }
+.onetime-remove-btn { background: none; border: none; cursor: pointer; color: var(--red); font-size: 0.95rem; padding: 0 2px; line-height: 1; }
+.onetime-name-input { margin-bottom: 8px; }
+.onetime-freq-row { display: flex; align-items: center; gap: 6px; }
+.onetime-freq-label { font-size: 0.78rem; color: var(--text-muted); white-space: nowrap; font-weight: 500; }
+.onetime-add-btn { background: var(--terra); color: white; border: none; border-radius: 8px; width: 34px; height: 34px; font-size: 1.1rem; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: transform .12s; }
+.onetime-add-btn:active { transform: scale(0.93); }
+.visit-onetime-tag { display: inline-flex; align-items: center; gap: 3px; background: rgba(92,122,99,0.12); color: var(--sage); border-radius: 20px; padding: 2px 9px; font-size: 0.72rem; font-weight: 600; }
+.onetime-schedule-badge { font-size: 0.62rem; background: rgba(132,116,168,0.13); color: var(--lavender); border-radius: 20px; padding: 1px 7px; font-weight: 600; margin-left: 2px; }
+
+ { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 700; color: var(--text); margin-bottom: 14px; }
+.litter-card { background: var(--warm-white); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 10px var(--shadow); }
+.litter-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+.litter-name { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 700; }
+.litter-price-tag { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+.stars .filled { color: var(--sand); } .stars .empty { color: var(--border); }
+.litter-metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 8px; }
+.metric { background: var(--cream); border-radius: 8px; padding: 7px 8px; text-align: center; }
+.metric-label { font-size: 0.65rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.metric-value { font-size: 0.78rem; color: var(--text); font-weight: 500; margin-top: 2px; }
+.litter-notes { font-size: 0.78rem; color: var(--text-muted); margin-top: 8px; font-style: italic; }
+.litter-actions { display: flex; gap: 8px; margin-top: 10px; }
+.ppl-badge { display: inline-block; background: rgba(132,116,168,0.12); color: var(--lavender); border-radius: 20px; padding: 2px 8px; font-size: 0.7rem; font-weight: 700; }
+.unreviewed-badge { font-size: 0.7rem; color: var(--text-muted); background: var(--cream2); border-radius: 20px; padding: 2px 8px; font-weight: 500; }
+.add-item-btn { width: 100%; padding: 10px; background: none; color: var(--terra); border: 2px dashed var(--terra-light); border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 600; cursor: pointer; margin-top: 4px; display: flex; align-items: center; justify-content: center; gap: 6px; transition: background .15s; }
+.add-item-btn:hover { background: rgba(184,92,56,0.06); }
+.star-picker { display: flex; gap: 6px; }
+.star-btn { font-size: 1.6rem; background: none; border: none; cursor: pointer; color: var(--border); line-height: 1; transition: transform .1s; }
+.star-btn.on { color: var(--sand); }
+.empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 0.9rem; }
+.empty-state .empty-icon { font-size: 3rem; margin-bottom: 10px; }
+.toast { position: fixed; bottom: calc(var(--nav-h) + 12px); left: 50%; transform: translateX(-50%) translateY(20px); background: var(--text); color: white; padding: 10px 20px; border-radius: 20px; font-size: 0.85rem; font-weight: 500; opacity: 0; transition: all .3s; z-index: 600; white-space: nowrap; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+@media (min-width: 481px) { body { box-shadow: 0 0 60px rgba(0,0,0,0.15); } }
+#loading-screen {
+  position: fixed; inset: 0; background: var(--cream);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 9999; gap: 16px;
+}
+#loading-screen .loading-paw { font-size: 2.8rem; animation: pulse 1.2s ease-in-out infinite; }
+#loading-screen .loading-text { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; color: var(--text-muted); }
+@keyframes pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.15);opacity:0.7} }
+
+/* CAT PROFILE UPCOMING */
+.cat-upcoming-block {
+  background: var(--warm-white); border: 1.5px solid var(--border);
+  border-radius: var(--radius); margin-bottom: 14px;
+  box-shadow: 0 2px 10px var(--shadow); overflow: hidden;
+}
+.cat-upcoming-block-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px; border-bottom: 1px solid var(--cream2);
+}
+.cat-upcoming-block-title {
+  font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--text-muted);
+}
+.cat-upcoming-est {
+  font-size: 0.75rem; font-weight: 700; color: var(--sage);
+  background: rgba(92,122,99,0.10); border-radius: 20px; padding: 2px 10px;
+}
+.cat-upcoming-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 14px; border-bottom: 1px solid var(--cream2);
+}
+.cat-upcoming-item:last-child { border-bottom: none; }
+.cat-upcoming-check {
+  width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; margin-top: 2px;
+  border: 2px solid var(--border); background: white; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.65rem; color: white; transition: all .15s;
+}
+.cat-upcoming-check.checked { background: var(--sage); border-color: var(--sage); }
+.cat-upcoming-body { flex: 1; min-width: 0; }
+.cat-upcoming-name { font-size: 0.88rem; font-weight: 600; display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.cat-upcoming-date { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+.cat-upcoming-note { font-size: 0.72rem; color: var(--text-muted); font-style: italic; margin-top: 1px; }
+.cat-upcoming-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+.cat-upcoming-price { font-size: 0.82rem; font-weight: 700; color: var(--sage); }
+.cat-upcoming-item.done-item { opacity: 0.4; }
+.cat-upcoming-item.done-item .cat-upcoming-name { text-decoration: line-through; }
+.cat-upcoming-add-btn {
+  width: 100%; padding: 9px; background: none; color: var(--terra);
+  border: none; border-top: 1px solid var(--cream2);
+  font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 600;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;
+  transition: background .15s;
+}
+.cat-upcoming-add-btn:hover { background: rgba(184,92,56,0.05); }
+
+</style>
+</head>
+<body>
+
+<div id="loading-screen">
+  <div class="loading-paw">🐾</div>
+  <div class="loading-text">Loading your cats…</div>
+</div>
+
+<header class="app-header">
+  <div class="header-title">🐾 Miaou <span>Records</span></div>
+  <button class="header-add-btn" onclick="showAddCatModal()">+</button>
+</header>
+
+<main class="main">
+
+  <!-- CATS -->
+  <div id="tab-cats" class="section active">
+    <div id="cats-list-view">
+      <div class="cats-grid" id="cats-grid"></div>
+      <div id="upcoming-section"></div>
+    </div>
+    <div id="cat-detail" class="detail-view">
+      <button class="back-btn" onclick="showCatsList()">← All Cats</button>
+      <div class="detail-header" id="detail-header"></div>
+      <div id="cat-upcoming-section"></div>
+      <button class="add-visit-btn" onclick="showAddVisitModal()">+ Add Visit</button>
+      <div class="timeline" id="visit-timeline"></div>
+    </div>
+  </div>
+
+  <!-- VET SCHEDULE -->
+  <div id="tab-vet" class="section">
+
+    <div class="vet-section-label">💊 Treatment prices</div>
+
+    <div class="dashboard-panel" id="price-dashboard">
+      <button class="dashboard-toggle" onclick="toggleDashboard()">
+        <div class="dashboard-toggle-left">
+          <span>🗂</span>
+          <span class="dashboard-toggle-label">Edit Price List</span>
+        </div>
+        <span class="dashboard-chevron">▼</span>
+      </button>
+      <div class="dashboard-body">
+        <div id="treatment-rows"></div>
+        <div class="add-treatment-row">
+          <input class="add-treatment-input" id="new-t-name" placeholder="Treatment name" onkeydown="if(event.key==='Enter')addTreatmentInline()">
+          <input class="add-treatment-price" id="new-t-price" type="number" step="0.5" placeholder="$0">
+          <select class="form-select repeat-count-sel" id="new-t-repeat-count" style="width:72px;padding:8px 6px;font-size:0.82rem">
+            <option value="">—</option>
+            <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+            <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+            <option value="7">7</option><option value="8">8</option><option value="9">9</option>
+            <option value="10">10</option><option value="11">11</option>
+          </select>
+          <select class="form-select repeat-unit-sel" id="new-t-repeat-unit" style="flex:1;padding:8px 6px;font-size:0.82rem">
+            <option value="days">days</option>
+            <option value="weeks">weeks</option>
+            <option value="months" selected>months</option>
+            <option value="years">years</option>
+          </select>
+          <button class="add-treatment-btn" onclick="addTreatmentInline()">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="vet-section-label">📅 Per-cat schedules</div>
+    <div id="vet-cat-sections"></div>
+  </div>
+
+  <!-- LITTER -->
+  <div id="tab-litter" class="section">
+    <div class="section-title">🌿 Litter Reviews</div>
+    <div id="litter-list"></div>
+    <button class="add-item-btn" onclick="showAddLitterModal()">＋ Add litter brand</button>
+  </div>
+
+</main>
+
+<nav class="bottom-nav">
+  <button class="nav-tab active" onclick="switchTab('cats',this)"><span class="nav-icon">🐾</span>Cats</button>
+  <button class="nav-tab" onclick="switchTab('vet',this)"><span class="nav-icon">📅</span>Schedule</button>
+  <button class="nav-tab" onclick="switchTab('litter',this)"><span class="nav-icon">🌿</span>Litter</button>
+</nav>
+
+<!-- MODAL: VISIT -->
+<div class="modal-overlay" id="visit-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="visit-modal-title">Add Visit</div>
+    <div class="form-group"><label class="form-label">Date</label><input type="date" class="form-input" id="visit-date"></div>
+    <div class="form-group"><label class="form-label">Weight (kg)</label><input type="number" step="0.1" class="form-input" id="visit-weight" placeholder="e.g. 3.2"></div>
+    <div class="form-group">
+      <label class="form-label">Treatments done</label>
+      <div class="treatment-picker" id="visit-treatment-picker"></div>
+    </div>
+    <div class="cost-summary">
+      <span class="cost-summary-label">Auto-calculated total</span>
+      <span class="cost-summary-total" id="visit-cost-auto">$0</span>
+    </div>
+    <div class="form-group" style="margin-top:10px">
+      <label class="form-label">Override cost ($) <span style="font-weight:400;text-transform:none;font-size:0.7rem">— optional, leave blank to use total above</span></label>
+      <input type="number" step="0.5" class="form-input" id="visit-cost" placeholder="e.g. 45">
+    </div>
+    <div class="form-group"><label class="form-label">Notes</label><textarea class="form-textarea" id="visit-notes" placeholder="Observations, medications..."></textarea></div>
+
+    <!-- ONE-TIME TREATMENTS -->
+    <div class="onetime-section">
+      <div class="onetime-header">
+        <span class="onetime-title">🔁 One-time follow-ups</span>
+        <span class="onetime-hint">Done today, repeat once later</span>
+      </div>
+      <div id="onetime-list"></div>
+      <div class="onetime-add-row">
+        <input type="text" class="form-input onetime-name-input" id="ot-name" placeholder="e.g. Kitten vaccine 2nd dose">
+        <div class="onetime-freq-row">
+          <span class="onetime-freq-label">Repeat in</span>
+          <select class="form-select" id="ot-count" style="width:70px;padding:8px 8px">
+            <option value="1">1</option><option value="2">2</option><option value="3" selected>3</option>
+            <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+            <option value="7">7</option><option value="8">8</option><option value="9">9</option>
+            <option value="10">10</option><option value="11">11</option>
+          </select>
+          <select class="form-select" id="ot-unit" style="flex:1;padding:8px 8px">
+            <option value="days">days</option>
+            <option value="weeks" selected>weeks</option>
+            <option value="months">months</option>
+            <option value="years">years</option>
+          </select>
+          <button class="onetime-add-btn" onclick="addOneTime()">＋</button>
+        </div>
+      </div>
+    </div>
+
+    <button class="form-submit" onclick="saveVisit()">Save Visit</button>
+    <button class="form-cancel" onclick="closeModal('visit-modal')">Cancel</button>
+  </div>
+</div>
+
+<!-- MODAL: ADD CAT -->
+<div class="modal-overlay" id="add-cat-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Add Cat</div>
+    <div class="form-group"><label class="form-label">Name</label><input type="text" class="form-input" id="new-cat-name" placeholder="Cat name"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Date of Birth</label><input type="date" class="form-input" id="new-cat-dob"></div>
+      <div class="form-group"><label class="form-label">Emoji</label><input type="text" class="form-input" id="new-cat-emoji" placeholder="🐱" maxlength="2"></div>
+    </div>
+    <button class="form-submit" onclick="addCat()">Add Cat</button>
+    <button class="form-cancel" onclick="closeModal('add-cat-modal')">Cancel</button>
+  </div>
+</div>
+
+<!-- MODAL: SCHEDULE ITEM -->
+<div class="modal-overlay" id="sched-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="sched-modal-title">Schedule Treatment</div>
+    <div class="form-group">
+      <label class="form-label">Treatment</label>
+      <select class="form-select" id="sched-treatment" onchange="updateSchedPrice()">
+        <option value="">— pick a treatment —</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Due Date</label><input type="date" class="form-input" id="sched-date"></div>
+      <div class="form-group"><label class="form-label">Override Price ($)</label><input type="number" step="0.5" class="form-input" id="sched-price" placeholder="Auto"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Notes</label><input type="text" class="form-input" id="sched-notes" placeholder="e.g. every 3 months"></div>
+    <button class="form-submit" onclick="saveSchedItem()">Save</button>
+    <button class="form-cancel" onclick="closeModal('sched-modal')">Cancel</button>
+  </div>
+</div>
+
+<!-- MODAL: EDIT TREATMENT -->
+<div class="modal-overlay" id="treatment-edit-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Edit Treatment</div>
+    <div class="form-group"><label class="form-label">Name</label><input type="text" class="form-input" id="edit-t-name"></div>
+    <div class="form-group"><label class="form-label">Price ($)</label><input type="number" step="0.5" class="form-input" id="edit-t-price"></div>
+    <div class="form-group">
+      <label class="form-label">Repeats every</label>
+      <div class="repeat-picker">
+        <select class="form-select repeat-count-sel" id="edit-t-repeat-count">
+          <option value="">—</option>
+          <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+          <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+          <option value="7">7</option><option value="8">8</option><option value="9">9</option>
+          <option value="10">10</option><option value="11">11</option>
+        </select>
+        <select class="form-select repeat-unit-sel" id="edit-t-repeat-unit">
+          <option value="days">days</option>
+          <option value="weeks">weeks</option>
+          <option value="months">months</option>
+          <option value="years">years</option>
+        </select>
+      </div>
+    </div>
+    <button class="form-submit" onclick="saveTreatmentEdit()">Save</button>
+    <button class="form-cancel" onclick="closeModal('treatment-edit-modal')">Cancel</button>
+  </div>
+</div>
+
+<!-- MODAL: LITTER -->
+<div class="modal-overlay" id="litter-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="litter-modal-title">Add Litter</div>
+    <div class="form-group"><label class="form-label">Brand Name</label><input type="text" class="form-input" id="litter-name"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Price & Size</label><input type="text" class="form-input" id="litter-price" placeholder="e.g. 11$ / 5kg"></div>
+      <div class="form-group"><label class="form-label">$/L</label><input type="number" step="0.01" class="form-input" id="litter-ppl"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Rating</label>
+      <div class="star-picker" id="star-picker">
+        <button class="star-btn" onclick="setStar(1)">★</button><button class="star-btn" onclick="setStar(2)">★</button>
+        <button class="star-btn" onclick="setStar(3)">★</button><button class="star-btn" onclick="setStar(4)">★</button>
+        <button class="star-btn" onclick="setStar(5)">★</button>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Smell</label><input type="text" class="form-input" id="litter-smell"></div>
+      <div class="form-group"><label class="form-label">Poo clumping</label><input type="text" class="form-input" id="litter-poo"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Pee clumping</label><input type="text" class="form-input" id="litter-pee"></div>
+      <div class="form-group"><label class="form-label">Notes</label><input type="text" class="form-input" id="litter-notes"></div>
+    </div>
+    <button class="form-submit" onclick="saveLitter()">Save</button>
+    <button class="form-cancel" onclick="closeModal('litter-modal')">Cancel</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+// ═══ ICONS ═══
+const ICONS={'Vaccin':'💉','Vaccine':'💉','Flea':'🦟','Barghout':'🦟','Nafas':'💨','Doud':'🪱','Worm':'🪱','Blood':'🩸','Fahes dam':'🩸','Benej':'💊','Ass':'🩹','Deworm':'🪱','Bravecto':'🛡️','Catch One':'🎯','Ebre':'💉','Xray':'🩻'};
+function iconFor(n){for(const k in ICONS)if(n&&n.toLowerCase().includes(k.toLowerCase()))return ICONS[k];return'💊';}
+
+// ═══ CAT SVG AVATARS ═══
+function catSVG(style, size=48){
+  const s=size, r=s*0.5;
+  if(style==='white'){
+    // Loupou — white/cream cat, soft blue eyes
+    return`<svg xmlns="http://www.w3.org/2000/svg" width="${s}" height="${s}" viewBox="0 0 48 48">
+      <polygon points="7,20 13,5 20,17" fill="#f0ede8" stroke="#d8d3cc" stroke-width="1"/>
+      <polygon points="41,20 35,5 28,17" fill="#f0ede8" stroke="#d8d3cc" stroke-width="1"/>
+      <polygon points="10,18 13,8 19,16" fill="#f5c8cc" opacity="0.55"/>
+      <polygon points="38,18 35,8 29,16" fill="#f5c8cc" opacity="0.55"/>
+      <ellipse cx="24" cy="29" rx="19" ry="17" fill="#f5f2ee" stroke="#e0dbd2" stroke-width="1"/>
+      <ellipse cx="17" cy="25" rx="3.8" ry="4.5" fill="#7bbcd4"/>
+      <ellipse cx="31" cy="25" rx="3.8" ry="4.5" fill="#7bbcd4"/>
+      <ellipse cx="17" cy="25" rx="1.8" ry="2.8" fill="#1a1a2a"/>
+      <ellipse cx="31" cy="25" rx="1.8" ry="2.8" fill="#1a1a2a"/>
+      <circle cx="18.2" cy="23.2" r="0.9" fill="white"/>
+      <circle cx="32.2" cy="23.2" r="0.9" fill="white"/>
+      <polygon points="24,31 22,33.5 26,33.5" fill="#e8a0b4"/>
+      <path d="M22,34.5 Q24,36.5 26,34.5" fill="none" stroke="#c07090" stroke-width="0.9" stroke-linecap="round"/>
+      <line x1="7" y1="28" x2="15" y2="30" stroke="#d0ccc6" stroke-width="0.8" opacity="0.7"/>
+      <line x1="7" y1="31" x2="15" y2="31.5" stroke="#d0ccc6" stroke-width="0.8" opacity="0.7"/>
+      <line x1="41" y1="28" x2="33" y2="30" stroke="#d0ccc6" stroke-width="0.8" opacity="0.7"/>
+      <line x1="41" y1="31" x2="33" y2="31.5" stroke="#d0ccc6" stroke-width="0.8" opacity="0.7"/>
+    </svg>`;
+  }
+  if(style==='blackwhite'){
+    // Snickers — black/white/beige tuxedo mix
+    return`<svg xmlns="http://www.w3.org/2000/svg" width="${s}" height="${s}" viewBox="0 0 48 48">
+      <polygon points="7,20 13,5 20,17" fill="#2c2a27"/>
+      <polygon points="41,20 35,5 28,17" fill="#c8b89a"/>
+      <polygon points="10,18 13,8 19,16" fill="#e8aab4" opacity="0.5"/>
+      <polygon points="38,18 35,8 29,16" fill="#e8aab4" opacity="0.5"/>
+      <ellipse cx="24" cy="29" rx="19" ry="17" fill="#2c2a27"/>
+      <ellipse cx="24" cy="29" rx="19" ry="17" fill="url(#bwpatch)"/>
+      <defs>
+        <radialGradient id="bwpatch" cx="60%" cy="30%" r="60%">
+          <stop offset="0%" stop-color="#c8b89a" stop-opacity="0.45"/>
+          <stop offset="100%" stop-color="transparent"/>
+        </radialGradient>
+      </defs>
+      <ellipse cx="24" cy="34" rx="10" ry="8" fill="#e8e2d8"/>
+      <ellipse cx="17" cy="25" rx="3.8" ry="4.5" fill="#c8a840"/>
+      <ellipse cx="31" cy="25" rx="3.8" ry="4.5" fill="#c8a840"/>
+      <ellipse cx="17" cy="25" rx="1.8" ry="2.8" fill="#0a0a0a"/>
+      <ellipse cx="31" cy="25" rx="1.8" ry="2.8" fill="#0a0a0a"/>
+      <circle cx="18.2" cy="23.2" r="0.9" fill="white"/>
+      <circle cx="32.2" cy="23.2" r="0.9" fill="white"/>
+      <polygon points="24,31 22,33.5 26,33.5" fill="#e8a0b4"/>
+      <path d="M22,34.5 Q24,36.5 26,34.5" fill="none" stroke="#c07090" stroke-width="0.9" stroke-linecap="round"/>
+      <line x1="7" y1="29" x2="15" y2="30.5" stroke="#888" stroke-width="0.7" opacity="0.6"/>
+      <line x1="7" y1="32" x2="15" y2="32.5" stroke="#888" stroke-width="0.7" opacity="0.6"/>
+      <line x1="41" y1="29" x2="33" y2="30.5" stroke="#888" stroke-width="0.7" opacity="0.6"/>
+      <line x1="41" y1="32" x2="33" y2="32.5" stroke="#888" stroke-width="0.7" opacity="0.6"/>
+    </svg>`;
+  }
+  return null; // fall back to emoji
+}
+function catIcon(cat, size=48){
+  if(cat.catStyle){const svg=catSVG(cat.catStyle,size);if(svg)return`<span style="display:inline-flex;line-height:1">${svg}</span>`;}
+  return`<span style="font-size:${size*0.05}rem;line-height:1">${cat.emoji}</span>`;
+}
+function catIconCard(cat){
+  if(cat.catStyle){const svg=catSVG(cat.catStyle,52);if(svg)return`<span class="cat-emoji" style="font-size:0">${svg}</span>`;}
+  return`<span class="cat-emoji">${cat.emoji}</span>`;
+}
+function catIconDetail(cat){
+  if(cat.catStyle){const svg=catSVG(cat.catStyle,56);if(svg)return`<div class="detail-emoji" onclick="promptRenameEmoji('${cat.id}')" title="Tap to change style" style="font-size:0;line-height:0">${svg}</div>`;}
+  return`<div class="detail-emoji" onclick="promptRenameEmoji('${cat.id}')" title="Tap to change emoji">${cat.emoji}</div>`;
+}
+
+// ═══ DEFAULT DATA ═══
+const DEFAULT={
+  treatments:[
+    {id:'t1',name:'Vaccine (yearly)',price:30,repeatCount:1,repeatUnit:'years'},
+    {id:'t2',name:'Flea',price:8,repeatCount:1,repeatUnit:'months'},
+    {id:'t3',name:'Nafas',price:18,repeatCount:null,repeatUnit:'months'},
+    {id:'t4',name:'Worm Injection',price:15,repeatCount:6,repeatUnit:'months'},
+    {id:'t5',name:'Blood Test',price:60,repeatCount:null,repeatUnit:'months'},
+    {id:'t6',name:'Benej',price:30,repeatCount:null,repeatUnit:'months'},
+  ],
+  cats:[
+    {id:'kitten1',name:'Afandeh',emoji:'🙀',catStyle:'',dob:'2025-09-13',color:'#e07b3a',
+     schedules:[
+       {id:'s1',treatmentId:'t1',dueDate:'2027-02-14',price:30,notes:'Yearly vaccine',done:false},
+       {id:'s2',treatmentId:'t4',dueDate:'2026-04-01',price:15,notes:'Monthly deworm',done:false},
+       {id:'s3',treatmentId:'t2',dueDate:'2026-04-08',price:8,notes:'Monthly flea',done:false},
+     ],
+     visits:[
+       {id:'v1',date:'2025-12-13',weight:1.5,cost:0,treatments:[],oneTimeTreatments:[{name:'Vaccine (1st dose)',repeatCount:3,repeatUnit:'weeks'},{name:'Deworm (1st dose)',repeatCount:10,repeatUnit:'days'}],notes:'Dawa bel dayne for 10 days, once daily after cleaning\nHabbet doud after 10 days → every month until 6 months → every 3 months'},
+       {id:'v2',date:'2025-12-24',weight:1.8,cost:0,treatments:[],oneTimeTreatments:[{name:'Deworm (2nd dose)',repeatCount:3,repeatUnit:'weeks'}],notes:'Still has ear mites — use dawa everyday'},
+       {id:'v3',date:'2026-01-03',weight:2.2,cost:0,treatments:[],oneTimeTreatments:[{name:'Vaccine (2nd dose)',repeatCount:3,repeatUnit:'weeks'}],notes:'Still has earmites — continue dawa only for 10 days'},
+       {id:'v4',date:'2026-01-24',weight:2.5,cost:40,treatments:[],oneTimeTreatments:[{name:'Vaccine (3rd dose)',repeatCount:3,repeatUnit:'weeks'},{name:'Deworm (3rd dose)',repeatCount:1,repeatUnit:'months'}],notes:'No more earmites ✓ — clean ears once per week'},
+       {id:'v5',date:'2026-02-14',weight:3.6,cost:30,treatments:['t1'],oneTimeTreatments:[],notes:'Vaccine (yearly) — rabies ✓'},
+       {id:'v6',date:'2026-02-28',weight:3.9,cost:0,treatments:[],oneTimeTreatments:[],notes:''},
+     ]},
+    {id:'kitten2',name:'Snickers',emoji:'🐈',catStyle:'blackwhite',dob:'2025-08-08',color:'#5c5248',
+     schedules:[
+       {id:'s1',treatmentId:'t1',dueDate:'2027-02-14',price:30,notes:'Yearly vaccine',done:false},
+       {id:'s2',treatmentId:'t4',dueDate:'2026-04-01',price:15,notes:'Monthly deworm',done:false},
+       {id:'s3',treatmentId:'t6',dueDate:'2026-03-10',price:30,notes:'Follow-up ligament check',done:false},
+     ],
+     visits:[
+       {id:'v1',date:'2025-12-13',weight:null,cost:0,treatments:[],oneTimeTreatments:[{name:'Vaccine (1st dose)',repeatCount:3,repeatUnit:'weeks'},{name:'Deworm (1st dose)',repeatCount:10,repeatUnit:'days'}],notes:'Dawa bel dayne for 10 days, once daily after cleaning\nHabbet doud after 10 days → every month until 6 months → every 3 months'},
+       {id:'v2',date:'2025-12-24',weight:2.4,cost:0,treatments:[],oneTimeTreatments:[{name:'Deworm (2nd dose)',repeatCount:3,repeatUnit:'weeks'}],notes:'Still has ear mites — use dawa everyday'},
+       {id:'v3',date:'2026-01-03',weight:2.6,cost:0,treatments:[],oneTimeTreatments:[{name:'Vaccine (2nd dose)',repeatCount:3,repeatUnit:'weeks'}],notes:'No earmites ✓ — clean ears twice per week'},
+       {id:'v4',date:'2026-01-24',weight:2.9,cost:40,treatments:[],oneTimeTreatments:[{name:'Vaccine (3rd dose)',repeatCount:3,repeatUnit:'weeks'},{name:'Deworm (3rd dose)',repeatCount:1,repeatUnit:'months'}],notes:'Clean ears once per week'},
+       {id:'v5',date:'2026-02-14',weight:2.9,cost:90,treatments:['t1'],oneTimeTreatments:[],notes:'Vaccine (yearly) — rabies ✓\nXray $30 — Ebre (injection) $30\nShould feel better within one day'},
+       {id:'v6',date:'2026-02-28',weight:3.0,cost:0,treatments:[],oneTimeTreatments:[],notes:'Checked — something wrong with ligament\n0.6mg today, 0.4mg for 5 days'},
+     ]},
+    {id:'biso',name:'Biso',emoji:'😾',catStyle:'',dob:null,color:'#c07030',
+     schedules:[
+       {id:'s1',treatmentId:'t1',dueDate:'2026-12-01',price:30,notes:'Yearly vaccine',done:false},
+       {id:'s2',treatmentId:'t4',dueDate:'2026-06-01',price:15,notes:'Worm Injection — 6 months',done:false},
+       {id:'s3',treatmentId:'t2',dueDate:'2026-01-01',price:8,notes:'⚠️ Missed — do as soon as possible',done:false},
+     ],
+     visits:[{id:'v1',date:'2025-12-01',weight:6.2,cost:45,treatments:['t1','t4'],notes:'Yearly check-up\nYearly vaccine ✓\nWorm Injection (6 months) ✓\nBarghout done ✓\n⚠️ Overweight — feed less wet food'}]},
+    {id:'loupou',name:'Loupou',emoji:'🐱',catStyle:'white',dob:null,color:'#8aacbf',
+     schedules:[
+       {id:'s1',treatmentId:'t1',dueDate:'2026-12-01',price:30,notes:'Yearly vaccine',done:false},
+       {id:'s2',treatmentId:'t4',dueDate:'2026-06-01',price:15,notes:'Worm Injection — 6 months',done:false},
+       {id:'s3',treatmentId:'t2',dueDate:'2026-01-01',price:8,notes:'⚠️ Missed — do as soon as possible',done:false},
+     ],
+     visits:[{id:'v1',date:'2025-12-01',weight:6.7,cost:45,treatments:['t1','t4'],notes:'Yearly check-up\nYearly vaccine ✓\nWorm Injection (6 months) ✓\nBarghout done ✓\nTondif dinen\n⚠️ Overweight'}]},
+  ],
+  litters:[
+    {id:'l1',name:'Thomas',rating:4,price:'11.2$ / 5kg',pricePerL:1.90,smell:'No smell',poo:'Great',pee:'Bi farfit chway',notes:''},
+    {id:'l2',name:'Champ',rating:3,price:'5.76$ / 7kg',pricePerL:0.70,smell:'No smell',poo:'Great',pee:'Bi farfit ktir',notes:''},
+    {id:'l3',name:'Prochoice',rating:0,price:'6.49$ / 10L',pricePerL:0.65,smell:'',poo:'',pee:'',notes:''},
+    {id:'l4',name:'Signor Gatto',rating:0,price:'6.99$ / 10L',pricePerL:0.70,smell:'',poo:'',pee:'',notes:''},
+    {id:'l5',name:'Kiki Kat',rating:0,price:'7.59$ / 10L',pricePerL:0.76,smell:'',poo:'',pee:'',notes:''},
+    {id:'l6',name:'Vancat',rating:0,price:'8.69$ / 10kg (12L)',pricePerL:0.72,smell:'',poo:'',pee:'',notes:''},
+  ]
+};
+
+// ═══ STATE ═══
+let data, currentCatId=null, editingVisitId=null, editingSchedId=null, schedCatId=null;
+let editingTreatmentId=null, editingLitterId=null, currentStarRating=0;
+let selectedTreatments=new Set();
+
+// ═══ FIREBASE CONFIG ═══
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDGFwXOFdTGYGbHSKafoh6zoaQO8zABPmc",
+  authDomain: "miaou-57319.firebaseapp.com",
+  projectId: "miaou-57319",
+  storageBucket: "miaou-57319.firebasestorage.app",
+  messagingSenderId: "152797535766",
+  appId: "1:152797535766:web:668885df602e2927e09f37"
+};
+
+// ═══ FIREBASE INIT ═══
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+const fbApp = initializeApp(FIREBASE_CONFIG);
+const db = getFirestore(fbApp);
+const DATA_REF = doc(db, 'miaou', 'data');
+
+function uid(){return '_'+Math.random().toString(36).slice(2,9);}
+
+async function loadData(){
+  document.getElementById('loading-screen').style.display='flex';
+  try {
+    const snap = await getDoc(DATA_REF);
+    if(snap.exists()){
+      data = snap.data().payload ? JSON.parse(snap.data().payload) : JSON.parse(JSON.stringify(DEFAULT));
+    } else {
+      data = JSON.parse(JSON.stringify(DEFAULT));
+      await saveData(); // write defaults on first load
+    }
+  } catch(e) {
+    console.error('Firebase load error:', e);
+    // fallback to localStorage if offline
+    try { const s=localStorage.getItem('miaou_offline'); data=s?JSON.parse(s):JSON.parse(JSON.stringify(DEFAULT)); }
+    catch(e2){ data=JSON.parse(JSON.stringify(DEFAULT)); }
+  }
+  document.getElementById('loading-screen').style.display='none';
+  renderCatsGrid();
+  renderUpcoming();
+}
+
+async function saveData(){
+  try {
+    await setDoc(DATA_REF, { payload: JSON.stringify(data), updated: new Date().toISOString() });
+    localStorage.setItem('miaou_offline', JSON.stringify(data)); // keep offline copy
+  } catch(e) {
+    console.error('Firebase save error:', e);
+    try { localStorage.setItem('miaou_offline', JSON.stringify(data)); } catch(e2){}
+  }
+}
+
+// ═══ NAV ═══
+function switchTab(name,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name==='cats')showCatsList();
+  if(name==='vet')renderVetSchedule();
+  if(name==='litter')renderLitter();
+}
+
+// ═══ HELPERS ═══
+function calcAge(dob){if(!dob)return null;const d=new Date(dob),now=new Date();let m=(now.getFullYear()-d.getFullYear())*12+(now.getMonth()-d.getMonth());return m<24?m+' months':Math.floor(m/12)+' years';}
+function latestWeight(cat){const vs=cat.visits.filter(v=>v.weight);if(!vs.length)return null;return vs.slice().sort((a,b)=>b.date.localeCompare(a.date))[0].weight;}
+function lastVisit(cat){if(!cat.visits.length)return null;return cat.visits.slice().sort((a,b)=>b.date.localeCompare(a.date))[0];}
+function totalCost(cat){return cat.visits.reduce((s,v)=>s+(v.cost||0),0);}
+function formatDate(d){if(!d)return'';const[y,m,day]=d.split('-');return`${day}/${m}/${y}`;}
+function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
+function tById(id){return data.treatments.find(t=>t.id===id);}
+function daysUntil(ds){const d=new Date(ds),now=new Date();now.setHours(0,0,0,0);d.setHours(0,0,0,0);return Math.round((d-now)/86400000);}
+function statusFor(s){
+  if(s.done)return{cls:'status-done',label:'Done'};
+  const days=daysUntil(s.dueDate);
+  if(days<0)return{cls:'status-overdue',label:`${-days}d overdue`};
+  if(days<=7)return{cls:'status-soon',label:`In ${days}d`};
+  return{cls:'status-upcoming',label:`In ${days}d`};
+}
+
+// ═══ CATS LIST ═══
+function renderCatsGrid(){
+  const grid=document.getElementById('cats-grid');
+  grid.innerHTML='';
+  data.cats.forEach(cat=>{
+    const wt=latestWeight(cat),age=calcAge(cat.dob);
+    const pastels={'#e07b3a':'#fde8d8','#c07030':'#fde0c8','#5c5248':'#ede8e4','#8aacbf':'#ddeef5','#b85c38':'#fde8e0','#5c7a63':'#e0ede2','#c4a882':'#f5edd8','#8474a8':'#ede8f5'};
+    const bg=pastels[cat.color]||'#f5f0e8';
+    const next=cat.schedules.filter(s=>!s.done).sort((a,b)=>a.dueDate.localeCompare(b.dueDate))[0];
+    const card=document.createElement('div');
+    card.className='cat-card';
+    card.style.borderTop=`4px solid ${cat.color}`;
+    card.innerHTML=`
+      <span class="cat-visits-count">${cat.visits.length} visits</span>
+      ${catIconCard(cat)}
+      <div class="cat-name">${cat.name}</div>
+      <div class="cat-age">${age?age+' old':'Age unknown'}</div>
+      ${wt?`<span class="cat-weight-badge" style="background:${bg};color:${cat.color}">⚖️ ${wt} kg</span>`:''}
+      ${next?`<span class="cat-next-badge">📅 ${tById(next.treatmentId)?.name||'?'} · ${formatDate(next.dueDate)}</span>`:''}
+    `;
+    card.onclick=()=>openCatDetail(cat.id);
+    grid.appendChild(card);
+  });
+}
+function showCatsList(){
+  document.getElementById('cats-list-view').style.display='block';
+  document.getElementById('cat-detail').classList.remove('active');
+  renderCatsGrid();
+  renderUpcoming();
+}
+
+function renderUpcoming(){
+  const container=document.getElementById('upcoming-section');
+  // Gather pending items: overdue OR due within 30 days
+  const items=[];
+  data.cats.forEach(cat=>{
+    cat.schedules.filter(s=>!s.done).forEach(s=>{
+      const days=daysUntil(s.dueDate);
+      if(days<=30){
+        const t=s.oneTime?null:tById(s.treatmentId);
+        items.push({cat,s,t,days});
+      }
+    });
+  });
+  items.sort((a,b)=>a.s.dueDate.localeCompare(b.s.dueDate));
+
+  if(!items.length){
+    container.innerHTML=`
+      <div class="upcoming-header"><div class="upcoming-title">📅 Next 30 days</div></div>
+      <div class="upcoming-empty">🎉 Nothing due in the next 30 days!</div>`;
+    return;
+  }
+
+  const totalEst=items.reduce((sum,{s,t})=>sum+(s.price!==undefined?s.price:(t?t.price:0)),0);
+
+  const rows=items.map(({cat,s,t,days})=>{
+    const isOneTime=!!s.oneTime;
+    const name=isOneTime?s.oneTimeName:(t?t.name:'Unknown');
+    const price=isOneTime?0:(s.price!==undefined?s.price:(t?t.price:0));
+    const st=statusFor(s);
+    // Small avatar: SVG cat or emoji
+    let avatar;
+    if(cat.catStyle){
+      const svg=catSVG(cat.catStyle,32);
+      avatar=svg?`<div class="upcoming-cat-avatar" style="background:transparent;font-size:0">${svg}</div>`
+                :`<div class="upcoming-cat-avatar" style="background:${hexToRgba(cat.color,0.12)}">${cat.emoji}</div>`;
+    } else {
+      avatar=`<div class="upcoming-cat-avatar" style="background:${hexToRgba(cat.color,0.12)}">${cat.emoji}</div>`;
+    }
+    const dateLabel=days===0?'Today':days===1?'Tomorrow':`${formatDate(s.dueDate)}`;
+    return`<div class="upcoming-item" style="border-left-color:${cat.color}" onclick="openCatDetail('${cat.id}')" >
+      <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:${cat.color};border-radius:3px 0 0 3px"></div>
+      ${avatar}
+      <div class="upcoming-body">
+        <div class="upcoming-treatment">${iconFor(name)} ${name}
+          <span class="status-pill ${st.cls}">${st.label}</span>
+        </div>
+        <div class="upcoming-cat-name">${cat.emoji} ${cat.name}${s.notes?` · ${s.notes}`:''}</div>
+      </div>
+      <div class="upcoming-right">
+        <span class="upcoming-date">${dateLabel}</span>
+        ${price?`<span class="upcoming-price">$${price}</span>`:''}
+      </div>
+    </div>`;
+  }).join('');
+
+  container.innerHTML=`
+    <div class="upcoming-header">
+      <div class="upcoming-title">📅 Next 30 days</div>
+      <span class="upcoming-total">Est. $${totalEst}</span>
+    </div>
+    ${rows}`;
+}
+
+function hexToRgba(hex,alpha){
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return`rgba(${r},${g},${b},${alpha})`;
+}
+function openCatDetail(catId){
+  currentCatId=catId;
+  document.getElementById('cats-list-view').style.display='none';
+  document.getElementById('cat-detail').classList.add('active');
+  renderCatDetail();
+}
+function renderCatDetail(){
+  const cat=data.cats.find(c=>c.id===currentCatId);if(!cat)return;
+  const wt=latestWeight(cat),age=calcAge(cat.dob),total=totalCost(cat);
+  const dobDisplay=cat.dob
+    ?`<span class="editable-dob" onclick="makeDobEditable('${cat.id}')" title="Tap to edit date of birth">📅 Born ${formatDate(cat.dob)}${age?' · '+age:''}</span>`
+    :`<span class="editable-dob" onclick="makeDobEditable('${cat.id}')" title="Tap to add date of birth">📅 <em style="color:var(--terra-light)">Add birth date</em></span>`;
+  document.getElementById('detail-header').innerHTML=`
+    ${catIconDetail(cat)}
+    <div style="flex:1;min-width:0">
+      <div class="detail-cat-name" id="editable-name-${cat.id}" onclick="makeNameEditable('${cat.id}')" title="Tap to rename">${cat.name}</div>
+      <div class="detail-cat-meta" id="dob-display-${cat.id}">${dobDisplay} · <strong>$${total} spent</strong></div>
+      ${wt?`<div class="detail-cat-weight" style="color:${cat.color}">⚖️ ${wt} kg</div>`:''}
+    </div>`;
+  renderCatUpcoming(cat);
+  renderTimeline(cat);
+}
+
+function renderCatUpcoming(cat){
+  const el=document.getElementById('cat-upcoming-section');
+  if(!el)return;
+  const all=cat.schedules.slice().sort((a,b)=>a.dueDate.localeCompare(b.dueDate));
+  if(!all.length){el.innerHTML='';return;}
+
+  const pending=all.filter(s=>!s.done);
+  const done=all.filter(s=>s.done);
+  const pendingEst=pending.reduce((sum,s)=>{
+    if(s.oneTime)return sum;
+    const t=tById(s.treatmentId);
+    return sum+(s.price!==undefined?s.price:(t?t.price:0));
+  },0);
+
+  function schedRow(s){
+    const isOneTime=!!s.oneTime;
+    const t=isOneTime?null:tById(s.treatmentId);
+    const name=isOneTime?s.oneTimeName:(t?t.name:'?');
+    const price=isOneTime?0:(s.price!==undefined?s.price:(t?t.price:0));
+    const st=statusFor(s);
+    const days=daysUntil(s.dueDate);
+    const dateLabel=days===0?'Today':days===1?'Tomorrow':days<0?`${Math.abs(days)}d overdue`:formatDate(s.dueDate);
+    return`<div class="cat-upcoming-item${s.done?' done-item':''}">
+      <div class="cat-upcoming-check${s.done?' checked':''}" onclick="toggleSchedDone('${cat.id}','${s.id}')">${s.done?'✓':''}</div>
+      <div class="cat-upcoming-body">
+        <div class="cat-upcoming-name">
+          ${isOneTime?'🔁':iconFor(name)} ${escHtml(name)}
+          ${isOneTime?`<span class="onetime-schedule-badge">one-time</span>`:''}
+          <span class="status-pill ${st.cls}">${st.label}</span>
+        </div>
+        <div class="cat-upcoming-date">📅 ${dateLabel}</div>
+        ${s.notes?`<div class="cat-upcoming-note">${escHtml(s.notes)}</div>`:''}
+      </div>
+      <div class="cat-upcoming-right">
+        ${price?`<span class="cat-upcoming-price">$${price}</span>`:''}
+      </div>
+    </div>`;
+  }
+
+  el.innerHTML=`<div class="cat-upcoming-block" style="border-top:3px solid ${cat.color}">
+    <div class="cat-upcoming-block-header">
+      <span class="cat-upcoming-block-title">📅 Schedule</span>
+      ${pendingEst?`<span class="cat-upcoming-est">Est. $${pendingEst} pending</span>`:''}
+    </div>
+    ${pending.map(schedRow).join('')}
+    ${done.length?`
+      <div style="padding:8px 14px 4px;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);border-top:1px solid var(--cream2)">Completed</div>
+      ${done.map(schedRow).join('')}
+    `:''}
+    <button class="cat-upcoming-add-btn" onclick="showSchedModal('${cat.id}')">＋ Add treatment</button>
+  </div>`;
+}
+function makeDobEditable(catId){
+  const cat=data.cats.find(c=>c.id===catId);
+  const meta=document.getElementById('dob-display-'+catId);
+  const total=totalCost(cat);
+  meta.innerHTML=`<input type="date" class="form-input" id="dob-input-${catId}"
+    value="${cat.dob||''}" style="width:160px;padding:4px 8px;font-size:0.82rem;display:inline-block;margin-bottom:2px"
+    onblur="saveDob('${catId}',this.value)" onkeydown="if(event.key==='Enter')this.blur()"> · <strong>$${total} spent</strong>`;
+  document.getElementById('dob-input-'+catId).focus();
+}
+function saveDob(catId,val){
+  data.cats.find(c=>c.id===catId).dob=val||null;
+  saveData();renderCatDetail();showToast('Date of birth saved ✓');
+}
+function makeNameEditable(catId){
+  const cat=data.cats.find(c=>c.id===catId);
+  const el=document.getElementById('editable-name-'+catId);
+  el.outerHTML=`<input class="cat-name-input" id="editable-name-${catId}" value="${cat.name}" onblur="saveName('${catId}',this.value)" onkeydown="if(event.key==='Enter')this.blur()">`;
+  document.getElementById('editable-name-'+catId).focus();
+}
+function saveName(catId,v){if(!v.trim())return renderCatDetail();data.cats.find(c=>c.id===catId).name=v.trim();saveData();renderCatDetail();}
+function promptRenameEmoji(catId){const e=prompt('New emoji:');if(!e)return;data.cats.find(c=>c.id===catId).emoji=e.trim().slice(0,2);saveData();renderCatDetail();}
+
+// ═══ TIMELINE ═══
+function renderTimeline(cat){
+  const tl=document.getElementById('visit-timeline');
+  const sorted=cat.visits.slice().sort((a,b)=>b.date.localeCompare(a.date));
+  if(!sorted.length){tl.innerHTML=`<div class="empty-state"><div class="empty-icon">🏥</div>No visits yet</div>`;return;}
+  tl.innerHTML=sorted.map(v=>{
+    const tags=(v.treatments||[]).map(tid=>{const t=tById(tid);return t?`<span class="visit-treatment-tag">${iconFor(t.name)} ${t.name}</span>`:''}).join('');
+    const otTags=(v.oneTimeTreatments||[]).map(ot=>`<span class="visit-onetime-tag">🔁 ${escHtml(ot.name)} · in ${ot.repeatCount} ${ot.repeatUnit}</span>`).join('');
+    return`<div class="visit-card"><div class="visit-date">${formatDate(v.date)}</div>
+      ${v.weight?`<span class="visit-weight">⚖️ ${v.weight} kg</span> `:''}
+      ${(tags||otTags)?`<div class="visit-treatments">${tags}${otTags}</div>`:''}
+      ${v.notes?`<div class="visit-notes">${escHtml(v.notes)}</div>`:''}
+      ${v.cost?`<span class="visit-cost">💳 $${v.cost}</span>`:''}
+      <div class="visit-actions">
+        <button class="btn-edit" onclick="editVisit('${v.id}')">✏️ Edit</button>
+        <button class="btn-delete" onclick="deleteVisit('${v.id}')">🗑 Delete</button>
+      </div></div>`;
+  }).join('');
+}
+
+// ═══ VISIT CRUD ═══
+function buildTreatmentPicker(selectedIds){
+  selectedTreatments=new Set(selectedIds||[]);
+  const c=document.getElementById('visit-treatment-picker');
+  if(!data.treatments.length){c.innerHTML=`<div style="font-size:0.82rem;color:var(--text-muted);padding:8px 0">No treatments yet. Add them in the Schedule tab.</div>`;return;}
+  c.innerHTML=data.treatments.map(t=>`
+    <div class="treatment-check-row${selectedTreatments.has(t.id)?' selected':''}" id="trow-${t.id}" onclick="toggleTreatment('${t.id}')">
+      <div class="t-name"><span>${iconFor(t.name)}</span>${t.name}</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="t-price">$${t.price}</span>
+        <div class="t-check" id="tcheck-${t.id}">${selectedTreatments.has(t.id)?'✓':''}</div>
+      </div>
+    </div>`).join('');
+  updateAutoTotal();
+}
+function toggleTreatment(tid){
+  selectedTreatments.has(tid)?selectedTreatments.delete(tid):selectedTreatments.add(tid);
+  const row=document.getElementById('trow-'+tid),chk=document.getElementById('tcheck-'+tid);
+  row.classList.toggle('selected',selectedTreatments.has(tid));
+  chk.textContent=selectedTreatments.has(tid)?'✓':'';
+  updateAutoTotal();
+}
+function updateAutoTotal(){
+  let total=0;selectedTreatments.forEach(tid=>{const t=tById(tid);if(t)total+=t.price;});
+  document.getElementById('visit-cost-auto').textContent='$'+total;
+}
+let oneTimeTreatments=[]; // [{name, repeatCount, repeatUnit}]
+
+function renderOnetimeList(){
+  const el=document.getElementById('onetime-list');
+  if(!el)return;
+  el.innerHTML=oneTimeTreatments.map((ot,i)=>`
+    <div class="onetime-list-item">
+      <div class="onetime-list-item-left">🔁 ${escHtml(ot.name)}</div>
+      <div class="onetime-list-item-right">
+        <span class="onetime-list-item-badge">in ${ot.repeatCount} ${ot.repeatUnit}</span>
+        <button class="onetime-remove-btn" onclick="removeOneTime(${i})">✕</button>
+      </div>
+    </div>`).join('');
+}
+function addOneTime(){
+  const name=document.getElementById('ot-name').value.trim();
+  if(!name){showToast('Enter a treatment name');return;}
+  const repeatCount=parseInt(document.getElementById('ot-count').value)||1;
+  const repeatUnit=document.getElementById('ot-unit').value;
+  oneTimeTreatments.push({name,repeatCount,repeatUnit});
+  document.getElementById('ot-name').value='';
+  renderOnetimeList();
+}
+function removeOneTime(i){
+  oneTimeTreatments.splice(i,1);
+  renderOnetimeList();
+}
+function addDuration(dateStr,count,unit){
+  const d=new Date(dateStr);
+  if(unit==='days') d.setDate(d.getDate()+count);
+  else if(unit==='weeks') d.setDate(d.getDate()+count*7);
+  else if(unit==='months') d.setMonth(d.getMonth()+count);
+  else if(unit==='years') d.setFullYear(d.getFullYear()+count);
+  return d.toISOString().slice(0,10);
+}
+
+function showAddVisitModal(){
+  editingVisitId=null; oneTimeTreatments=[];
+  document.getElementById('visit-modal-title').textContent='Add Visit';
+  document.getElementById('visit-date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('visit-weight').value='';
+  document.getElementById('visit-cost').value='';
+  document.getElementById('visit-notes').value='';
+  document.getElementById('ot-name').value='';
+  buildTreatmentPicker([]);renderOnetimeList();openModal('visit-modal');
+}
+function editVisit(visitId){
+  const cat=data.cats.find(c=>c.id===currentCatId),v=cat.visits.find(x=>x.id===visitId);
+  editingVisitId=visitId; oneTimeTreatments=[];
+  document.getElementById('visit-modal-title').textContent='Edit Visit';
+  document.getElementById('visit-date').value=v.date;
+  document.getElementById('visit-weight').value=v.weight||'';
+  document.getElementById('visit-cost').value=v.cost||'';
+  document.getElementById('visit-notes').value=v.notes||'';
+  document.getElementById('ot-name').value='';
+  buildTreatmentPicker(v.treatments||[]);renderOnetimeList();openModal('visit-modal');
+}
+function saveVisit(){
+  const cat=data.cats.find(c=>c.id===currentCatId);
+  const date=document.getElementById('visit-date').value;
+  if(!date){showToast('Please enter a date');return;}
+  let auto=0;selectedTreatments.forEach(tid=>{const t=tById(tid);if(t)auto+=t.price;});
+  const ov=parseFloat(document.getElementById('visit-cost').value);
+  const v={id:editingVisitId||uid(),date,weight:parseFloat(document.getElementById('visit-weight').value)||null,cost:isNaN(ov)?auto:ov,treatments:[...selectedTreatments],oneTimeTreatments:[...oneTimeTreatments],notes:document.getElementById('visit-notes').value.trim()};
+  if(editingVisitId){const i=cat.visits.findIndex(x=>x.id===editingVisitId);cat.visits[i]=v;}
+  else cat.visits.push(v);
+  // Auto-create one-time follow-up schedule items
+  if(!editingVisitId){
+    oneTimeTreatments.forEach(ot=>{
+      const dueDate=addDuration(date,ot.repeatCount,ot.repeatUnit);
+      cat.schedules.push({id:uid(),oneTime:true,oneTimeName:ot.name,dueDate,price:0,notes:`Follow-up from visit ${formatDate(date)}`,done:false});
+    });
+  }
+  saveData();closeModal('visit-modal');renderCatDetail();showToast(editingVisitId?'Visit updated ✓':'Visit added ✓');
+}
+function deleteVisit(visitId){
+  // no confirm needed — toast acts as feedback
+  const cat=data.cats.find(c=>c.id===currentCatId);
+  cat.visits=cat.visits.filter(v=>v.id!==visitId);
+  saveData();renderCatDetail();showToast('Visit deleted');
+}
+
+// ═══ ADD CAT ═══
+function showAddCatModal(){document.getElementById('new-cat-name').value='';document.getElementById('new-cat-dob').value='';document.getElementById('new-cat-emoji').value='🐱';openModal('add-cat-modal');}
+function addCat(){
+  const name=document.getElementById('new-cat-name').value.trim();
+  if(!name){showToast('Please enter a name');return;}
+  const cat={id:uid(),name,emoji:document.getElementById('new-cat-emoji').value.trim()||'🐱',dob:document.getElementById('new-cat-dob').value||null,color:['#b85c38','#5c7a63','#c4a882','#8474a8','#4a7fa5','#a05c8c'][data.cats.length%6],visits:[],schedules:[]};
+  data.cats.push(cat);saveData();closeModal('add-cat-modal');renderCatsGrid();showToast(name+' added ✓');
+}
+
+// ═══ VET SCHEDULE ═══
+function toggleDashboard(){document.getElementById('price-dashboard').classList.toggle('open');}
+
+function repeatLabel(t){
+  if(!t.repeatCount)return'';
+  return`<span class="treatment-repeat-badge">↻ every ${t.repeatCount} ${t.repeatUnit}</span>`;
+}
+
+function renderTreatmentRows(){
+  const c=document.getElementById('treatment-rows');
+  c.innerHTML=data.treatments.map(t=>`
+    <div class="treatment-row">
+      <div class="treatment-row-left" style="flex:1;min-width:0">
+        <span>${iconFor(t.name)}</span>
+        <div style="min-width:0">
+          <span class="treatment-row-name">${escHtml(t.name)}</span>
+          ${t.repeatCount?`<br><span class="treatment-repeat-badge">↻ every ${t.repeatCount} ${t.repeatUnit}</span>`:''}
+        </div>
+      </div>
+      <div class="treatment-row-actions">
+        <span class="treatment-row-price">$${t.price}</span>
+        <button class="icon-btn" onclick="openEditTreatment('${t.id}')">✏️</button>
+        <button class="icon-btn del" onclick="deleteTreatment('${t.id}')">🗑</button>
+      </div>
+    </div>`).join('')||'<div style="font-size:0.82rem;color:var(--text-muted);padding:6px 0">No treatments yet.</div>';
+}
+
+function addTreatmentInline(){
+  const name=document.getElementById('new-t-name').value.trim();
+  const price=parseFloat(document.getElementById('new-t-price').value);
+  if(!name||isNaN(price)){showToast('Enter a name and price');return;}
+  const repeatCount=parseInt(document.getElementById('new-t-repeat-count').value)||null;
+  const repeatUnit=document.getElementById('new-t-repeat-unit').value||'months';
+  data.treatments.push({id:uid(),name,price,repeatCount,repeatUnit});
+  document.getElementById('new-t-name').value='';
+  document.getElementById('new-t-price').value='';
+  document.getElementById('new-t-repeat-count').value='';
+  saveData();renderTreatmentRows();showToast('Treatment added ✓');
+}
+function openEditTreatment(tid){
+  const t=tById(tid);if(!t)return;
+  editingTreatmentId=tid;
+  document.getElementById('edit-t-name').value=t.name;
+  document.getElementById('edit-t-price').value=t.price;
+  document.getElementById('edit-t-repeat-count').value=t.repeatCount||'';
+  document.getElementById('edit-t-repeat-unit').value=t.repeatUnit||'months';
+  openModal('treatment-edit-modal');
+}
+function saveTreatmentEdit(){
+  const t=tById(editingTreatmentId);if(!t)return;
+  t.name=document.getElementById('edit-t-name').value.trim()||t.name;
+  t.price=parseFloat(document.getElementById('edit-t-price').value)||t.price;
+  t.repeatCount=parseInt(document.getElementById('edit-t-repeat-count').value)||null;
+  t.repeatUnit=document.getElementById('edit-t-repeat-unit').value||'months';
+  saveData();closeModal('treatment-edit-modal');renderTreatmentRows();renderVetCatSections();showToast('Updated ✓');
+}
+function deleteTreatment(tid){
+  // no confirm needed
+  data.treatments=data.treatments.filter(t=>t.id!==tid);
+  saveData();renderTreatmentRows();renderVetCatSections();
+}
+
+function renderVetSchedule(){renderTreatmentRows();renderVetCatSections();}
+
+function renderVetCatSections(){
+  const c=document.getElementById('vet-cat-sections');
+  c.innerHTML=data.cats.map(cat=>{
+    const sorted=cat.schedules.slice().sort((a,b)=>a.dueDate.localeCompare(b.dueDate));
+    const pendingCost=sorted.filter(s=>!s.done).reduce((sum,s)=>{const t=tById(s.treatmentId);return sum+(s.price!==undefined?s.price:(t?t.price:0));},0);
+    const schedHtml=sorted.length?sorted.map(s=>{
+      const isOneTime=!!s.oneTime;
+      const t=isOneTime?null:tById(s.treatmentId);
+      const name=isOneTime?s.oneTimeName:(t?t.name:'Unknown treatment');
+      const price=isOneTime?0:(s.price!==undefined?s.price:(t?t.price:0));
+      const st=statusFor(s);
+      return`<div class="schedule-item${s.done?' done':''}">
+        <button class="schedule-check-btn${s.done?' checked':''}" onclick="toggleSchedDone('${cat.id}','${s.id}')">${s.done?'✓':''}</button>
+        <div class="schedule-item-body">
+          <div class="schedule-item-name">
+            ${isOneTime?'🔁':iconFor(name)} ${name}
+            ${isOneTime?`<span class="onetime-schedule-badge">one-time</span>`:''}
+            <span class="status-pill ${st.cls}">${st.label}</span>
+          </div>
+          <div class="schedule-item-date">📅 ${formatDate(s.dueDate)}</div>
+          ${s.notes?`<div class="schedule-item-notes">${escHtml(s.notes)}</div>`:''}
+        </div>
+        <div class="schedule-item-right">
+          ${price?`<span class="schedule-item-price">$${price}</span>`:''}
+          <div class="schedule-item-btns">
+            <button class="icon-btn" onclick="editSchedItem('${cat.id}','${s.id}')">✏️</button>
+            <button class="icon-btn del" onclick="deleteSchedItem('${cat.id}','${s.id}')">🗑</button>
+          </div>
+        </div>
+      </div>`;
+    }).join(''):`<div style="font-size:0.82rem;color:var(--text-muted);padding:10px 16px">No scheduled items yet.</div>`;
+
+    return`<div class="vet-cat-block">
+      <div class="vet-cat-block-header">
+        <div class="vet-cat-block-title">${cat.emoji} ${cat.name}</div>
+        <div class="vet-cat-block-meta">
+          ${pendingCost?`<span class="vet-cat-est">Est. $${pendingCost}</span>`:''}
+        </div>
+      </div>
+      <div class="vet-cat-body">${schedHtml}</div>
+      <button class="add-sched-btn" onclick="showAddSchedModal('${cat.id}')">＋ Add treatment</button>
+    </div>`;
+  }).join('');
+}
+
+function toggleSchedDone(catId,schedId){
+  const cat=data.cats.find(c=>c.id===catId),s=cat.schedules.find(x=>x.id===schedId);
+  s.done=!s.done;saveData();renderVetCatSections();showToast(s.done?'Marked done ✓':'Marked pending');
+}
+function showAddSchedModal(catId){
+  schedCatId=catId;editingSchedId=null;
+  document.getElementById('sched-modal-title').textContent='Schedule Treatment';
+  buildSchedSelect('');
+  document.getElementById('sched-date').value='';
+  document.getElementById('sched-price').value='';
+  document.getElementById('sched-notes').value='';
+  openModal('sched-modal');
+}
+function editSchedItem(catId,schedId){
+  schedCatId=catId;editingSchedId=schedId;
+  const cat=data.cats.find(c=>c.id===catId),s=cat.schedules.find(x=>x.id===schedId);
+  document.getElementById('sched-modal-title').textContent='Edit Scheduled Item';
+  buildSchedSelect(s.treatmentId);
+  document.getElementById('sched-date').value=s.dueDate;
+  document.getElementById('sched-price').value=s.price!==undefined?s.price:'';
+  document.getElementById('sched-notes').value=s.notes||'';
+  openModal('sched-modal');
+}
+function buildSchedSelect(selectedId){
+  const sel=document.getElementById('sched-treatment');
+  sel.innerHTML=`<option value="">— pick a treatment —</option>`+
+    data.treatments.map(t=>{
+      const rep=t.repeatCount?` · ↻ every ${t.repeatCount} ${t.repeatUnit}`:'';
+      return`<option value="${t.id}"${t.id===selectedId?' selected':''}>${iconFor(t.name)} ${t.name} — $${t.price}${rep}</option>`;
+    }).join('');
+  updateSchedPrice();
+}
+function updateSchedPrice(){
+  const tid=document.getElementById('sched-treatment').value,t=tById(tid);
+  document.getElementById('sched-price').placeholder=t?'$'+t.price+' (default)':'Auto';
+}
+function saveSchedItem(){
+  const treatmentId=document.getElementById('sched-treatment').value;
+  const dueDate=document.getElementById('sched-date').value;
+  if(!treatmentId||!dueDate){showToast('Pick a treatment and date');return;}
+  const ov=parseFloat(document.getElementById('sched-price').value);
+  const t=tById(treatmentId);
+  const item={id:editingSchedId||uid(),treatmentId,dueDate,price:isNaN(ov)?(t?t.price:0):ov,notes:document.getElementById('sched-notes').value.trim(),done:false};
+  const cat=data.cats.find(c=>c.id===schedCatId);
+  if(editingSchedId){const i=cat.schedules.findIndex(s=>s.id===editingSchedId);cat.schedules[i]=item;}
+  else cat.schedules.push(item);
+  saveData();closeModal('sched-modal');renderVetCatSections();showToast(editingSchedId?'Updated ✓':'Scheduled ✓');
+}
+function deleteSchedItem(catId,schedId){
+  const cat=data.cats.find(c=>c.id===catId);
+  cat.schedules=cat.schedules.filter(s=>s.id!==schedId);
+  saveData();renderVetCatSections();
+  if(currentCatId===catId)renderCatUpcoming(cat);
+  showToast('Removed ✓');
+}
+
+// ═══ LITTER ═══
+function starsHtml(r){let s='';for(let i=1;i<=5;i++)s+=`<span class="${i<=r?'filled':'empty'}">★</span>`;return`<span class="stars">${s}</span>`;}
+function renderLitter(){
+  const list=document.getElementById('litter-list');
+  list.innerHTML=data.litters.map(l=>{
+    const rev=l.smell||l.poo||l.pee;
+    return`<div class="litter-card">
+      <div class="litter-header">
+        <div><div class="litter-name">${escHtml(l.name)}</div>
+          <div class="litter-price-tag">${escHtml(l.price)}${l.pricePerL?` <span class="ppl-badge">$${l.pricePerL.toFixed(2)}/L</span>`:''}</div>
+        </div>
+        ${l.rating?starsHtml(l.rating):'<span class="unreviewed-badge">Not rated</span>'}
+      </div>
+      ${rev?`<div class="litter-metrics">
+        <div class="metric"><div class="metric-label">Smell</div><div class="metric-value">${l.smell||'—'}</div></div>
+        <div class="metric"><div class="metric-label">Poo</div><div class="metric-value">${l.poo||'—'}</div></div>
+        <div class="metric"><div class="metric-label">Pee</div><div class="metric-value">${l.pee||'—'}</div></div>
+      </div>`:'<div style="color:var(--text-muted);font-size:0.8rem;padding:4px 0">Not yet reviewed</div>'}
+      ${l.notes?`<div class="litter-notes">${escHtml(l.notes)}</div>`:''}
+      <div class="litter-actions">
+        <button class="btn-edit" style="flex:2" onclick="editLitter('${l.id}')">✏️ Edit Review</button>
+        <button class="btn-delete" style="flex:1" onclick="deleteLitter('${l.id}')">🗑</button>
+      </div></div>`;
+  }).join('')||'<div class="empty-state"><div class="empty-icon">🌿</div>No litters added yet.</div>';
+}
+function showAddLitterModal(){editingLitterId=null;currentStarRating=0;document.getElementById('litter-modal-title').textContent='Add Litter';['litter-name','litter-price','litter-ppl','litter-smell','litter-poo','litter-pee','litter-notes'].forEach(id=>document.getElementById(id).value='');updateStarPicker(0);openModal('litter-modal');}
+function editLitter(lid){
+  const l=data.litters.find(x=>x.id===lid);if(!l)return;
+  editingLitterId=lid;currentStarRating=l.rating||0;
+  document.getElementById('litter-modal-title').textContent='Edit '+l.name;
+  document.getElementById('litter-name').value=l.name;
+  document.getElementById('litter-price').value=l.price;
+  document.getElementById('litter-ppl').value=l.pricePerL||'';
+  document.getElementById('litter-smell').value=l.smell||'';
+  document.getElementById('litter-poo').value=l.poo||'';
+  document.getElementById('litter-pee').value=l.pee||'';
+  document.getElementById('litter-notes').value=l.notes||'';
+  updateStarPicker(l.rating||0);openModal('litter-modal');
+}
+function setStar(n){currentStarRating=n;updateStarPicker(n);}
+function updateStarPicker(n){document.querySelectorAll('#star-picker .star-btn').forEach((b,i)=>b.classList.toggle('on',i<n));}
+function saveLitter(){
+  const name=document.getElementById('litter-name').value.trim();
+  if(!name){showToast('Please enter a brand name');return;}
+  const litter={id:editingLitterId||uid(),name,rating:currentStarRating,price:document.getElementById('litter-price').value.trim(),pricePerL:parseFloat(document.getElementById('litter-ppl').value)||null,smell:document.getElementById('litter-smell').value.trim(),poo:document.getElementById('litter-poo').value.trim(),pee:document.getElementById('litter-pee').value.trim(),notes:document.getElementById('litter-notes').value.trim()};
+  if(editingLitterId){const i=data.litters.findIndex(x=>x.id===editingLitterId);data.litters[i]=litter;}
+  else data.litters.push(litter);
+  saveData();closeModal('litter-modal');renderLitter();showToast('Saved ✓');
+}
+function deleteLitter(lid){data.litters=data.litters.filter(l=>l.id!==lid);saveData();renderLitter();showToast('Removed ✓');}
+
+// ═══ MODALS ═══
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+
+// ═══ TOAST ═══
+let toastTimer;
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2200);}
+
+// ═══ INIT ═══
+loadData(); // async — renders when done
+</script>
+</body>
+</html>
