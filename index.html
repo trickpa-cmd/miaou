@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>🐾 Miaou</title>
+<meta name="theme-color" content="#b85c38">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Miaou">
+<link rel="manifest" href="./miaou.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="./miaou-icon-192.png">
+<link rel="apple-touch-icon" href="./miaou-icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -42,24 +49,24 @@ body::before {
 }
 .header-title { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 700; color: var(--terra-dark); letter-spacing: -0.02em; }
 .header-title span { color: var(--sand); }
+.header-actions { display: flex; align-items: center; gap: 8px; }
+.header-icon-btn {
+  min-width: 36px; height: 36px; border-radius: 12px;
+  background: var(--cream); color: var(--terra-dark); border: 1.5px solid var(--border);
+  font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  padding: 0 10px; box-shadow: 0 2px 8px rgba(44,33,24,0.06); transition: transform .15s, background .15s, border-color .15s, opacity .15s;
+}
+.header-icon-btn:active { transform: scale(0.93); }
+.header-icon-btn:hover { background: var(--cream2); border-color: var(--terra-light); }
+.header-icon-btn[disabled] { opacity: 0.45; cursor: not-allowed; }
+.header-icon-btn.install-btn { background: rgba(92,122,99,0.1); color: var(--sage); border-color: rgba(92,122,99,0.18); display: none; }
 .header-add-btn {
-  width: 36px; height: 36px; border-radius: 50%;
+  width: 36px; height: 36px; border-radius: 12px;
   background: var(--terra); color: white; border: none; font-size: 1.4rem; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 2px 8px rgba(184,92,56,0.4); transition: transform .15s;
 }
 .header-add-btn:active { transform: scale(0.93); }
-.header-actions { display: flex; align-items: center; gap: 10px; }
-.header-history-btn {
-  min-width: 44px; height: 36px; padding: 0 12px; border-radius: 999px;
-  background: var(--cream); color: var(--text); border: 1.5px solid var(--border);
-  font-size: 0.82rem; font-weight: 700; cursor: pointer;
-  display: flex; align-items: center; justify-content: center; gap: 6px;
-}
-.header-history-count {
-  min-width: 18px; height: 18px; border-radius: 50%; background: var(--terra); color: white;
-  display: inline-flex; align-items: center; justify-content: center; font-size: 0.65rem; padding: 0 4px;
-}
 .main { padding: 16px 16px calc(var(--nav-h) + 20px); position: relative; z-index: 1; }
 .bottom-nav {
   position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
@@ -69,14 +76,23 @@ body::before {
 }
 .nav-tab {
   flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 3px; cursor: pointer; border: none; background: none;
+  gap: 3px; cursor: pointer; border: none; background: none; position: relative;
   color: var(--text-muted); font-family: 'DM Sans', sans-serif;
-  font-size: 0.62rem; font-weight: 500; letter-spacing: 0.02em;
-  transition: color .2s; padding: 8px 2px; text-transform: uppercase;
+  font-size: 0.62rem; font-weight: 700; letter-spacing: 0.03em;
+  transition: color .2s, transform .2s; padding: 8px 2px; text-transform: uppercase;
+}
+.nav-tab::before {
+  content: ''; position: absolute; top: 7px; left: 12px; right: 12px; bottom: 7px;
+  border-radius: 16px; background: transparent; transition: background .2s, box-shadow .2s, transform .2s; z-index: -1;
 }
 .nav-tab .nav-icon { font-size: 1.35rem; transition: transform .2s; }
-.nav-tab.active { color: var(--terra); }
-.nav-tab.active .nav-icon { transform: translateY(-2px); }
+.nav-tab.active { color: var(--terra-dark); transform: translateY(-1px); }
+.nav-tab.active::before { background: rgba(184,92,56,0.14); box-shadow: inset 0 0 0 1px rgba(184,92,56,0.14); }
+.nav-tab.active .nav-icon { transform: translateY(-2px) scale(1.06); }
+.nav-tab.active::after {
+  content: ''; position: absolute; top: 5px; left: 50%; transform: translateX(-50%);
+  width: 28px; height: 4px; border-radius: 99px; background: var(--terra);
+ }
 .section { display: none; }
 .section.active { display: block; }
 
@@ -297,14 +313,6 @@ body::before {
 .star-btn.on { color: var(--sand); }
 .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 0.9rem; }
 .empty-state .empty-icon { font-size: 3rem; margin-bottom: 10px; }
-.history-modal .modal { max-height: 85vh; }
-.history-list { display: flex; flex-direction: column; gap: 10px; }
-.history-item { background: var(--cream); border: 1.5px solid var(--border); border-radius: 12px; padding: 12px; }
-.history-item-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-.history-item-title { font-size: 0.9rem; font-weight: 700; color: var(--text); }
-.history-item-time { font-size: 0.72rem; color: var(--text-muted); margin-top: 3px; }
-.history-item-btn { border: 1.5px solid var(--border); background: var(--warm-white); color: var(--terra); border-radius: 8px; padding: 7px 10px; font-size: 0.78rem; font-weight: 700; cursor: pointer; flex-shrink: 0; }
-.history-empty { text-align: center; color: var(--text-muted); padding: 18px 10px; font-size: 0.85rem; }
 .toast { position: fixed; bottom: calc(var(--nav-h) + 12px); left: 50%; transform: translateX(-50%) translateY(20px); background: var(--text); color: white; padding: 10px 20px; border-radius: 20px; font-size: 0.85rem; font-weight: 500; opacity: 0; transition: all .3s; z-index: 600; white-space: nowrap; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 @media (min-width: 481px) { body { box-shadow: 0 0 60px rgba(0,0,0,0.15); } }
@@ -389,7 +397,9 @@ body::before {
 <header class="app-header">
   <div class="header-title">🐾 Miaou</div>
   <div class="header-actions">
-    <button class="header-history-btn" onclick="openHistoryModal()">↺ <span class="header-history-count" id="history-count">0</span></button>
+    <button class="header-icon-btn" id="undo-btn" onclick="undoAction()" title="Undo" aria-label="Undo">↶</button>
+    <button class="header-icon-btn" id="redo-btn" onclick="redoAction()" title="Redo" aria-label="Redo">↷</button>
+    <button class="header-icon-btn install-btn" id="install-btn" onclick="promptInstallApp()" title="Install app" aria-label="Install app">📲</button>
     <button class="header-add-btn" onclick="showAddCatModal()">+</button>
   </div>
 </header>
@@ -461,9 +471,9 @@ body::before {
 </main>
 
 <nav class="bottom-nav">
-  <button class="nav-tab active" onclick="switchTab('cats',this)"><span class="nav-icon">🐾</span>Cats</button>
-  <button class="nav-tab" onclick="switchTab('vet',this)"><span class="nav-icon">📅</span>Schedule</button>
-  <button class="nav-tab" onclick="switchTab('litter',this)"><span class="nav-icon">🌿</span>Litter</button>
+  <button class="nav-tab active" data-tab="cats" onclick="switchTab('cats',this)"><span class="nav-icon">🐾</span>Cats</button>
+  <button class="nav-tab" data-tab="vet" onclick="switchTab('vet',this)"><span class="nav-icon">📅</span>Schedule</button>
+  <button class="nav-tab" data-tab="litter" onclick="switchTab('litter',this)"><span class="nav-icon">🌿</span>Litter</button>
 </nav>
 
 <!-- MODAL: VISIT -->
@@ -619,22 +629,13 @@ body::before {
 
 <div class="confirm-overlay" id="confirm-modal">
   <div class="confirm-card" role="dialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-message">
-    <div class="confirm-icon">🗑</div>
+    <div class="confirm-icon" id="confirm-icon">🗑</div>
     <div class="confirm-title" id="confirm-title">Delete item?</div>
     <div class="confirm-message" id="confirm-message">Are you sure you want to delete this item?</div>
     <div class="confirm-actions">
       <button class="confirm-cancel" id="confirm-cancel-btn">Cancel</button>
       <button class="confirm-delete" id="confirm-delete-btn">Delete</button>
     </div>
-  </div>
-</div>
-
-<div class="modal-overlay history-modal" id="history-modal">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-title">History Log</div>
-    <div class="history-list" id="history-list"></div>
-    <button class="form-cancel" onclick="closeModal('history-modal')">Close</button>
   </div>
 </div>
 
@@ -783,8 +784,6 @@ const DEFAULT={
 let data, currentCatId=null, editingVisitId=null, editingSchedId=null, schedCatId=null;
 let editingTreatmentId=null, editingLitterId=null, currentStarRating=0;
 let selectedTreatments=new Set();
-let historyLog=[];
-const HISTORY_LIMIT=50;
 
 // ═══ FIREBASE CONFIG ═══
 const FIREBASE_CONFIG = {
@@ -798,7 +797,88 @@ const FIREBASE_CONFIG = {
 
 let _getDoc, _setDoc, _DATA_REF;
 
+
 function uid(){return '_'+Math.random().toString(36).slice(2,9);}
+function clone(v){return v===undefined?undefined:JSON.parse(JSON.stringify(v));}
+const HISTORY_LIMIT = 250;
+let undoStack = [], redoStack = [], isApplyingHistory = false, deferredInstallPrompt = null;
+function pathValue(path){return path.reduce((acc,key)=>acc[key], data);}
+function parentAt(path){let ref=data;for(let i=0;i<path.length-1;i++)ref=ref[path[i]];return ref;}
+function applyOp(op, direction){
+  if(op.type==='replace'){
+    const parent=parentAt(op.path), key=op.path[op.path.length-1];
+    parent[key]=clone(direction==='undo'?op.oldValue:op.newValue);
+    return;
+  }
+  const arr=pathValue(op.path);
+  if(op.type==='array-insert'){
+    if(direction==='undo') arr.splice(op.index,1);
+    else arr.splice(op.index,0,clone(op.value));
+    return;
+  }
+  if(op.type==='array-remove'){
+    if(direction==='undo') arr.splice(op.index,0,clone(op.value));
+    else arr.splice(op.index,1);
+  }
+}
+function applyOps(ops,direction){ ops.forEach(op=>applyOp(op,direction)); }
+function pushHistory(label, ops){
+  if(isApplyingHistory || !ops || !ops.length) return;
+  undoStack.push({id:uid(), label, ops, at:new Date().toISOString()});
+  if(undoStack.length>HISTORY_LIMIT) undoStack=undoStack.slice(-HISTORY_LIMIT);
+  redoStack=[];
+  updateUndoRedoButtons();
+}
+function updateUndoRedoButtons(){
+  const undoBtn=document.getElementById('undo-btn');
+  const redoBtn=document.getElementById('redo-btn');
+  if(undoBtn) undoBtn.disabled=!undoStack.length;
+  if(redoBtn) redoBtn.disabled=!redoStack.length;
+}
+function renderCurrentTab(){
+  const active=document.querySelector('.nav-tab.active');
+  const tabName=active?active.getAttribute('data-tab'):'cats';
+  renderCatsGrid();
+  renderUpcoming();
+  renderTreatmentRows();
+  renderVetCatSections();
+  renderLitter();
+  if(currentCatId && document.getElementById('cat-detail').classList.contains('active')) renderCatDetail(currentCatId);
+  if(tabName==='cats' && !currentCatId) showCatsList();
+  updateUndoRedoButtons();
+}
+async function undoAction(){
+  if(!undoStack.length) return;
+  const entry=undoStack.pop();
+  isApplyingHistory=true;
+  applyOps(entry.ops,'undo');
+  isApplyingHistory=false;
+  redoStack.push(entry);
+  await saveData();
+  renderCurrentTab();
+  showToast('Undid: '+entry.label);
+}
+async function redoAction(){
+  if(!redoStack.length) return;
+  const entry=redoStack.pop();
+  isApplyingHistory=true;
+  applyOps(entry.ops,'redo');
+  isApplyingHistory=false;
+  undoStack.push(entry);
+  await saveData();
+  renderCurrentTab();
+  showToast('Redid: '+entry.label);
+}
+function catIndexById(catId){return data.cats.findIndex(c=>c.id===catId);}
+function visitIndexById(catId,visitId){const cat=data.cats.find(c=>c.id===catId);return cat?cat.visits.findIndex(v=>v.id===visitId):-1;}
+function scheduleIndexById(catId,schedId){const cat=data.cats.find(c=>c.id===catId);return cat?cat.schedules.findIndex(s=>s.id===schedId):-1;}
+function treatmentIndexById(tid){return data.treatments.findIndex(t=>t.id===tid);}
+function litterIndexById(lid){return data.litters.findIndex(l=>l.id===lid);}
+async function commitChange(label, ops){
+  pushHistory(label, ops);
+  await saveData();
+  updateUndoRedoButtons();
+}
 
 async function loadData(){
   document.getElementById('loading-screen').style.display='flex';
@@ -815,88 +895,53 @@ async function loadData(){
     _getDoc = getDoc; _setDoc = setDoc;
     const snap = await getDoc(_DATA_REF);
     if(snap.exists()){
-      data = snap.data().payload ? JSON.parse(snap.data().payload) : JSON.parse(JSON.stringify(DEFAULT));
-      historyLog = Array.isArray(snap.data().historyLog) ? snap.data().historyLog : [];
+      const payload = snap.data();
+      data = payload.payload ? JSON.parse(payload.payload) : JSON.parse(JSON.stringify(DEFAULT));
+      undoStack = payload.undoLog ? JSON.parse(payload.undoLog) : [];
+      redoStack = payload.redoLog ? JSON.parse(payload.redoLog) : [];
     } else {
       data = JSON.parse(JSON.stringify(DEFAULT));
-      historyLog = [];
+      undoStack = [];
+      redoStack = [];
       await saveData();
     }
   } catch(e) {
     console.error('Firebase error:', e);
     try {
       const s=localStorage.getItem('miaou_offline');
+      const u=localStorage.getItem('miaou_undo');
+      const r=localStorage.getItem('miaou_redo');
       data=s?JSON.parse(s):JSON.parse(JSON.stringify(DEFAULT));
-      const h=localStorage.getItem('miaou_history');
-      historyLog=h?JSON.parse(h):[];
+      undoStack=u?JSON.parse(u):[];
+      redoStack=r?JSON.parse(r):[];
     }
-    catch(e2){ data=JSON.parse(JSON.stringify(DEFAULT)); historyLog=[]; }
+    catch(e2){ data=JSON.parse(JSON.stringify(DEFAULT)); undoStack=[]; redoStack=[]; }
   }
   clearTimeout(timeout);
   document.getElementById('loading-screen').style.display='none';
   renderCatsGrid();
   renderUpcoming();
-  renderHistoryLog();
+  updateUndoRedoButtons();
+  initInstallPrompt();
 }
 
 async function saveData(){
   try {
+    const payload={ payload: JSON.stringify(data), undoLog: JSON.stringify(undoStack), redoLog: JSON.stringify(redoStack), updated: new Date().toISOString() };
     if(_setDoc && _DATA_REF){
-      await _setDoc(_DATA_REF, { payload: JSON.stringify(data), historyLog, updated: new Date().toISOString() });
+      await _setDoc(_DATA_REF, payload);
     }
     localStorage.setItem('miaou_offline', JSON.stringify(data));
-    localStorage.setItem('miaou_history', JSON.stringify(historyLog));
+    localStorage.setItem('miaou_undo', JSON.stringify(undoStack));
+    localStorage.setItem('miaou_redo', JSON.stringify(redoStack));
   } catch(e) {
     console.error('Firebase save error:', e);
     try {
       localStorage.setItem('miaou_offline', JSON.stringify(data));
-      localStorage.setItem('miaou_history', JSON.stringify(historyLog));
+      localStorage.setItem('miaou_undo', JSON.stringify(undoStack));
+      localStorage.setItem('miaou_redo', JSON.stringify(redoStack));
     } catch(e2){}
   }
-}
-
-function cloneDataState(){return JSON.parse(JSON.stringify(data));}
-function recordHistory(action,beforeSnapshot){
-  historyLog.unshift({id:uid(),action:action||'Change',timestamp:new Date().toISOString(),snapshot:beforeSnapshot});
-  historyLog=historyLog.slice(0,HISTORY_LIMIT);
-  renderHistoryLog();
-}
-function formatHistoryTime(ts){
-  const d=new Date(ts);
-  return d.toLocaleString();
-}
-function renderHistoryLog(){
-  const count=document.getElementById('history-count');
-  if(count) count.textContent=String(historyLog.length);
-  const list=document.getElementById('history-list');
-  if(!list) return;
-  if(!historyLog.length){
-    list.innerHTML='<div class="history-empty">No saved changes yet.</div>';
-    return;
-  }
-  list.innerHTML=historyLog.map(item=>`<div class="history-item"><div class="history-item-top"><div><div class="history-item-title">${escHtml(item.action)}</div><div class="history-item-time">${formatHistoryTime(item.timestamp)}</div></div><button class="history-item-btn" onclick="revertHistory('${item.id}')">Revert</button></div></div>`).join('');
-}
-function openHistoryModal(){renderHistoryLog();openModal('history-modal');}
-async function revertHistory(id){
-  const item=historyLog.find(x=>x.id===id);
-  if(!item) return;
-  askDelete('Revert to this point? Your current state will be saved in history first.',async ()=>{
-    const current=cloneDataState();
-    data=JSON.parse(JSON.stringify(item.snapshot));
-    recordHistory('Reverted: '+item.action,current);
-    await saveData();
-    rerenderAll();
-    closeModal('history-modal');
-    showToast('Reverted ✓');
-  },'Revert');
-}
-function rerenderAll(){
-  renderCatsGrid();
-  renderUpcoming();
-  renderVetSchedule();
-  renderLitter();
-  renderHistoryLog();
-  if(currentCatId) renderCatDetail();
 }
 
 // ═══ NAV ═══
@@ -908,6 +953,7 @@ function switchTab(name,btn){
   if(name==='cats')showCatsList();
   if(name==='vet')renderVetSchedule();
   if(name==='litter')renderLitter();
+  updateUndoRedoButtons();
 }
 
 // ═══ HELPERS ═══
@@ -1110,10 +1156,12 @@ function makeDobEditable(catId){
   document.getElementById('dob-input-'+catId).focus();
 }
 function saveDob(catId,val){
-  const before=cloneDataState();
-  data.cats.find(c=>c.id===catId).dob=val||null;
-  recordHistory('Updated date of birth',before);
-  saveData();renderCatDetail();showToast('Date of birth saved ✓');
+  const ci=catIndexById(catId);
+  const prev=data.cats[ci].dob||null;
+  const next=val||null;
+  if(prev===next){ renderCatDetail(); return; }
+  data.cats[ci].dob=next;
+  commitChange('Updated date of birth',[{type:'replace', path:['cats',ci,'dob'], oldValue:prev, newValue:next}]);renderCatDetail();showToast('Date of birth saved ✓');
 }
 function makeNameEditable(catId){
   const cat=data.cats.find(c=>c.id===catId);
@@ -1121,8 +1169,27 @@ function makeNameEditable(catId){
   el.outerHTML=`<input class="cat-name-input" id="editable-name-${catId}" value="${cat.name}" onblur="saveName('${catId}',this.value)" onkeydown="if(event.key==='Enter')this.blur()">`;
   document.getElementById('editable-name-'+catId).focus();
 }
-function saveName(catId,v){if(!v.trim())return renderCatDetail();const before=cloneDataState();data.cats.find(c=>c.id===catId).name=v.trim();recordHistory('Renamed cat',before);saveData();renderCatDetail();}
-function promptRenameEmoji(catId){const e=prompt('New emoji:');if(!e)return;const before=cloneDataState();data.cats.find(c=>c.id===catId).emoji=e.trim().slice(0,2);recordHistory('Updated cat emoji',before);saveData();renderCatDetail();}
+
+function saveName(catId,v){
+  if(!v.trim()) return renderCatDetail();
+  const ci=catIndexById(catId), cat=data.cats[ci], next=v.trim(), prev=cat.name;
+  if(prev===next) return renderCatDetail();
+  cat.name=next;
+  commitChange('Renamed '+next,[{type:'replace', path:['cats',ci,'name'], oldValue:prev, newValue:next}]);
+  renderCatDetail();
+}
+
+
+function promptRenameEmoji(catId){
+  const e=prompt('New emoji:');
+  if(!e) return;
+  const ci=catIndexById(catId), cat=data.cats[ci], prev=cat.emoji, next=e.trim().slice(0,2);
+  if(!next || prev===next) return;
+  cat.emoji=next;
+  commitChange('Changed cat emoji',[{type:'replace', path:['cats',ci,'emoji'], oldValue:prev, newValue:next}]);
+  renderCatDetail();
+}
+
 
 // ═══ TIMELINE ═══
 function renderTimeline(cat){
@@ -1211,11 +1278,10 @@ function addDuration(dateStr,count,unit){
 
 
 let confirmDeleteAction=null;
-function askDelete(message,onConfirm,confirmLabel='Delete'){
+function askDelete(message,onConfirm){
   const modal=document.getElementById('confirm-modal');
-  document.getElementById('confirm-title').textContent=confirmLabel==='Revert'?'Revert change?':'Delete item?';
+  document.getElementById('confirm-title').textContent='Delete item?';
   document.getElementById('confirm-message').textContent=message||'Are you sure you want to delete this item?';
-  document.getElementById('confirm-delete-btn').textContent=confirmLabel;
   confirmDeleteAction=()=>{
     closeConfirmModal();
     if(typeof onConfirm==='function') onConfirm();
@@ -1224,7 +1290,6 @@ function askDelete(message,onConfirm,confirmLabel='Delete'){
 }
 function closeConfirmModal(){
   document.getElementById('confirm-modal').classList.remove('open');
-  document.getElementById('confirm-delete-btn').textContent='Delete';
   confirmDeleteAction=null;
 }
 
@@ -1249,45 +1314,64 @@ function editVisit(visitId){
   document.getElementById('ot-name').value='';
   buildTreatmentPicker(v.treatments||[]);renderOnetimeList();openModal('visit-modal');
 }
+
 function saveVisit(){
   const cat=data.cats.find(c=>c.id===currentCatId);
+  const ci=catIndexById(currentCatId);
   const date=document.getElementById('visit-date').value;
   if(!date){showToast('Please enter a date');return;}
   let auto=0;selectedTreatments.forEach(tid=>{const t=tById(tid);if(t)auto+=t.price;});
   const ov=parseFloat(document.getElementById('visit-cost').value);
   const v={id:editingVisitId||uid(),date,weight:parseFloat(document.getElementById('visit-weight').value)||null,cost:isNaN(ov)?auto:ov,treatments:[...selectedTreatments],oneTimeTreatments:[...oneTimeTreatments],notes:document.getElementById('visit-notes').value.trim()};
-  const before=cloneDataState();
-  if(editingVisitId){const i=cat.visits.findIndex(x=>x.id===editingVisitId);cat.visits[i]=v;}
-  else cat.visits.push(v);
-  // Auto-create one-time follow-up schedule items
-  if(!editingVisitId){
+  const ops=[];
+  if(editingVisitId){
+    const vi=cat.visits.findIndex(x=>x.id===editingVisitId);
+    const prev=clone(cat.visits[vi]);
+    cat.visits[vi]=v;
+    ops.push({type:'replace', path:['cats',ci,'visits',vi], oldValue:prev, newValue:clone(v)});
+  } else {
+    const insertIndex=cat.visits.length;
+    cat.visits.push(v);
+    ops.push({type:'array-insert', path:['cats',ci,'visits'], index:insertIndex, value:clone(v)});
     oneTimeTreatments.forEach(ot=>{
       const dueDate=addDuration(date,ot.repeatCount,ot.repeatUnit);
-      cat.schedules.push({id:uid(),oneTime:true,oneTimeName:ot.name,dueDate,price:0,notes:`Follow-up from visit ${formatDate(date)}`,done:false});
+      const sched={id:uid(),oneTime:true,oneTimeName:ot.name,dueDate,price:0,notes:`Follow-up from visit ${formatDate(date)}`,done:false};
+      const schedIndex=cat.schedules.length;
+      cat.schedules.push(sched);
+      ops.push({type:'array-insert', path:['cats',ci,'schedules'], index:schedIndex, value:clone(sched)});
     });
   }
-  recordHistory(editingVisitId?'Updated visit':'Added visit',before);
-  saveData();closeModal('visit-modal');renderCatDetail();showToast(editingVisitId?'Visit updated ✓':'Visit added ✓');
+  commitChange(editingVisitId?'Updated visit':'Added visit', ops);
+  closeModal('visit-modal');renderCatDetail();showToast(editingVisitId?'Visit updated ✓':'Visit added ✓');
 }
+
+
 function deleteVisit(visitId){
   askDelete('Delete this visit? This action cannot be undone.',()=>{
-    const before=cloneDataState();
-    const cat=data.cats.find(c=>c.id===currentCatId);
+    const ci=catIndexById(currentCatId);
+    const cat=data.cats[ci];
+    const vi=cat.visits.findIndex(v=>v.id===visitId);
+    const removed=clone(cat.visits[vi]);
     cat.visits=cat.visits.filter(v=>v.id!==visitId);
-    recordHistory('Deleted visit',before);
-    saveData();renderCatDetail();showToast('Visit deleted');
+    commitChange('Deleted visit',[{type:'array-remove', path:['cats',ci,'visits'], index:vi, value:removed}]);
+    renderCatDetail();showToast('Visit deleted');
   });
 }
 
+
 // ═══ ADD CAT ═══
 function showAddCatModal(){document.getElementById('new-cat-name').value='';document.getElementById('new-cat-dob').value='';document.getElementById('new-cat-emoji').value='🐱';openModal('add-cat-modal');}
+
 function addCat(){
   const name=document.getElementById('new-cat-name').value.trim();
   if(!name){showToast('Please enter a name');return;}
   const cat={id:uid(),name,emoji:document.getElementById('new-cat-emoji').value.trim()||'🐱',dob:document.getElementById('new-cat-dob').value||null,color:['#b85c38','#5c7a63','#c4a882','#8474a8','#4a7fa5','#a05c8c'][data.cats.length%6],visits:[],schedules:[]};
-  const before=cloneDataState();
-  data.cats.push(cat);recordHistory('Added cat',before);saveData();closeModal('add-cat-modal');renderCatsGrid();showToast(name+' added ✓');
+  const index=data.cats.length;
+  data.cats.push(cat);
+  commitChange('Added cat '+name,[{type:'array-insert', path:['cats'], index:index, value:cat}]);
+  closeModal('add-cat-modal');renderCatsGrid();showToast(name+' added ✓');
 }
+
 
 // ═══ VET SCHEDULE ═══
 function toggleDashboard(){document.getElementById('price-dashboard').classList.toggle('open');}
@@ -1316,20 +1400,23 @@ function renderTreatmentRows(){
     </div>`).join('')||'<div style="font-size:0.82rem;color:var(--text-muted);padding:6px 0">No treatments yet.</div>';
 }
 
+
 function addTreatmentInline(){
   const name=document.getElementById('new-t-name').value.trim();
   const price=parseFloat(document.getElementById('new-t-price').value);
   if(!name||isNaN(price)){showToast('Enter a name and price');return;}
   const repeatCount=parseInt(document.getElementById('new-t-repeat-count').value)||null;
   const repeatUnit=document.getElementById('new-t-repeat-unit').value||'months';
-  const before=cloneDataState();
-  data.treatments.push({id:uid(),name,price,repeatCount,repeatUnit});
+  const treatment={id:uid(),name,price,repeatCount,repeatUnit};
+  const index=data.treatments.length;
+  data.treatments.push(treatment);
   document.getElementById('new-t-name').value='';
   document.getElementById('new-t-price').value='';
   document.getElementById('new-t-repeat-count').value='';
-  recordHistory('Added treatment',before);
-  saveData();renderTreatmentRows();showToast('Treatment added ✓');
+  commitChange('Added treatment '+name,[{type:'array-insert', path:['treatments'], index:index, value:clone(treatment)}]);
+  renderTreatmentRows();showToast('Treatment added ✓');
 }
+
 function openEditTreatment(tid){
   const t=tById(tid);if(!t)return;
   editingTreatmentId=tid;
@@ -1339,24 +1426,29 @@ function openEditTreatment(tid){
   document.getElementById('edit-t-repeat-unit').value=t.repeatUnit||'months';
   openModal('treatment-edit-modal');
 }
+
 function saveTreatmentEdit(){
-  const t=tById(editingTreatmentId);if(!t)return;
-  const before=cloneDataState();
+  const ti=treatmentIndexById(editingTreatmentId), t=data.treatments[ti]; if(!t)return;
+  const prev=clone(t);
   t.name=document.getElementById('edit-t-name').value.trim()||t.name;
   t.price=parseFloat(document.getElementById('edit-t-price').value)||t.price;
   t.repeatCount=parseInt(document.getElementById('edit-t-repeat-count').value)||null;
   t.repeatUnit=document.getElementById('edit-t-repeat-unit').value||'months';
-  recordHistory('Updated treatment',before);
-  saveData();closeModal('treatment-edit-modal');renderTreatmentRows();renderVetCatSections();showToast('Updated ✓');
+  commitChange('Edited treatment '+t.name,[{type:'replace', path:['treatments',ti], oldValue:prev, newValue:clone(t)}]);
+  closeModal('treatment-edit-modal');renderTreatmentRows();renderVetCatSections();showToast('Updated ✓');
 }
+
+
 function deleteTreatment(tid){
   askDelete('Delete this treatment from the price list?',()=>{
-    const before=cloneDataState();
+    const ti=treatmentIndexById(tid);
+    const removed=clone(data.treatments[ti]);
     data.treatments=data.treatments.filter(t=>t.id!==tid);
-    recordHistory('Deleted treatment',before);
-    saveData();renderTreatmentRows();renderVetCatSections();showToast('Removed ✓');
+    commitChange('Deleted treatment',[{type:'array-remove', path:['treatments'], index:ti, value:removed}]);
+    renderTreatmentRows();renderVetCatSections();showToast('Removed ✓');
   });
 }
+
 
 function renderVetSchedule(){renderTreatmentRows();renderVetCatSections();}
 
@@ -1405,11 +1497,15 @@ function renderVetCatSections(){
   }).join('');
 }
 
+
 function toggleSchedDone(catId,schedId){
-  const cat=data.cats.find(c=>c.id===catId),s=cat.schedules.find(x=>x.id===schedId);
-  const before=cloneDataState();
-  s.done=!s.done;recordHistory(s.done?'Marked schedule done':'Marked schedule pending',before);saveData();renderVetCatSections();showToast(s.done?'Marked done ✓':'Marked pending');
+  const ci=catIndexById(catId), si=scheduleIndexById(catId,schedId), s=data.cats[ci].schedules[si];
+  const prev=!!s.done;
+  s.done=!s.done;
+  commitChange(s.done?'Marked schedule done':'Marked schedule pending',[{type:'replace', path:['cats',ci,'schedules',si,'done'], oldValue:prev, newValue:!!s.done}]);
+  renderVetCatSections();showToast(s.done?'Marked done ✓':'Marked pending');
 }
+
 function showAddSchedModal(catId){
   schedCatId=catId;editingSchedId=null;
   document.getElementById('sched-modal-title').textContent='Schedule Treatment';
@@ -1442,41 +1538,54 @@ function updateSchedPrice(){
   const tid=document.getElementById('sched-treatment').value,t=tById(tid);
   document.getElementById('sched-price').placeholder=t?'$'+t.price+' (default)':'Auto';
 }
+
 function saveSchedItem(){
   const treatmentId=document.getElementById('sched-treatment').value;
   const dueDate=document.getElementById('sched-date').value;
   if(!treatmentId||!dueDate){showToast('Pick a treatment and date');return;}
   const ov=parseFloat(document.getElementById('sched-price').value);
   const t=tById(treatmentId);
-  const item={id:editingSchedId||uid(),treatmentId,dueDate,price:isNaN(ov)?(t?t.price:0):ov,notes:document.getElementById('sched-notes').value.trim(),done:false};
   const cat=data.cats.find(c=>c.id===schedCatId);
-  const before=cloneDataState();
-  if(editingSchedId){const i=cat.schedules.findIndex(s=>s.id===editingSchedId);cat.schedules[i]=item;}
-  else cat.schedules.push(item);
-  recordHistory(editingSchedId?'Updated scheduled item':'Added scheduled item',before);
-  saveData();closeModal('sched-modal');renderVetCatSections();showToast(editingSchedId?'Updated ✓':'Scheduled ✓');
+  const ci=catIndexById(schedCatId);
+  const existing=editingSchedId?cat.schedules.find(s=>s.id===editingSchedId):null;
+  const item={id:editingSchedId||uid(),treatmentId,dueDate,price:isNaN(ov)?(t?t.price:0):ov,notes:document.getElementById('sched-notes').value.trim(),done:existing?!!existing.done:false};
+  let ops=[];
+  if(editingSchedId){
+    const i=cat.schedules.findIndex(s=>s.id===editingSchedId);
+    const prev=clone(cat.schedules[i]);
+    cat.schedules[i]=item;
+    ops=[{type:'replace', path:['cats',ci,'schedules',i], oldValue:prev, newValue:clone(item)}];
+  }
+  else {
+    const index=cat.schedules.length;
+    cat.schedules.push(item);
+    ops=[{type:'array-insert', path:['cats',ci,'schedules'], index:index, value:clone(item)}];
+  }
+  commitChange(editingSchedId?'Updated scheduled item':'Added scheduled item', ops);
+  closeModal('sched-modal');renderVetCatSections();showToast(editingSchedId?'Updated ✓':'Scheduled ✓');
 }
+
+
 function deleteSchedItem(catId,schedId){
   askDelete('Delete this scheduled item?',()=>{
-    const before=cloneDataState();
-    const cat=data.cats.find(c=>c.id===catId);
+    const ci=catIndexById(catId);
+    const cat=data.cats[ci];
+    const si=cat.schedules.findIndex(s=>s.id===schedId);
+    const removed=clone(cat.schedules[si]);
     cat.schedules=cat.schedules.filter(s=>s.id!==schedId);
-    recordHistory('Deleted scheduled item',before);
-    saveData();renderVetCatSections();
+    commitChange('Deleted scheduled item',[{type:'array-remove', path:['cats',ci,'schedules'], index:si, value:removed}]);
+    renderVetCatSections();
     if(currentCatId===catId)renderCatUpcoming(cat);
     showToast('Removed ✓');
   });
 }
 
+
 // ═══ LITTER ═══
 function starsHtml(r){let s='';for(let i=1;i<=5;i++)s+=`<span class="${i<=r?'filled':'empty'}">★</span>`;return`<span class="stars">${s}</span>`;}
 function renderLitter(){
   const list=document.getElementById('litter-list');
-  const sortedLitters=data.litters.slice().sort((a,b)=>{
-    const ra=(typeof a.rating==='number'?a.rating:0), rb=(typeof b.rating==='number'?b.rating:0);
-    if(rb!==ra) return rb-ra;
-    return (a.name||'').localeCompare(b.name||'');
-  });
+  const sortedLitters=data.litters.slice().sort((a,b)=>{const rd=(b.rating||0)-(a.rating||0); return rd!==0?rd:String(a.name||'').localeCompare(String(b.name||''));});
   list.innerHTML=sortedLitters.map(l=>{
     const rev=l.smell||l.poo||l.pee;
     return`<div class="litter-card">
@@ -1514,24 +1623,38 @@ function editLitter(lid){
 }
 function setStar(n){currentStarRating=n;updateStarPicker(n);}
 function updateStarPicker(n){document.querySelectorAll('#star-picker .star-btn').forEach((b,i)=>b.classList.toggle('on',i<n));}
+
 function saveLitter(){
   const name=document.getElementById('litter-name').value.trim();
   if(!name){showToast('Please enter a brand name');return;}
   const litter={id:editingLitterId||uid(),name,rating:currentStarRating,price:document.getElementById('litter-price').value.trim(),pricePerL:parseFloat(document.getElementById('litter-ppl').value)||null,smell:document.getElementById('litter-smell').value.trim(),poo:document.getElementById('litter-poo').value.trim(),pee:document.getElementById('litter-pee').value.trim(),notes:document.getElementById('litter-notes').value.trim()};
-  const before=cloneDataState();
-  if(editingLitterId){const i=data.litters.findIndex(x=>x.id===editingLitterId);data.litters[i]=litter;}
-  else data.litters.push(litter);
-  recordHistory(editingLitterId?'Updated litter review':'Added litter review',before);
-  saveData();closeModal('litter-modal');renderLitter();showToast('Saved ✓');
+  let ops=[];
+  if(editingLitterId){
+    const i=litterIndexById(editingLitterId);
+    const prev=clone(data.litters[i]);
+    data.litters[i]=litter;
+    ops=[{type:'replace', path:['litters',i], oldValue:prev, newValue:clone(litter)}];
+  }
+  else {
+    const index=data.litters.length;
+    data.litters.push(litter);
+    ops=[{type:'array-insert', path:['litters'], index:index, value:clone(litter)}];
+  }
+  commitChange(editingLitterId?'Updated litter '+name:'Added litter '+name, ops);
+  closeModal('litter-modal');renderLitter();showToast('Saved ✓');
 }
+
+
 function deleteLitter(lid){
   askDelete('Delete this litter review?',()=>{
-    const before=cloneDataState();
+    const li=litterIndexById(lid);
+    const removed=clone(data.litters[li]);
     data.litters=data.litters.filter(l=>l.id!==lid);
-    recordHistory('Deleted litter review',before);
-    saveData();renderLitter();showToast('Removed ✓');
+    commitChange('Deleted litter review',[{type:'array-remove', path:['litters'], index:li, value:removed}]);
+    renderLitter();showToast('Removed ✓');
   });
 }
+
 
 // ═══ MODALS ═══
 function openModal(id){document.getElementById(id).classList.add('open');}
@@ -1546,6 +1669,53 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape') closeConfirmModal();
   if(e.key==='Enter' && confirmDeleteAction) confirmDeleteAction();
 });
+
+
+// ═══ INSTALL PROMPT ═══
+function installBtn(show){
+  const btn=document.getElementById('install-btn');
+  if(!btn) return;
+  btn.style.display=show?'flex':'none';
+}
+async function promptInstallApp(){
+  if(!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  const choice = await deferredInstallPrompt.userChoice;
+  if(choice && choice.outcome==='accepted'){
+    showToast('Miaou installed ✓');
+    installBtn(false);
+  }
+  deferredInstallPrompt = null;
+}
+function initInstallPrompt(){
+  if(window.__miaouInstallReady) return;
+  window.__miaouInstallReady = true;
+  if('serviceWorker' in navigator){
+    window.addEventListener('load',()=>{
+      navigator.serviceWorker.register('./sw.js').catch(err=>console.error('SW register failed', err));
+    });
+  }
+  window.addEventListener('beforeinstallprompt', e=>{
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    installBtn(true);
+    if(!sessionStorage.getItem('miaou_install_prompt_seen')){
+      sessionStorage.setItem('miaou_install_prompt_seen','1');
+      askConfirm({
+        title:'Install Miaou?',
+        message:'Add Miaou to your home screen for a faster app experience.',
+        icon:'🐾',
+        confirmLabel:'Install',
+        onConfirm:()=>{ promptInstallApp(); }
+      });
+    }
+  });
+  window.addEventListener('appinstalled', ()=>{
+    deferredInstallPrompt = null;
+    installBtn(false);
+    showToast('Installed ✓');
+  });
+}
 
 // ═══ TOAST ═══
 let toastTimer;
