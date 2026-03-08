@@ -417,12 +417,7 @@ body::before {
   <div class="auth-card">
     <div class="auth-logo">🐾</div>
     <div class="auth-title">Sign in to Miaou</div>
-    <div class="auth-text">Use Google sign in to access the shared records. Only the approved Google accounts can open the app.</div>
-    <div class="auth-allowed">
-      Allowed accounts:<br>
-      ziadehpatrick@gmail.com<br>
-      stefanie.a.hanna@gmail.com
-    </div>
+    <div class="auth-text">Use Google sign in to access the shared records.</div>
     <button class="auth-btn" id="google-signin-btn" type="button">Continue with Google</button>
     <button class="auth-btn secondary" id="auth-signout-btn" type="button" style="display:none">Sign out</button>
     <div class="auth-status" id="auth-status"></div>
@@ -865,6 +860,18 @@ function storageKey(){return currentUserEmail?`miaou_offline_${currentUserEmail}
 function deepClone(v){return JSON.parse(JSON.stringify(v));}
 function setAuthStatus(msg,isError=true){const el=document.getElementById('auth-status'); if(!el) return; el.textContent=msg||''; el.style.color=isError?'var(--red)':'var(--sage)';}
 function isAllowedEmail(email){return ALLOWED_EMAILS.includes(String(email||'').toLowerCase());}
+function isStandaloneMode(){
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+function getFriendlyAuthError(error){
+  const code = String(error?.code || '');
+  if(code.includes('popup_blocked')) return 'Google sign in was blocked by the browser. Please try again.';
+  if(code.includes('popup_closed')) return 'Google sign in was closed before it finished.';
+  if(code.includes('unauthorized-domain')) return 'This website domain is not authorized in Firebase yet. Add your live domain in Firebase Authentication then try again.';
+  if(code.includes('operation-not-allowed')) return 'Google sign in is not enabled in Firebase Authentication yet.';
+  if(code.includes('network-request-failed')) return 'Network issue while opening Google sign in. Please try again.';
+  return 'Google sign in did not complete. Please try again.';
+}
 function setSignedInUi(){
   document.getElementById('auth-overlay').classList.remove('open');
   document.getElementById('backup-user-chip').textContent=currentUserEmail?`🔒 ${currentUserEmail}`:'🔒 Not signed in';
@@ -872,6 +879,8 @@ function setSignedInUi(){
 function setSignedOutUi(){
   document.getElementById('auth-overlay').classList.add('open');
   document.getElementById('backup-user-chip').textContent='🔒 Not signed in';
+  const signoutBtn = document.getElementById('auth-signout-btn');
+  if(signoutBtn) signoutBtn.style.display='none';
 }
 
 async function initFirebase(){
@@ -1036,24 +1045,40 @@ async function saveData(meta={}){
 }
 
 async function signInWithGoogle(){
-  setAuthStatus('');
+  setAuthStatus('', false);
+  const btn = document.getElementById('google-signin-btn');
+  if(btn){ btn.disabled = true; btn.style.opacity = '0.7'; }
   try {
     const provider = new _GoogleAuthProvider();
     provider.setCustomParameters({prompt:'select_account'});
+    setAuthStatus('Opening Google sign in…', false);
+
+    if(isStandaloneMode() || /iphone|ipad|ipod|android/i.test(navigator.userAgent)){
+      await _signInWithRedirect(_auth, provider);
+      return;
+    }
+
     await _signInWithPopup(_auth, provider);
+    return;
   } catch(e) {
     console.error('Sign in error:', e);
-    if(String(e.code||'').includes('popup')){
+    const code = String(e.code || '');
+    if(code.includes('popup')){
       try {
         const provider = new _GoogleAuthProvider();
         provider.setCustomParameters({prompt:'select_account'});
+        setAuthStatus('Opening Google sign in…', false);
         await _signInWithRedirect(_auth, provider);
         return;
       } catch(err) {
-        console.error(err);
+        console.error('Redirect sign in error:', err);
+        setAuthStatus(getFriendlyAuthError(err));
       }
+    } else {
+      setAuthStatus(getFriendlyAuthError(e));
     }
-    setAuthStatus('Google sign in did not complete. Please try again.');
+  } finally {
+    if(btn){ btn.disabled = false; btn.style.opacity = ''; }
   }
 }
 
@@ -1079,7 +1104,12 @@ async function bootstrap(){
   document.getElementById('loading-screen').style.display='flex';
   try {
     await initFirebase();
-    try { await _getRedirectResult(_auth); } catch(err) { console.error('Redirect result error:', err); }
+    try {
+      await _getRedirectResult(_auth);
+    } catch(err) {
+      console.error('Redirect result error:', err);
+      setAuthStatus(getFriendlyAuthError(err));
+    }
     _onAuthStateChanged(_auth, async user => {
       if(!user){
         currentUserEmail='';
