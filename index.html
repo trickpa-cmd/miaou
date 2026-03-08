@@ -288,6 +288,16 @@ body::before {
 .empty-state .empty-icon { font-size: 3rem; margin-bottom: 10px; }
 .toast { position: fixed; bottom: calc(var(--nav-h) + 12px); left: 50%; transform: translateX(-50%) translateY(20px); background: var(--text); color: white; padding: 10px 20px; border-radius: 20px; font-size: 0.85rem; font-weight: 500; opacity: 0; transition: all .3s; z-index: 600; white-space: nowrap; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* HISTORY */
+.history-item { display: flex; align-items: center; gap: 10px; background: var(--warm-white); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 11px 12px; margin-bottom: 7px; box-shadow: 0 1px 6px var(--shadow); }
+.history-icon { font-size: 1.1rem; flex-shrink: 0; width: 26px; text-align: center; }
+.history-body { flex: 1; min-width: 0; }
+.history-label { font-size: 0.85rem; font-weight: 500; }
+.history-time { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
+.history-restore-btn { padding: 5px 10px; background: var(--sage); color: white; border: none; border-radius: 8px; font-size: 0.72rem; font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+.history-restore-btn:active { opacity: 0.8; }
+
 @media (min-width: 481px) { body { box-shadow: 0 0 60px rgba(0,0,0,0.15); } }
 #loading-screen {
   position: fixed; inset: 0; background: var(--cream);
@@ -423,12 +433,19 @@ body::before {
     <button class="add-item-btn" onclick="showAddLitterModal()">＋ Add litter brand</button>
   </div>
 
+  <!-- HISTORY -->
+  <div id="tab-history" class="section">
+    <div class="section-title">📋 Change History</div>
+    <div id="history-list"></div>
+  </div>
+
 </main>
 
 <nav class="bottom-nav">
   <button class="nav-tab active" onclick="switchTab('cats',this)"><span class="nav-icon">🐾</span>Cats</button>
   <button class="nav-tab" onclick="switchTab('vet',this)"><span class="nav-icon">📅</span>Schedule</button>
   <button class="nav-tab" onclick="switchTab('litter',this)"><span class="nav-icon">🌿</span>Litter</button>
+  <button class="nav-tab" onclick="switchTab('history',this)"><span class="nav-icon">📋</span>History</button>
 </nav>
 
 <!-- MODAL: VISIT -->
@@ -719,7 +736,8 @@ const DEFAULT={
     {id:'l4',name:'Signor Gatto',rating:0,price:'6.99$ / 10L',pricePerL:0.70,smell:'',poo:'',pee:'',notes:''},
     {id:'l5',name:'Kiki Kat',rating:0,price:'7.59$ / 10L',pricePerL:0.76,smell:'',poo:'',pee:'',notes:''},
     {id:'l6',name:'Vancat',rating:0,price:'8.69$ / 10kg (12L)',pricePerL:0.72,smell:'',poo:'',pee:'',notes:''},
-  ]
+  ],
+  history:[]
 };
 
 // ═══ STATE ═══
@@ -740,6 +758,13 @@ const FIREBASE_CONFIG = {
 let _getDoc, _setDoc, _DATA_REF;
 
 function uid(){return '_'+Math.random().toString(36).slice(2,9);}
+
+const MAX_HISTORY_ENTRIES=200;
+function logHistory(op, type, label, oldValue){
+  if(!data.history) data.history=[];
+  data.history.unshift({id:uid(), op, type, label, timestamp:new Date().toISOString(), oldValue:oldValue||null});
+  if(data.history.length>MAX_HISTORY_ENTRIES) data.history=data.history.slice(0,MAX_HISTORY_ENTRIES);
+}
 
 async function loadData(){
   document.getElementById('loading-screen').style.display='flex';
@@ -768,6 +793,7 @@ async function loadData(){
   }
   clearTimeout(timeout);
   document.getElementById('loading-screen').style.display='none';
+  if(!data.history) data.history=[];
   renderCatsGrid();
   renderUpcoming();
 }
@@ -793,6 +819,7 @@ function switchTab(name,btn){
   if(name==='cats')showCatsList();
   if(name==='vet')renderVetSchedule();
   if(name==='litter')renderLitter();
+  if(name==='history')renderHistory();
 }
 
 // ═══ HELPERS ═══
@@ -1117,6 +1144,7 @@ function saveVisit(){
   let auto=0;selectedTreatments.forEach(tid=>{const t=tById(tid);if(t)auto+=t.price;});
   const ov=parseFloat(document.getElementById('visit-cost').value);
   const v={id:editingVisitId||uid(),date,weight:parseFloat(document.getElementById('visit-weight').value)||null,cost:isNaN(ov)?auto:ov,treatments:[...selectedTreatments],oneTimeTreatments:[...oneTimeTreatments],notes:document.getElementById('visit-notes').value.trim()};
+  const oldV=editingVisitId?JSON.parse(JSON.stringify(cat.visits.find(x=>x.id===editingVisitId))):null;
   if(editingVisitId){const i=cat.visits.findIndex(x=>x.id===editingVisitId);cat.visits[i]=v;}
   else cat.visits.push(v);
   // Auto-create one-time follow-up schedule items
@@ -1126,12 +1154,15 @@ function saveVisit(){
       cat.schedules.push({id:uid(),oneTime:true,oneTimeName:ot.name,dueDate,price:0,notes:`Follow-up from visit ${formatDate(date)}`,done:false});
     });
   }
+  logHistory(editingVisitId?'update':'create','visit',`Visit for ${cat.name} on ${formatDate(date)}`,oldV);
   saveData();closeModal('visit-modal');renderCatDetail();showToast(editingVisitId?'Visit updated ✓':'Visit added ✓');
 }
 function deleteVisit(visitId){
-  // no confirm needed — toast acts as feedback
   const cat=data.cats.find(c=>c.id===currentCatId);
-  cat.visits=cat.visits.filter(v=>v.id!==visitId);
+  const v=cat.visits.find(x=>x.id===visitId);
+  if(!confirm(`Delete visit for ${cat.name} on ${formatDate(v.date)}? This cannot be undone.`)) return;
+  logHistory('delete','visit',`Visit for ${cat.name} on ${formatDate(v.date)}`,{catId:currentCatId,visit:v});
+  cat.visits=cat.visits.filter(x=>x.id!==visitId);
   saveData();renderCatDetail();showToast('Visit deleted');
 }
 
@@ -1141,7 +1172,9 @@ function addCat(){
   const name=document.getElementById('new-cat-name').value.trim();
   if(!name){showToast('Please enter a name');return;}
   const cat={id:uid(),name,emoji:document.getElementById('new-cat-emoji').value.trim()||'🐱',dob:document.getElementById('new-cat-dob').value||null,color:['#b85c38','#5c7a63','#c4a882','#8474a8','#4a7fa5','#a05c8c'][data.cats.length%6],visits:[],schedules:[]};
-  data.cats.push(cat);saveData();closeModal('add-cat-modal');renderCatsGrid();showToast(name+' added ✓');
+  data.cats.push(cat);
+  logHistory('create','cat',`Cat added: ${name}`,null);
+  saveData();closeModal('add-cat-modal');renderCatsGrid();showToast(name+' added ✓');
 }
 
 // ═══ VET SCHEDULE ═══
@@ -1177,10 +1210,12 @@ function addTreatmentInline(){
   if(!name||isNaN(price)){showToast('Enter a name and price');return;}
   const repeatCount=parseInt(document.getElementById('new-t-repeat-count').value)||null;
   const repeatUnit=document.getElementById('new-t-repeat-unit').value||'months';
-  data.treatments.push({id:uid(),name,price,repeatCount,repeatUnit});
+  const t={id:uid(),name,price,repeatCount,repeatUnit};
+  data.treatments.push(t);
   document.getElementById('new-t-name').value='';
   document.getElementById('new-t-price').value='';
   document.getElementById('new-t-repeat-count').value='';
+  logHistory('create','treatment',`Treatment added: ${name}`,null);
   saveData();renderTreatmentRows();showToast('Treatment added ✓');
 }
 function openEditTreatment(tid){
@@ -1194,15 +1229,19 @@ function openEditTreatment(tid){
 }
 function saveTreatmentEdit(){
   const t=tById(editingTreatmentId);if(!t)return;
+  const oldT=JSON.parse(JSON.stringify(t));
   t.name=document.getElementById('edit-t-name').value.trim()||t.name;
   t.price=parseFloat(document.getElementById('edit-t-price').value)||t.price;
   t.repeatCount=parseInt(document.getElementById('edit-t-repeat-count').value)||null;
   t.repeatUnit=document.getElementById('edit-t-repeat-unit').value||'months';
+  logHistory('update','treatment',`Treatment updated: ${t.name}`,oldT);
   saveData();closeModal('treatment-edit-modal');renderTreatmentRows();renderVetCatSections();showToast('Updated ✓');
 }
 function deleteTreatment(tid){
-  // no confirm needed
-  data.treatments=data.treatments.filter(t=>t.id!==tid);
+  const t=tById(tid);if(!t)return;
+  if(!confirm(`Delete treatment "${t.name}"? This cannot be undone.`)) return;
+  logHistory('delete','treatment',`Treatment: ${t.name}`,t);
+  data.treatments=data.treatments.filter(x=>x.id!==tid);
   saveData();renderTreatmentRows();renderVetCatSections();
 }
 
@@ -1297,13 +1336,19 @@ function saveSchedItem(){
   const t=tById(treatmentId);
   const item={id:editingSchedId||uid(),treatmentId,dueDate,price:isNaN(ov)?(t?t.price:0):ov,notes:document.getElementById('sched-notes').value.trim(),done:false};
   const cat=data.cats.find(c=>c.id===schedCatId);
+  const oldS=editingSchedId?JSON.parse(JSON.stringify(cat.schedules.find(s=>s.id===editingSchedId))):null;
   if(editingSchedId){const i=cat.schedules.findIndex(s=>s.id===editingSchedId);cat.schedules[i]=item;}
   else cat.schedules.push(item);
+  logHistory(editingSchedId?'update':'create','schedule',`Schedule: ${t?t.name:'?'} for ${cat.name} on ${formatDate(dueDate)}`,oldS);
   saveData();closeModal('sched-modal');renderVetCatSections();showToast(editingSchedId?'Updated ✓':'Scheduled ✓');
 }
 function deleteSchedItem(catId,schedId){
   const cat=data.cats.find(c=>c.id===catId);
-  cat.schedules=cat.schedules.filter(s=>s.id!==schedId);
+  const s=cat.schedules.find(x=>x.id===schedId);
+  const name=s.oneTime?s.oneTimeName:(tById(s.treatmentId)?.name||'Unknown');
+  if(!confirm(`Remove "${name}" for ${cat.name}? This cannot be undone.`)) return;
+  logHistory('delete','schedule',`Schedule: ${name} for ${cat.name}`,{catId,schedule:s});
+  cat.schedules=cat.schedules.filter(x=>x.id!==schedId);
   saveData();renderVetCatSections();
   if(currentCatId===catId)renderCatUpcoming(cat);
   showToast('Removed ✓');
@@ -1313,7 +1358,9 @@ function deleteSchedItem(catId,schedId){
 function starsHtml(r){let s='';for(let i=1;i<=5;i++)s+=`<span class="${i<=r?'filled':'empty'}">★</span>`;return`<span class="stars">${s}</span>`;}
 function renderLitter(){
   const list=document.getElementById('litter-list');
-  list.innerHTML=data.litters.map(l=>{
+  // Sort by rating descending; unrated items (rating 0 or null) go to the bottom
+  const sorted=data.litters.slice().sort((a,b)=>(b.rating||0)-(a.rating||0));
+  list.innerHTML=sorted.map(l=>{
     const rev=l.smell||l.poo||l.pee;
     return`<div class="litter-card">
       <div class="litter-header">
@@ -1354,11 +1401,71 @@ function saveLitter(){
   const name=document.getElementById('litter-name').value.trim();
   if(!name){showToast('Please enter a brand name');return;}
   const litter={id:editingLitterId||uid(),name,rating:currentStarRating,price:document.getElementById('litter-price').value.trim(),pricePerL:parseFloat(document.getElementById('litter-ppl').value)||null,smell:document.getElementById('litter-smell').value.trim(),poo:document.getElementById('litter-poo').value.trim(),pee:document.getElementById('litter-pee').value.trim(),notes:document.getElementById('litter-notes').value.trim()};
+  const oldL=editingLitterId?JSON.parse(JSON.stringify(data.litters.find(x=>x.id===editingLitterId))):null;
   if(editingLitterId){const i=data.litters.findIndex(x=>x.id===editingLitterId);data.litters[i]=litter;}
   else data.litters.push(litter);
+  logHistory(editingLitterId?'update':'create','litter',`Litter: ${name}`,oldL);
   saveData();closeModal('litter-modal');renderLitter();showToast('Saved ✓');
 }
-function deleteLitter(lid){data.litters=data.litters.filter(l=>l.id!==lid);saveData();renderLitter();showToast('Removed ✓');}
+function deleteLitter(lid){
+  const l=data.litters.find(x=>x.id===lid);if(!l)return;
+  if(!confirm(`Remove "${l.name}"? This cannot be undone.`)) return;
+  logHistory('delete','litter',`Litter: ${l.name}`,l);
+  data.litters=data.litters.filter(x=>x.id!==lid);
+  saveData();renderLitter();showToast('Removed ✓');
+}
+
+// ═══ HISTORY ═══
+function renderHistory(){
+  const list=document.getElementById('history-list');
+  if(!data.history||!data.history.length){
+    list.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div>No changes recorded yet.</div>';
+    return;
+  }
+  const opIcon={create:'✅',update:'✏️',delete:'🗑️'};
+  const opColor={create:'var(--green)',update:'var(--orange)',delete:'var(--red)'};
+  list.innerHTML=data.history.map(h=>{
+    const dt=new Date(h.timestamp);
+    const dateStr=dt.toLocaleDateString()+' '+dt.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
+    const canRestore=h.op==='delete'&&h.oldValue;
+    return`<div class="history-item">
+      <div class="history-icon" style="color:${opColor[h.op]||'var(--text-muted)'}">${opIcon[h.op]||'•'}</div>
+      <div class="history-body">
+        <div class="history-label">${escHtml(h.label)}</div>
+        <div class="history-time">${dateStr}</div>
+      </div>
+      ${canRestore?`<button class="history-restore-btn" aria-label="Restore: ${escHtml(h.label)}" onclick="restoreItem('${h.id}')">Restore</button>`:''}
+    </div>`;
+  }).join('');
+}
+function restoreItem(histId){
+  const h=data.history.find(x=>x.id===histId);
+  if(!h||h.op!=='delete'||!h.oldValue){showToast('Cannot restore this item');return;}
+  if(h.type==='visit'){
+    const cat=data.cats.find(c=>c.id===h.oldValue.catId);
+    if(!cat){showToast('Cat no longer exists');return;}
+    cat.visits.push(h.oldValue.visit);
+    logHistory('create','visit',`Restored: ${h.label}`,null);
+    saveData();renderCatDetail();showToast('Visit restored ✓');
+  } else if(h.type==='litter'){
+    data.litters.push(h.oldValue);
+    logHistory('create','litter',`Restored: ${h.label}`,null);
+    saveData();renderLitter();showToast('Litter restored ✓');
+  } else if(h.type==='schedule'){
+    const cat=data.cats.find(c=>c.id===h.oldValue.catId);
+    if(!cat){showToast('Cat no longer exists');return;}
+    cat.schedules.push(h.oldValue.schedule);
+    logHistory('create','schedule',`Restored: ${h.label}`,null);
+    saveData();renderVetCatSections();if(currentCatId===h.oldValue.catId)renderCatUpcoming(cat);showToast('Schedule restored ✓');
+  } else if(h.type==='treatment'){
+    data.treatments.push(h.oldValue);
+    logHistory('create','treatment',`Restored: ${h.label}`,null);
+    saveData();renderTreatmentRows();renderVetCatSections();showToast('Treatment restored ✓');
+  } else {
+    showToast('Restore not supported for this type');return;
+  }
+  renderHistory();
+}
 
 // ═══ MODALS ═══
 function openModal(id){document.getElementById(id).classList.add('open');}
