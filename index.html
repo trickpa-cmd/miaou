@@ -345,6 +345,19 @@ body::before {
 }
 .cat-upcoming-add-btn:hover { background: rgba(184,92,56,0.05); }
 
+
+.confirm-overlay { position: fixed; inset: 0; z-index: 700; background: rgba(44,33,24,0.55); display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
+.confirm-overlay.open { display: flex; }
+.confirm-card { width: 100%; max-width: 360px; background: var(--warm-white); border: 1.5px solid var(--border); border-radius: 22px; box-shadow: 0 12px 36px rgba(44,33,24,0.18); padding: 22px 18px 16px; transform: translateY(8px) scale(0.98); opacity: 0; transition: transform .18s ease, opacity .18s ease; }
+.confirm-overlay.open .confirm-card { transform: translateY(0) scale(1); opacity: 1; }
+.confirm-icon { width: 54px; height: 54px; margin: 0 auto 12px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.45rem; background: rgba(192,57,43,0.10); color: var(--red); }
+.confirm-title { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 700; color: var(--text); text-align: center; margin-bottom: 6px; }
+.confirm-message { font-size: 0.9rem; color: var(--text-muted); text-align: center; line-height: 1.55; margin-bottom: 16px; }
+.confirm-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.confirm-cancel, .confirm-delete { width: 100%; border-radius: 12px; padding: 11px 12px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+.confirm-cancel { background: var(--cream); color: var(--text-muted); border: 1.5px solid var(--border); }
+.confirm-delete { background: var(--red); color: white; border: none; box-shadow: 0 6px 16px rgba(192,57,43,0.25); }
+
 </style>
 </head>
 <body>
@@ -578,6 +591,19 @@ body::before {
     </div>
     <button class="form-submit" onclick="saveLitter()">Save</button>
     <button class="form-cancel" onclick="closeModal('litter-modal')">Cancel</button>
+  </div>
+</div>
+
+
+<div class="confirm-overlay" id="confirm-modal">
+  <div class="confirm-card" role="dialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-message">
+    <div class="confirm-icon">🗑</div>
+    <div class="confirm-title" id="confirm-title">Delete item?</div>
+    <div class="confirm-message" id="confirm-message">Are you sure you want to delete this item?</div>
+    <div class="confirm-actions">
+      <button class="confirm-cancel" id="confirm-cancel-btn">Cancel</button>
+      <button class="confirm-delete" id="confirm-delete-btn">Delete</button>
+    </div>
   </div>
 </div>
 
@@ -1077,8 +1103,11 @@ function addOneTime(){
   renderOnetimeList();
 }
 function removeOneTime(i){
-  oneTimeTreatments.splice(i,1);
-  renderOnetimeList();
+  askDelete('Delete this one time follow up?',()=>{
+    oneTimeTreatments.splice(i,1);
+    renderOnetimeList();
+    showToast('Removed ✓');
+  });
 }
 function addDuration(dateStr,count,unit){
   const d=new Date(dateStr);
@@ -1087,6 +1116,23 @@ function addDuration(dateStr,count,unit){
   else if(unit==='months') d.setMonth(d.getMonth()+count);
   else if(unit==='years') d.setFullYear(d.getFullYear()+count);
   return d.toISOString().slice(0,10);
+}
+
+
+let confirmDeleteAction=null;
+function askDelete(message,onConfirm){
+  const modal=document.getElementById('confirm-modal');
+  document.getElementById('confirm-title').textContent='Delete item?';
+  document.getElementById('confirm-message').textContent=message||'Are you sure you want to delete this item?';
+  confirmDeleteAction=()=>{
+    closeConfirmModal();
+    if(typeof onConfirm==='function') onConfirm();
+  };
+  modal.classList.add('open');
+}
+function closeConfirmModal(){
+  document.getElementById('confirm-modal').classList.remove('open');
+  confirmDeleteAction=null;
 }
 
 function showAddVisitModal(){
@@ -1129,10 +1175,11 @@ function saveVisit(){
   saveData();closeModal('visit-modal');renderCatDetail();showToast(editingVisitId?'Visit updated ✓':'Visit added ✓');
 }
 function deleteVisit(visitId){
-  // no confirm needed — toast acts as feedback
-  const cat=data.cats.find(c=>c.id===currentCatId);
-  cat.visits=cat.visits.filter(v=>v.id!==visitId);
-  saveData();renderCatDetail();showToast('Visit deleted');
+  askDelete('Delete this visit? This action cannot be undone.',()=>{
+    const cat=data.cats.find(c=>c.id===currentCatId);
+    cat.visits=cat.visits.filter(v=>v.id!==visitId);
+    saveData();renderCatDetail();showToast('Visit deleted');
+  });
 }
 
 // ═══ ADD CAT ═══
@@ -1201,9 +1248,10 @@ function saveTreatmentEdit(){
   saveData();closeModal('treatment-edit-modal');renderTreatmentRows();renderVetCatSections();showToast('Updated ✓');
 }
 function deleteTreatment(tid){
-  // no confirm needed
-  data.treatments=data.treatments.filter(t=>t.id!==tid);
-  saveData();renderTreatmentRows();renderVetCatSections();
+  askDelete('Delete this treatment from the price list?',()=>{
+    data.treatments=data.treatments.filter(t=>t.id!==tid);
+    saveData();renderTreatmentRows();renderVetCatSections();showToast('Removed ✓');
+  });
 }
 
 function renderVetSchedule(){renderTreatmentRows();renderVetCatSections();}
@@ -1302,11 +1350,13 @@ function saveSchedItem(){
   saveData();closeModal('sched-modal');renderVetCatSections();showToast(editingSchedId?'Updated ✓':'Scheduled ✓');
 }
 function deleteSchedItem(catId,schedId){
-  const cat=data.cats.find(c=>c.id===catId);
-  cat.schedules=cat.schedules.filter(s=>s.id!==schedId);
-  saveData();renderVetCatSections();
-  if(currentCatId===catId)renderCatUpcoming(cat);
-  showToast('Removed ✓');
+  askDelete('Delete this scheduled item?',()=>{
+    const cat=data.cats.find(c=>c.id===catId);
+    cat.schedules=cat.schedules.filter(s=>s.id!==schedId);
+    saveData();renderVetCatSections();
+    if(currentCatId===catId)renderCatUpcoming(cat);
+    showToast('Removed ✓');
+  });
 }
 
 // ═══ LITTER ═══
@@ -1358,12 +1408,26 @@ function saveLitter(){
   else data.litters.push(litter);
   saveData();closeModal('litter-modal');renderLitter();showToast('Saved ✓');
 }
-function deleteLitter(lid){data.litters=data.litters.filter(l=>l.id!==lid);saveData();renderLitter();showToast('Removed ✓');}
+function deleteLitter(lid){
+  askDelete('Delete this litter review?',()=>{
+    data.litters=data.litters.filter(l=>l.id!==lid);
+    saveData();renderLitter();showToast('Removed ✓');
+  });
+}
 
 // ═══ MODALS ═══
 function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+const confirmModal=document.getElementById('confirm-modal');
+confirmModal.addEventListener('click',e=>{if(e.target===confirmModal)closeConfirmModal();});
+document.getElementById('confirm-cancel-btn').addEventListener('click',closeConfirmModal);
+document.getElementById('confirm-delete-btn').addEventListener('click',()=>{if(confirmDeleteAction)confirmDeleteAction();});
+document.addEventListener('keydown',e=>{
+  if(!confirmModal.classList.contains('open')) return;
+  if(e.key==='Escape') closeConfirmModal();
+  if(e.key==='Enter' && confirmDeleteAction) confirmDeleteAction();
+});
 
 // ═══ TOAST ═══
 let toastTimer;
