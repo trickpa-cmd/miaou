@@ -1,56 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Miaou 2.0</title>
-    <script>
-        // Assume that you have a history array to log changes
-        let history = [];
-
-        function logChange(action) {
-            const timestamp = new Date().toISOString();
-            history.push({ action, timestamp });
-            console.log(`Action: ${action} at ${timestamp}`);
-        }
-
-        function confirmDeleteVisit() {
-            if (confirm('Are you sure you want to delete this visit?')) {
-                deleteVisit();
-                logChange('Deleted a visit');
-            }
-        }
-
-        function confirmDeleteLitter() {
-            if (confirm('Are you sure you want to delete this litter review?')) {
-                deleteLitter();
-                logChange('Deleted a litter review');
-            }
-        }
-
-        function confirmDeleteSchedItem() {
-            if (confirm('Are you sure you want to delete this scheduled item?')) {
-                deleteSchedItem();
-                logChange('Deleted a scheduled item');
-            }
-        }
-
-        function confirmDeleteTreatment() {
-            if (confirm('Are you sure you want to delete this treatment?')) {
-                deleteTreatment();
-                logChange('Deleted a treatment');
-            }
-        }
-
-        // Modify renderLitter function to sort by rating
-        function renderLitter(litterReviews) {
-            litterReviews.sort((a, b) => b.rating - a.rating); // Sort by rating, highest first
-            // Continue with rendering...
-        }
-    </script>
+    <title>Miaou</title>
 </head>
 <body>
-    <h1>Welcome to Miaou 2.0!</h1>
-    <!-- Your application content goes here -->
+    <h1>Miaou 2.0</h1>
 </body>
 </html>
