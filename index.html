@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>🐾 Cat Records</title>
+<title>🐾 Miaou</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -355,7 +355,7 @@ body::before {
 </div>
 
 <header class="app-header">
-  <div class="header-title">🐾 Miaou <span>Records</span></div>
+  <div class="header-title">🐾 Miaou</div>
   <button class="header-add-btn" onclick="showAddCatModal()">+</button>
 </header>
 
@@ -1365,6 +1365,19 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 
 // ═══ INIT ═══
 loadData(); // async — renders when done
+
+// ═══ EXPOSE FUNCTIONS TO GLOBAL SCOPE (required for onclick in HTML with type=module) ═══
+Object.assign(window, {
+  switchTab, showCatsList, openCatDetail, showAddVisitModal, editVisit, deleteVisit,
+  showAddCatModal, addCat, saveVisit, toggleTreatment, addOneTime, removeOneTime,
+  makeNameEditable, saveName, promptRenameEmoji, makeDobEditable, saveDob,
+  toggleDashboard, addTreatmentInline, openEditTreatment, saveTreatmentEdit, deleteTreatment,
+  showSchedModal, showAddSchedModal, editSchedItem, deleteSchedItem, saveSchedItem,
+  toggleSchedDone, updateSchedPrice, buildSchedSelect,
+  renderVetSchedule, renderUpcoming, renderCatUpcoming,
+  showAddLitterModal, editLitter, saveLitter, deleteLitter, setStar,
+  openModal, closeModal, showToast
+});
 </script>
 </body>
 </html>
