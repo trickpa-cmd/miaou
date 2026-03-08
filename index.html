@@ -147,6 +147,8 @@ body::before {
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .form-submit { width: 100%; padding: 13px; background: var(--terra); color: white; border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 600; cursor: pointer; margin-top: 6px; box-shadow: 0 3px 10px rgba(184,92,56,0.35); }
 .form-cancel { width: 100%; padding: 11px; background: none; color: var(--text-muted); border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; cursor: pointer; margin-top: 8px; }
+.form-danger { width: 100%; padding: 13px; background: var(--red); color: white; border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 600; cursor: pointer; margin-top: 6px; box-shadow: 0 3px 10px rgba(192,57,43,0.35); }
+.confirm-message { font-size: 0.95rem; color: var(--text); line-height: 1.55; margin-bottom: 6px; }
 
 /* ══ VET SCHEDULE ══ */
 .vet-section-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin: 20px 0 8px; display: flex; align-items: center; gap: 6px; }
@@ -595,6 +597,17 @@ body::before {
     </div>
     <button class="form-submit" onclick="saveLitter()">Save</button>
     <button class="form-cancel" onclick="closeModal('litter-modal')">Cancel</button>
+  </div>
+</div>
+
+<!-- MODAL: CONFIRM DELETE -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="confirm-title">Are you sure?</div>
+    <p class="confirm-message" id="confirm-message"></p>
+    <button class="form-danger" id="confirm-ok-btn">Delete</button>
+    <button class="form-cancel" onclick="closeModal('confirm-modal')">Cancel</button>
   </div>
 </div>
 
@@ -1160,10 +1173,11 @@ function saveVisit(){
 function deleteVisit(visitId){
   const cat=data.cats.find(c=>c.id===currentCatId);
   const v=cat.visits.find(x=>x.id===visitId);
-  if(!confirm(`Delete visit for ${cat.name} on ${formatDate(v.date)}? This cannot be undone.`)) return;
-  logHistory('delete','visit',`Visit for ${cat.name} on ${formatDate(v.date)}`,{catId:currentCatId,visit:v});
-  cat.visits=cat.visits.filter(x=>x.id!==visitId);
-  saveData();renderCatDetail();showToast('Visit deleted');
+  showConfirm(`Delete visit for ${cat.name} on ${formatDate(v.date)}? This cannot be undone.`,()=>{
+    logHistory('delete','visit',`Visit for ${cat.name} on ${formatDate(v.date)}`,{catId:currentCatId,visit:v});
+    cat.visits=cat.visits.filter(x=>x.id!==visitId);
+    saveData();renderCatDetail();showToast('Visit deleted');
+  },'Delete Visit?');
 }
 
 // ═══ ADD CAT ═══
@@ -1239,10 +1253,11 @@ function saveTreatmentEdit(){
 }
 function deleteTreatment(tid){
   const t=tById(tid);if(!t)return;
-  if(!confirm(`Delete treatment "${t.name}"? This cannot be undone.`)) return;
-  logHistory('delete','treatment',`Treatment: ${t.name}`,t);
-  data.treatments=data.treatments.filter(x=>x.id!==tid);
-  saveData();renderTreatmentRows();renderVetCatSections();
+  showConfirm(`Delete treatment "${t.name}"? This cannot be undone.`,()=>{
+    logHistory('delete','treatment',`Treatment: ${t.name}`,t);
+    data.treatments=data.treatments.filter(x=>x.id!==tid);
+    saveData();renderTreatmentRows();renderVetCatSections();
+  },'Delete Treatment?');
 }
 
 function renderVetSchedule(){renderTreatmentRows();renderVetCatSections();}
@@ -1346,12 +1361,13 @@ function deleteSchedItem(catId,schedId){
   const cat=data.cats.find(c=>c.id===catId);
   const s=cat.schedules.find(x=>x.id===schedId);
   const name=s.oneTime?s.oneTimeName:(tById(s.treatmentId)?.name||'Unknown');
-  if(!confirm(`Remove "${name}" for ${cat.name}? This cannot be undone.`)) return;
-  logHistory('delete','schedule',`Schedule: ${name} for ${cat.name}`,{catId,schedule:s});
-  cat.schedules=cat.schedules.filter(x=>x.id!==schedId);
-  saveData();renderVetCatSections();
-  if(currentCatId===catId)renderCatUpcoming(cat);
-  showToast('Removed ✓');
+  showConfirm(`Remove "${name}" for ${cat.name}? This cannot be undone.`,()=>{
+    logHistory('delete','schedule',`Schedule: ${name} for ${cat.name}`,{catId,schedule:s});
+    cat.schedules=cat.schedules.filter(x=>x.id!==schedId);
+    saveData();renderVetCatSections();
+    if(currentCatId===catId)renderCatUpcoming(cat);
+    showToast('Removed ✓');
+  },'Remove Schedule?');
 }
 
 // ═══ LITTER ═══
@@ -1409,10 +1425,11 @@ function saveLitter(){
 }
 function deleteLitter(lid){
   const l=data.litters.find(x=>x.id===lid);if(!l)return;
-  if(!confirm(`Remove "${l.name}"? This cannot be undone.`)) return;
-  logHistory('delete','litter',`Litter: ${l.name}`,l);
-  data.litters=data.litters.filter(x=>x.id!==lid);
-  saveData();renderLitter();showToast('Removed ✓');
+  showConfirm(`Remove "${l.name}"? This cannot be undone.`,()=>{
+    logHistory('delete','litter',`Litter: ${l.name}`,l);
+    data.litters=data.litters.filter(x=>x.id!==lid);
+    saveData();renderLitter();showToast('Removed ✓');
+  },'Remove Litter?');
 }
 
 // ═══ HISTORY ═══
@@ -1471,6 +1488,17 @@ function restoreItem(histId){
 function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+
+function showConfirm(message, onConfirm, title){
+  document.getElementById('confirm-title').textContent=title||'Are you sure?';
+  document.getElementById('confirm-message').textContent=message;
+  const btn=document.getElementById('confirm-ok-btn');
+  btn.onclick=()=>{
+    closeModal('confirm-modal');
+    try{onConfirm();}catch(e){console.error('Confirm action error:',e);}
+  };
+  openModal('confirm-modal');
+}
 
 // ═══ TOAST ═══
 let toastTimer;
