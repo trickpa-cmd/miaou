@@ -291,7 +291,7 @@ body::before {
 @media (min-width: 481px) { body { box-shadow: 0 0 60px rgba(0,0,0,0.15); } }
 #loading-screen {
   position: fixed; inset: 0; background: var(--cream);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  display: none; flex-direction: column; align-items: center; justify-content: center;
   z-index: 9999; gap: 16px;
 }
 #loading-screen .loading-paw { font-size: 2.8rem; animation: pulse 1.2s ease-in-out infinite; }
@@ -749,20 +749,25 @@ function uid(){return '_'+Math.random().toString(36).slice(2,9);}
 
 async function loadData(){
   document.getElementById('loading-screen').style.display='flex';
+  // Failsafe: always hide loading screen after 5s no matter what
+  const timeout = setTimeout(()=>{
+    document.getElementById('loading-screen').style.display='none';
+    if(!data){ data=JSON.parse(JSON.stringify(DEFAULT)); renderCatsGrid(); renderUpcoming(); }
+  }, 5000);
   try {
     const snap = await getDoc(DATA_REF);
     if(snap.exists()){
       data = snap.data().payload ? JSON.parse(snap.data().payload) : JSON.parse(JSON.stringify(DEFAULT));
     } else {
       data = JSON.parse(JSON.stringify(DEFAULT));
-      await saveData(); // write defaults on first load
+      await saveData();
     }
   } catch(e) {
     console.error('Firebase load error:', e);
-    // fallback to localStorage if offline
     try { const s=localStorage.getItem('miaou_offline'); data=s?JSON.parse(s):JSON.parse(JSON.stringify(DEFAULT)); }
     catch(e2){ data=JSON.parse(JSON.stringify(DEFAULT)); }
   }
+  clearTimeout(timeout);
   document.getElementById('loading-screen').style.display='none';
   renderCatsGrid();
   renderUpcoming();
