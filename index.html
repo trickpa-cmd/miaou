@@ -583,7 +583,7 @@ body::before {
 
 <div class="toast" id="toast"></div>
 
-<script type="module">
+<script>
 // ═══ ICONS ═══
 const ICONS={'Vaccin':'💉','Vaccine':'💉','Flea':'🦟','Barghout':'🦟','Nafas':'💨','Doud':'🪱','Worm':'🪱','Blood':'🩸','Fahes dam':'🩸','Benej':'💊','Ass':'🩹','Deworm':'🪱','Bravecto':'🛡️','Catch One':'🎯','Ebre':'💉','Xray':'🩻'};
 function iconFor(n){for(const k in ICONS)if(n&&n.toLowerCase().includes(k.toLowerCase()))return ICONS[k];return'💊';}
@@ -737,25 +737,24 @@ const FIREBASE_CONFIG = {
   appId: "1:152797535766:web:668885df602e2927e09f37"
 };
 
-// ═══ FIREBASE INIT ═══
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
-
-const fbApp = initializeApp(FIREBASE_CONFIG);
-const db = getFirestore(fbApp);
-const DATA_REF = doc(db, 'miaou', 'data');
+let _getDoc, _setDoc, _DATA_REF;
 
 function uid(){return '_'+Math.random().toString(36).slice(2,9);}
 
 async function loadData(){
   document.getElementById('loading-screen').style.display='flex';
-  // Failsafe: always hide loading screen after 5s no matter what
   const timeout = setTimeout(()=>{
     document.getElementById('loading-screen').style.display='none';
     if(!data){ data=JSON.parse(JSON.stringify(DEFAULT)); renderCatsGrid(); renderUpcoming(); }
-  }, 5000);
+  }, 6000);
   try {
-    const snap = await getDoc(DATA_REF);
+    const {initializeApp} = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js");
+    const {getFirestore, doc, getDoc, setDoc} = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js");
+    const app = initializeApp(FIREBASE_CONFIG);
+    const db = getFirestore(app);
+    _DATA_REF = doc(db, 'miaou', 'data');
+    _getDoc = getDoc; _setDoc = setDoc;
+    const snap = await getDoc(_DATA_REF);
     if(snap.exists()){
       data = snap.data().payload ? JSON.parse(snap.data().payload) : JSON.parse(JSON.stringify(DEFAULT));
     } else {
@@ -763,7 +762,7 @@ async function loadData(){
       await saveData();
     }
   } catch(e) {
-    console.error('Firebase load error:', e);
+    console.error('Firebase error:', e);
     try { const s=localStorage.getItem('miaou_offline'); data=s?JSON.parse(s):JSON.parse(JSON.stringify(DEFAULT)); }
     catch(e2){ data=JSON.parse(JSON.stringify(DEFAULT)); }
   }
@@ -775,8 +774,10 @@ async function loadData(){
 
 async function saveData(){
   try {
-    await setDoc(DATA_REF, { payload: JSON.stringify(data), updated: new Date().toISOString() });
-    localStorage.setItem('miaou_offline', JSON.stringify(data)); // keep offline copy
+    if(_setDoc && _DATA_REF){
+      await _setDoc(_DATA_REF, { payload: JSON.stringify(data), updated: new Date().toISOString() });
+    }
+    localStorage.setItem('miaou_offline', JSON.stringify(data));
   } catch(e) {
     console.error('Firebase save error:', e);
     try { localStorage.setItem('miaou_offline', JSON.stringify(data)); } catch(e2){}
@@ -1369,20 +1370,7 @@ let toastTimer;
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2200);}
 
 // ═══ INIT ═══
-loadData(); // async — renders when done
-
-// ═══ EXPOSE FUNCTIONS TO GLOBAL SCOPE (required for onclick in HTML with type=module) ═══
-Object.assign(window, {
-  switchTab, showCatsList, openCatDetail, showAddVisitModal, editVisit, deleteVisit,
-  showAddCatModal, addCat, saveVisit, toggleTreatment, addOneTime, removeOneTime,
-  makeNameEditable, saveName, promptRenameEmoji, makeDobEditable, saveDob,
-  toggleDashboard, addTreatmentInline, openEditTreatment, saveTreatmentEdit, deleteTreatment,
-  showSchedModal, showAddSchedModal, editSchedItem, deleteSchedItem, saveSchedItem,
-  toggleSchedDone, updateSchedPrice, buildSchedSelect,
-  renderVetSchedule, renderUpcoming, renderCatUpcoming,
-  showAddLitterModal, editLitter, saveLitter, deleteLitter, setStar,
-  openModal, closeModal, showToast
-});
+loadData();
 </script>
 </body>
 </html>
