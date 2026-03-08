@@ -886,10 +886,11 @@ function setSignedOutUi(){
 async function initFirebase(){
   const {initializeApp} = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js");
   const {getFirestore, doc, getDoc, setDoc, runTransaction, serverTimestamp, collection, query, orderBy, limit, getDocs} = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js");
-  const {getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut} = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js");
+  const {getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence} = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js");
   const app = initializeApp(FIREBASE_CONFIG);
   _db = getFirestore(app);
   _auth = getAuth(app);
+  try { await setPersistence(_auth, browserLocalPersistence); } catch(err) { console.warn('Auth persistence warning:', err); }
   _doc = doc;
   _DATA_REF = doc(_db, 'miaou', 'data');
   _getDoc = getDoc; _setDoc = setDoc; _runTransaction = runTransaction; _serverTimestamp = serverTimestamp;
@@ -1044,6 +1045,43 @@ async function saveData(meta={}){
   }
 }
 
+function shouldPreferRedirectSignIn(){
+  return isStandaloneMode();
+}
+
+function markRedirectPending(){
+  try { sessionStorage.setItem('miaou_google_redirect_pending', '1'); } catch(err) {}
+}
+
+function clearRedirectPending(){
+  try { sessionStorage.removeItem('miaou_google_redirect_pending'); } catch(err) {}
+}
+
+async function completeSignedInUser(user){
+  const email = String((user && user.email) || '').toLowerCase();
+  if(!email){
+    currentUserEmail='';
+    data = deepClone(DEFAULT);
+    setSignedOutUi();
+    document.getElementById('loading-screen').style.display='none';
+    return;
+  }
+  if(!isAllowedEmail(email)){
+    setAuthStatus('This Google account is not allowed for Miaou.');
+    await _signOut(_auth);
+    return;
+  }
+  clearRedirectPending();
+  currentUserEmail = email;
+  setSignedInUi();
+  document.getElementById('auth-signout-btn').style.display='block';
+  await loadData();
+  renderVetCatSections();
+  renderLitter();
+  if(currentCatId) renderCatDetail();
+  setAuthStatus('', false);
+}
+
 async function signInWithGoogle(){
   setAuthStatus('', false);
   const btn = document.getElementById('google-signin-btn');
@@ -1053,7 +1091,8 @@ async function signInWithGoogle(){
     provider.setCustomParameters({prompt:'select_account'});
     setAuthStatus('Opening Google sign in…', false);
 
-    if(isStandaloneMode() || /iphone|ipad|ipod|android/i.test(navigator.userAgent)){
+    if(shouldPreferRedirectSignIn()){
+      markRedirectPending();
       await _signInWithRedirect(_auth, provider);
       return;
     }
@@ -1068,6 +1107,7 @@ async function signInWithGoogle(){
         const provider = new _GoogleAuthProvider();
         provider.setCustomParameters({prompt:'select_account'});
         setAuthStatus('Opening Google sign in…', false);
+        markRedirectPending();
         await _signInWithRedirect(_auth, provider);
         return;
       } catch(err) {
@@ -1105,33 +1145,47 @@ async function bootstrap(){
   try {
     await initFirebase();
     try {
-      await _getRedirectResult(_auth);
+      const redirectResult = await _getRedirectResult(_auth);
+      if(redirectResult && redirectResult.user){
+        await completeSignedInUser(redirectResult.user);
+      }
     } catch(err) {
       console.error('Redirect result error:', err);
       setAuthStatus(getFriendlyAuthError(err));
     }
+    let firstAuthEventHandled = false;
     _onAuthStateChanged(_auth, async user => {
-      if(!user){
-        currentUserEmail='';
-        data = deepClone(DEFAULT);
-        setSignedOutUi();
-        document.getElementById('loading-screen').style.display='none';
+      if(user){
+        firstAuthEventHandled = true;
+        await completeSignedInUser(user);
         return;
       }
-      const email = String(user.email||'').toLowerCase();
-      if(!isAllowedEmail(email)){
-        setAuthStatus('This Google account is not allowed for Miaou.');
-        await _signOut(_auth);
-        return;
+
+      if(!firstAuthEventHandled){
+        firstAuthEventHandled = true;
+        const pendingRedirect = (() => { try { return sessionStorage.getItem('miaou_google_redirect_pending') === '1'; } catch(err) { return false; } })();
+        if(pendingRedirect){
+          setAuthStatus('Finishing Google sign in…', false);
+          setTimeout(async () => {
+            const latestUser = _auth && _auth.currentUser ? _auth.currentUser : null;
+            if(latestUser){
+              await completeSignedInUser(latestUser);
+              return;
+            }
+            currentUserEmail='';
+            data = deepClone(DEFAULT);
+            setSignedOutUi();
+            document.getElementById('loading-screen').style.display='none';
+            setAuthStatus('Google sign in did not finish. Please tap Continue with Google again.');
+          }, 1200);
+          return;
+        }
       }
-      currentUserEmail = email;
-      setSignedInUi();
-      document.getElementById('auth-signout-btn').style.display='block';
-      await loadData();
-      renderVetCatSections();
-      renderLitter();
-      if(currentCatId) renderCatDetail();
-      setAuthStatus('', false);
+
+      currentUserEmail='';
+      data = deepClone(DEFAULT);
+      setSignedOutUi();
+      document.getElementById('loading-screen').style.display='none';
     });
   } catch(e) {
     console.error('Firebase init error:', e);
