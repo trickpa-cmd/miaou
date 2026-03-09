@@ -2,79 +2,171 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<meta name="theme-color" content="#b85c38">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Miaou Sign In</title>
+<link rel="manifest" href="miaou.webmanifest">
+<meta name="theme-color" content="#b85c38">
 <style>
-body{margin:0;font-family:Arial,sans-serif;background:#faf5ee;color:#5a4636;display:flex;min-height:100vh;align-items:center;justify-content:center;padding:24px;box-sizing:border-box}
-.card{max-width:420px;width:100%;background:#fffdf9;border:1px solid #e8dcc8;border-radius:24px;padding:28px;text-align:center;box-shadow:0 10px 30px rgba(44,33,24,.08)}
-.icon{font-size:44px;margin-bottom:10px}.title{font-size:30px;color:#8c3e22;font-weight:700;margin:0 0 8px}.msg{font-size:18px;line-height:1.5;margin:0;color:#7a6a58}
-.small{margin-top:12px;font-size:14px;color:#9a8875}
+:root {
+  --cream: #faf5ee; --warm-white: #fffdf9; --terra: #b85c38; --text: #2c2118; --text-muted: #7a6a58; --border: #e8dcc8; --red: #c0392b;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; min-height: 100vh; display: grid; place-items: center; background: var(--cream); color: var(--text);
+  font-family: Arial, sans-serif; padding: 20px;
+}
+.card {
+  width: min(420px, 100%); background: var(--warm-white); border: 1px solid var(--border); border-radius: 24px; padding: 28px 22px;
+  text-align: center; box-shadow: 0 8px 30px rgba(44,33,24,0.08);
+}
+.logo { font-size: 44px; margin-bottom: 12px; }
+h1 { margin: 0 0 10px; font-size: 30px; color: #8c3e22; font-family: Georgia, serif; }
+p { margin: 0 0 12px; color: var(--text-muted); line-height: 1.5; }
+button {
+  width: 100%; border: 0; border-radius: 14px; padding: 14px 16px; background: var(--terra); color: #fff; font-size: 18px; font-weight: 700; cursor: pointer;
+}
+.status { min-height: 24px; margin-top: 14px; color: var(--text-muted); }
+.status.error { color: var(--red); }
+.small { font-size: 13px; margin-top: 12px; }
 </style>
 </head>
 <body>
-<div class="card">
-  <div class="icon">🐾</div>
-  <h1 class="title">Signing you in</h1>
-  <p class="msg" id="status">Opening Google sign in…</p>
-  <div class="small">Please keep this screen open until Miaou comes back.</div>
-</div>
+  <div class="card">
+    <div class="logo">🐾</div>
+    <h1>Signing in…</h1>
+    <p id="message">Please wait while Miaou completes Google sign in.</p>
+    <button id="retry-btn" style="display:none">Continue with Google</button>
+    <div class="status" id="status"></div>
+    <div class="small">This page closes itself by returning to Miaou when sign in finishes.</div>
+  </div>
+
 <script type="module">
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyDGFwXOFdTGYGbHSKafoh6zoaQO8zABPmc",
   authDomain: "miaou-57319.firebaseapp.com",
   projectId: "miaou-57319",
   storageBucket: "miaou-57319.firebasestorage.app",
-  messagingSenderId: "152797535766",
-  appId: "1:152797535766:web:668885df602e2927e09f37"
+  messagingSenderId: "152797",
+  appId: "1:152797:web:miaou"
 };
 const ALLOWED_EMAILS = ['ziadehpatrick@gmail.com','stefanie.a.hanna@gmail.com'];
-const params = new URLSearchParams(location.search);
-const returnTo = params.get('return') || localStorage.getItem('miaou_auth_return_to') || './index.html';
+
 const statusEl = document.getElementById('status');
-function setStatus(msg){ statusEl.textContent = msg; }
-function writeStatus(obj){ try{ localStorage.setItem('miaou_auth_return_status', JSON.stringify({...obj, ts: Date.now()})); }catch(err){} }
-function finishBack(){ setTimeout(()=>location.replace(returnTo), 600); }
-function allowed(email){ return ALLOWED_EMAILS.includes(String(email||'').toLowerCase()); }
-const { initializeApp } = await import('https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js');
-const { initializeAuth, getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, browserLocalPersistence, indexedDBLocalPersistence, signOut } = await import('https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js');
+const msgEl = document.getElementById('message');
+const retryBtn = document.getElementById('retry-btn');
+
+function setStatus(msg, isError=false){
+  statusEl.textContent = msg || '';
+  statusEl.className = isError ? 'status error' : 'status';
+}
+function isAllowedEmail(email){
+  return ALLOWED_EMAILS.includes(String(email || '').toLowerCase());
+}
+function goHome(){
+  const target = localStorage.getItem('miaou_post_auth_target') || 'index.html';
+  window.location.replace(target + '?signedin=1&t=' + Date.now());
+}
+function markPending(){
+  localStorage.setItem('miaou_google_redirect_pending', '1');
+  localStorage.setItem('miaou_post_auth_target', 'index.html');
+}
+function clearPending(){
+  localStorage.removeItem('miaou_google_redirect_pending');
+}
+function friendlyError(error){
+  const code = String(error && error.code || '');
+  if(code.includes('unauthorized-domain')) return 'This website domain is not authorized in Firebase Authentication yet.';
+  if(code.includes('operation-not-allowed')) return 'Google sign in is not enabled in Firebase Authentication yet.';
+  if(code.includes('network-request-failed')) return 'Network issue while opening Google sign in.';
+  return 'Google sign in did not complete.';
+}
+
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js';
+import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js';
+
 const app = initializeApp(FIREBASE_CONFIG);
-let auth;
-try { auth = initializeAuth(app, { persistence: [indexedDBLocalPersistence, browserLocalPersistence] }); }
-catch(err){ auth = getAuth(app); }
-const provider = new GoogleAuthProvider();
-provider.setCustomParameters({ prompt:'select_account' });
-try {
-  const result = await getRedirectResult(auth);
-  const user = result?.user || auth.currentUser || null;
-  if(user){
-    const email = String(user.email || '').toLowerCase();
-    if(!allowed(email)){
-      await signOut(auth);
-      writeStatus({ ok:false, message:'This Google account is not allowed for Miaou.' });
-      setStatus('This Google account is not allowed for Miaou.');
-      finishBack();
-    } else {
-      try{ localStorage.setItem('miaou_google_redirect_pending','0'); }catch(err){}
-      writeStatus({ ok:true, email, message:'' });
-      setStatus('Sign in complete. Returning to Miaou…');
-      finishBack();
-    }
-  } else {
-    try{ localStorage.setItem('miaou_google_redirect_pending','1'); }catch(err){}
-    setStatus('Opening Google sign in…');
+const auth = getAuth(app);
+await setPersistence(auth, browserLocalPersistence);
+
+async function startRedirect(){
+  try {
+    markPending();
+    setStatus('Opening Google…');
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({prompt:'select_account'});
     await signInWithRedirect(auth, provider);
+  } catch(error){
+    console.error(error);
+    setStatus(friendlyError(error), true);
+    retryBtn.style.display = 'block';
   }
-} catch(err) {
-  console.error(err);
-  let message = 'Google sign in did not complete. Please try again.';
-  const code = String(err?.code || '');
-  if(code.includes('unauthorized-domain')) message = 'This website domain is not authorized in Firebase yet.';
-  else if(code.includes('operation-not-allowed')) message = 'Google sign in is not enabled in Firebase Authentication yet.';
-  else if(code.includes('network-request-failed')) message = 'Network issue while opening Google sign in.';
-  writeStatus({ ok:false, message });
-  setStatus(message);
-  finishBack();
+}
+
+async function finishRedirect(){
+  try {
+    const result = await getRedirectResult(auth);
+    const user = result && result.user ? result.user : auth.currentUser;
+    if(user){
+      const email = String(user.email || '').toLowerCase();
+      if(!isAllowedEmail(email)){
+        await signOut(auth);
+        clearPending();
+        msgEl.textContent = 'That Google account is not allowed for Miaou.';
+        setStatus('Please use an approved Google account.', true);
+        retryBtn.style.display = 'block';
+        return;
+      }
+      clearPending();
+      setStatus('Sign in complete. Returning to Miaou…');
+      goHome();
+      return;
+    }
+
+    let handled = false;
+    onAuthStateChanged(auth, async user2 => {
+      if(handled) return;
+      if(!user2) return;
+      handled = true;
+      const email = String(user2.email || '').toLowerCase();
+      if(!isAllowedEmail(email)){
+        await signOut(auth);
+        clearPending();
+        msgEl.textContent = 'That Google account is not allowed for Miaou.';
+        setStatus('Please use an approved Google account.', true);
+        retryBtn.style.display = 'block';
+        return;
+      }
+      clearPending();
+      setStatus('Sign in complete. Returning to Miaou…');
+      goHome();
+    });
+
+    setTimeout(() => {
+      if(auth.currentUser){
+        handled = true;
+        clearPending();
+        goHome();
+      } else {
+        msgEl.textContent = 'Google sign in did not finish in the installed app.';
+        setStatus('Tap below to try again.', true);
+        retryBtn.style.display = 'block';
+      }
+    }, 2500);
+  } catch(error){
+    console.error(error);
+    msgEl.textContent = 'Google sign in did not finish in the installed app.';
+    setStatus(friendlyError(error), true);
+    retryBtn.style.display = 'block';
+  }
+}
+
+retryBtn.addEventListener('click', startRedirect);
+
+const params = new URLSearchParams(window.location.search);
+if(params.get('start') === '1'){
+  await startRedirect();
+} else {
+  await finishRedirect();
 }
 </script>
 </body>
