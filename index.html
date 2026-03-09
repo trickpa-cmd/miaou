@@ -4,13 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>🐾 Miaou</title>
+<link rel="manifest" href="miaou.webmanifest">
 <meta name="theme-color" content="#b85c38">
+<link rel="apple-touch-icon" href="miaou-icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Miaou">
-<link rel="manifest" href="./miaou.webmanifest">
-<link rel="icon" type="image/png" sizes="192x192" href="./miaou-icon-192.png">
-<link rel="apple-touch-icon" href="./miaou-icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -49,19 +47,8 @@ body::before {
 }
 .header-title { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 700; color: var(--terra-dark); letter-spacing: -0.02em; }
 .header-title span { color: var(--sand); }
-.header-actions { display: flex; align-items: center; gap: 8px; }
-.header-icon-btn {
-  min-width: 36px; height: 36px; border-radius: 12px;
-  background: var(--cream); color: var(--terra-dark); border: 1.5px solid var(--border);
-  font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
-  padding: 0 10px; box-shadow: 0 2px 8px rgba(44,33,24,0.06); transition: transform .15s, background .15s, border-color .15s, opacity .15s;
-}
-.header-icon-btn:active { transform: scale(0.93); }
-.header-icon-btn:hover { background: var(--cream2); border-color: var(--terra-light); }
-.header-icon-btn[disabled] { opacity: 0.45; cursor: not-allowed; }
-.header-icon-btn.install-btn { background: rgba(92,122,99,0.1); color: var(--sage); border-color: rgba(92,122,99,0.18); display: none; }
 .header-add-btn {
-  width: 36px; height: 36px; border-radius: 12px;
+  width: 36px; height: 36px; border-radius: 50%;
   background: var(--terra); color: white; border: none; font-size: 1.4rem; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 2px 8px rgba(184,92,56,0.4); transition: transform .15s;
@@ -76,23 +63,14 @@ body::before {
 }
 .nav-tab {
   flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 3px; cursor: pointer; border: none; background: none; position: relative;
+  gap: 3px; cursor: pointer; border: none; background: none;
   color: var(--text-muted); font-family: 'DM Sans', sans-serif;
-  font-size: 0.62rem; font-weight: 700; letter-spacing: 0.03em;
-  transition: color .2s, transform .2s; padding: 8px 2px; text-transform: uppercase;
-}
-.nav-tab::before {
-  content: ''; position: absolute; top: 7px; left: 12px; right: 12px; bottom: 7px;
-  border-radius: 16px; background: transparent; transition: background .2s, box-shadow .2s, transform .2s; z-index: -1;
+  font-size: 0.62rem; font-weight: 500; letter-spacing: 0.02em;
+  transition: color .2s; padding: 8px 2px; text-transform: uppercase;
 }
 .nav-tab .nav-icon { font-size: 1.35rem; transition: transform .2s; }
-.nav-tab.active { color: var(--terra-dark); transform: translateY(-1px); }
-.nav-tab.active::before { background: rgba(184,92,56,0.14); box-shadow: inset 0 0 0 1px rgba(184,92,56,0.14); }
-.nav-tab.active .nav-icon { transform: translateY(-2px) scale(1.06); }
-.nav-tab.active::after {
-  content: ''; position: absolute; top: 5px; left: 50%; transform: translateX(-50%);
-  width: 28px; height: 4px; border-radius: 99px; background: var(--terra);
- }
+.nav-tab.active { color: var(--terra); }
+.nav-tab.active .nav-icon { transform: translateY(-2px); }
 .section { display: none; }
 .section.active { display: block; }
 
@@ -385,6 +363,44 @@ body::before {
 .confirm-cancel { background: var(--cream); color: var(--text-muted); border: 1.5px solid var(--border); }
 .confirm-delete { background: var(--red); color: white; border: none; box-shadow: 0 6px 16px rgba(192,57,43,0.25); }
 
+
+.header-actions { display:flex; align-items:center; gap:8px; }
+.header-icon-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--cream); color: var(--terra-dark); border: 1.5px solid var(--border);
+  font-size: 1rem; cursor: pointer; display:flex; align-items:center; justify-content:center;
+  transition: transform .15s, background .15s, border-color .15s;
+}
+.header-icon-btn:active { transform: scale(0.93); }
+.header-icon-btn:hover { background: var(--cream2); border-color: var(--terra-light); }
+.header-add-btn { font-weight: 700; }
+.auth-overlay {
+  position: fixed; inset: 0; z-index: 1200; background: rgba(250,245,238,0.96);
+  display: none; align-items: center; justify-content: center; padding: 24px;
+  backdrop-filter: blur(8px);
+}
+.auth-overlay.open { display:flex; }
+.auth-card {
+  width: 100%; max-width: 380px; background: var(--warm-white); border: 1.5px solid var(--border);
+  border-radius: 24px; box-shadow: 0 12px 40px rgba(44,33,24,0.12); padding: 24px 22px;
+}
+.auth-logo { font-size: 2.4rem; margin-bottom: 10px; text-align:center; }
+.auth-title { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 700; text-align: center; color: var(--terra-dark); }
+.auth-text { font-size: 0.92rem; color: var(--text-muted); text-align:center; line-height:1.55; margin: 8px 0 16px; }
+.auth-allowed { background: var(--cream); border: 1px solid var(--border); border-radius: 14px; padding: 12px 14px; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 14px; }
+.auth-btn { width:100%; padding: 12px 14px; border:none; border-radius: 12px; background: var(--terra); color:white; font: inherit; font-weight:600; cursor:pointer; box-shadow: 0 3px 10px rgba(184,92,56,0.35); }
+.auth-btn.secondary { background: transparent; color: var(--text-muted); border: 1.5px solid var(--border); box-shadow: none; margin-top: 8px; }
+.auth-status { min-height: 20px; font-size: 0.8rem; color: var(--red); text-align:center; margin-top: 10px; }
+.backup-list { display:flex; flex-direction:column; gap:10px; margin-top: 8px; }
+.backup-item { background: var(--cream); border: 1.5px solid var(--border); border-radius: 12px; padding: 12px; }
+.backup-top { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+.backup-title { font-size:0.86rem; font-weight:700; color: var(--text); }
+.backup-meta { font-size:0.74rem; color: var(--text-muted); margin-top: 3px; line-height:1.45; }
+.backup-actions { display:flex; gap:8px; margin-top: 10px; }
+.backup-empty { color: var(--text-muted); font-size:0.85rem; text-align:center; padding: 18px 8px; }
+.conflict-note { background: rgba(192,57,43,0.08); border: 1px solid rgba(192,57,43,0.16); color: var(--red); border-radius: 12px; padding: 12px 14px; font-size:0.84rem; line-height:1.5; margin-bottom: 14px; }
+.user-chip { display:inline-flex; align-items:center; gap:6px; background: var(--cream); color: var(--text-muted); border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px; font-size:0.72rem; font-weight:600; }
+
 </style>
 </head>
 <body>
@@ -397,12 +413,21 @@ body::before {
 <header class="app-header">
   <div class="header-title">🐾 Miaou</div>
   <div class="header-actions">
-    <button class="header-icon-btn" id="undo-btn" onclick="undoAction()" title="Undo" aria-label="Undo">↶</button>
-    <button class="header-icon-btn" id="redo-btn" onclick="redoAction()" title="Redo" aria-label="Redo">↷</button>
-    <button class="header-icon-btn install-btn" id="install-btn" onclick="promptInstallApp()" title="Install app" aria-label="Install app">📲</button>
+    <button class="header-icon-btn" id="backup-btn" onclick="openBackupModal()" title="Cloud backups">☁️</button>
     <button class="header-add-btn" onclick="showAddCatModal()">+</button>
   </div>
 </header>
+
+<div class="auth-overlay open" id="auth-overlay">
+  <div class="auth-card">
+    <div class="auth-logo">🐾</div>
+    <div class="auth-title">Sign in to Miaou</div>
+    <div class="auth-text">Use Google sign in to access the shared records.</div>
+    <button class="auth-btn" id="google-signin-btn" type="button">Continue with Google</button>
+    <button class="auth-btn secondary" id="auth-signout-btn" type="button" style="display:none">Sign out</button>
+    <div class="auth-status" id="auth-status"></div>
+  </div>
+</div>
 
 <main class="main">
 
@@ -471,9 +496,9 @@ body::before {
 </main>
 
 <nav class="bottom-nav">
-  <button class="nav-tab active" data-tab="cats" onclick="switchTab('cats',this)"><span class="nav-icon">🐾</span>Cats</button>
-  <button class="nav-tab" data-tab="vet" onclick="switchTab('vet',this)"><span class="nav-icon">📅</span>Schedule</button>
-  <button class="nav-tab" data-tab="litter" onclick="switchTab('litter',this)"><span class="nav-icon">🌿</span>Litter</button>
+  <button class="nav-tab active" onclick="switchTab('cats',this)"><span class="nav-icon">🐾</span>Cats</button>
+  <button class="nav-tab" onclick="switchTab('vet',this)"><span class="nav-icon">📅</span>Schedule</button>
+  <button class="nav-tab" onclick="switchTab('litter',this)"><span class="nav-icon">🌿</span>Litter</button>
 </nav>
 
 <!-- MODAL: VISIT -->
@@ -629,13 +654,45 @@ body::before {
 
 <div class="confirm-overlay" id="confirm-modal">
   <div class="confirm-card" role="dialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-message">
-    <div class="confirm-icon" id="confirm-icon">🗑</div>
+    <div class="confirm-icon">🗑</div>
     <div class="confirm-title" id="confirm-title">Delete item?</div>
     <div class="confirm-message" id="confirm-message">Are you sure you want to delete this item?</div>
     <div class="confirm-actions">
       <button class="confirm-cancel" id="confirm-cancel-btn">Cancel</button>
       <button class="confirm-delete" id="confirm-delete-btn">Delete</button>
     </div>
+  </div>
+</div>
+
+
+<div class="modal-overlay" id="backup-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Cloud Backups</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+      <span class="user-chip" id="backup-user-chip">🔒 Not signed in</span>
+      <button class="header-icon-btn" type="button" onclick="signOutUser()" style="width:auto;height:auto;border-radius:12px;padding:8px 12px;font-size:0.8rem">Sign out</button>
+    </div>
+    <div class="form-group" style="margin-bottom:8px">
+      <div class="form-label">Automatic versioning</div>
+      <div style="font-size:0.84rem;color:var(--text-muted);line-height:1.55">Every cloud save keeps the previous state as a restore point. Conflicting saves are blocked so another device cannot silently overwrite your records.</div>
+    </div>
+    <div class="backup-list" id="backup-list"></div>
+    <button class="form-cancel" onclick="closeModal('backup-modal')">Close</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="conflict-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Cloud save blocked</div>
+    <div class="conflict-note" id="conflict-message">A newer cloud version was found, so this page did not overwrite it.</div>
+    <div class="form-group" style="margin-bottom:8px">
+      <div class="form-label">What happened</div>
+      <div style="font-size:0.84rem;color:var(--text-muted);line-height:1.55">Another tab or device saved a newer revision. This app kept your current page from overwriting it by mistake.</div>
+    </div>
+    <button class="form-submit" onclick="reloadFromCloud()">Load latest cloud version</button>
+    <button class="form-cancel" onclick="closeModal('conflict-modal')">Keep this page for now</button>
   </div>
 </div>
 
@@ -795,154 +852,359 @@ const FIREBASE_CONFIG = {
   appId: "1:152797535766:web:668885df602e2927e09f37"
 };
 
-let _getDoc, _setDoc, _DATA_REF;
-
+let _getDoc, _setDoc, _DATA_REF, _db, _runTransaction, _serverTimestamp, _collection, _query, _orderBy, _limit, _getDocs, _doc;
+let _auth, _GoogleAuthProvider, _signInWithPopup, _signInWithRedirect, _getRedirectResult, _onAuthStateChanged, _signOut;
+const ALLOWED_EMAILS=['ziadehpatrick@gmail.com','stefanie.a.hanna@gmail.com'];
+let currentUserEmail='';
+let localRevision=0;
+let backups=[];
+pendingCloudPayload='';
 
 function uid(){return '_'+Math.random().toString(36).slice(2,9);}
-function clone(v){return v===undefined?undefined:JSON.parse(JSON.stringify(v));}
-const HISTORY_LIMIT = 250;
-let undoStack = [], redoStack = [], isApplyingHistory = false, deferredInstallPrompt = null;
-function pathValue(path){return path.reduce((acc,key)=>acc[key], data);}
-function parentAt(path){let ref=data;for(let i=0;i<path.length-1;i++)ref=ref[path[i]];return ref;}
-function applyOp(op, direction){
-  if(op.type==='replace'){
-    const parent=parentAt(op.path), key=op.path[op.path.length-1];
-    parent[key]=clone(direction==='undo'?op.oldValue:op.newValue);
-    return;
-  }
-  const arr=pathValue(op.path);
-  if(op.type==='array-insert'){
-    if(direction==='undo') arr.splice(op.index,1);
-    else arr.splice(op.index,0,clone(op.value));
-    return;
-  }
-  if(op.type==='array-remove'){
-    if(direction==='undo') arr.splice(op.index,0,clone(op.value));
-    else arr.splice(op.index,1);
-  }
+function storageKey(){return currentUserEmail?`miaou_offline_${currentUserEmail}`:'miaou_offline';}
+function deepClone(v){return JSON.parse(JSON.stringify(v));}
+function setAuthStatus(msg,isError=true){const el=document.getElementById('auth-status'); if(!el) return; el.textContent=msg||''; el.style.color=isError?'var(--red)':'var(--sage)';}
+function isAllowedEmail(email){return ALLOWED_EMAILS.includes(String(email||'').toLowerCase());}
+function isStandaloneMode(){
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 }
-function applyOps(ops,direction){ ops.forEach(op=>applyOp(op,direction)); }
-function pushHistory(label, ops){
-  if(isApplyingHistory || !ops || !ops.length) return;
-  undoStack.push({id:uid(), label, ops, at:new Date().toISOString()});
-  if(undoStack.length>HISTORY_LIMIT) undoStack=undoStack.slice(-HISTORY_LIMIT);
-  redoStack=[];
-  updateUndoRedoButtons();
+function getFriendlyAuthError(error){
+  const code = String(error?.code || '');
+  if(code.includes('popup_blocked')) return 'Google sign in was blocked by the browser. Please try again.';
+  if(code.includes('popup_closed')) return 'Google sign in was closed before it finished.';
+  if(code.includes('unauthorized-domain')) return 'This website domain is not authorized in Firebase yet. Add your live domain in Firebase Authentication then try again.';
+  if(code.includes('operation-not-allowed')) return 'Google sign in is not enabled in Firebase Authentication yet.';
+  if(code.includes('network-request-failed')) return 'Network issue while opening Google sign in. Please try again.';
+  return 'Google sign in did not complete. Please try again.';
 }
-function updateUndoRedoButtons(){
-  const undoBtn=document.getElementById('undo-btn');
-  const redoBtn=document.getElementById('redo-btn');
-  if(undoBtn) undoBtn.disabled=!undoStack.length;
-  if(redoBtn) redoBtn.disabled=!redoStack.length;
+function setSignedInUi(){
+  document.getElementById('auth-overlay').classList.remove('open');
+  document.getElementById('backup-user-chip').textContent=currentUserEmail?`🔒 ${currentUserEmail}`:'🔒 Not signed in';
 }
-function renderCurrentTab(){
-  const active=document.querySelector('.nav-tab.active');
-  const tabName=active?active.getAttribute('data-tab'):'cats';
-  renderCatsGrid();
-  renderUpcoming();
-  renderTreatmentRows();
-  renderVetCatSections();
-  renderLitter();
-  if(currentCatId && document.getElementById('cat-detail').classList.contains('active')) renderCatDetail(currentCatId);
-  if(tabName==='cats' && !currentCatId) showCatsList();
-  updateUndoRedoButtons();
+function setSignedOutUi(){
+  document.getElementById('auth-overlay').classList.add('open');
+  document.getElementById('backup-user-chip').textContent='🔒 Not signed in';
+  const signoutBtn = document.getElementById('auth-signout-btn');
+  if(signoutBtn) signoutBtn.style.display='none';
 }
-async function undoAction(){
-  if(!undoStack.length) return;
-  const entry=undoStack.pop();
-  isApplyingHistory=true;
-  applyOps(entry.ops,'undo');
-  isApplyingHistory=false;
-  redoStack.push(entry);
-  await saveData();
-  renderCurrentTab();
-  showToast('Undid: '+entry.label);
-}
-async function redoAction(){
-  if(!redoStack.length) return;
-  const entry=redoStack.pop();
-  isApplyingHistory=true;
-  applyOps(entry.ops,'redo');
-  isApplyingHistory=false;
-  undoStack.push(entry);
-  await saveData();
-  renderCurrentTab();
-  showToast('Redid: '+entry.label);
-}
-function catIndexById(catId){return data.cats.findIndex(c=>c.id===catId);}
-function visitIndexById(catId,visitId){const cat=data.cats.find(c=>c.id===catId);return cat?cat.visits.findIndex(v=>v.id===visitId):-1;}
-function scheduleIndexById(catId,schedId){const cat=data.cats.find(c=>c.id===catId);return cat?cat.schedules.findIndex(s=>s.id===schedId):-1;}
-function treatmentIndexById(tid){return data.treatments.findIndex(t=>t.id===tid);}
-function litterIndexById(lid){return data.litters.findIndex(l=>l.id===lid);}
-async function commitChange(label, ops){
-  pushHistory(label, ops);
-  await saveData();
-  updateUndoRedoButtons();
+
+async function initFirebase(){
+  const {initializeApp} = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js");
+  const {getFirestore, doc, getDoc, setDoc, runTransaction, serverTimestamp, collection, query, orderBy, limit, getDocs} = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js");
+  const {getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence} = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js");
+  const app = initializeApp(FIREBASE_CONFIG);
+  _db = getFirestore(app);
+  _auth = getAuth(app);
+  try { await setPersistence(_auth, browserLocalPersistence); } catch(err) { console.warn('Auth persistence warning:', err); }
+  _doc = doc;
+  _DATA_REF = doc(_db, 'miaou', 'data');
+  _getDoc = getDoc; _setDoc = setDoc; _runTransaction = runTransaction; _serverTimestamp = serverTimestamp;
+  _collection = collection; _query = query; _orderBy = orderBy; _limit = limit; _getDocs = getDocs;
+  _GoogleAuthProvider = GoogleAuthProvider; _signInWithPopup = signInWithPopup; _signInWithRedirect = signInWithRedirect; _getRedirectResult = getRedirectResult; _onAuthStateChanged = onAuthStateChanged; _signOut = signOut;
 }
 
 async function loadData(){
   document.getElementById('loading-screen').style.display='flex';
-  const timeout = setTimeout(()=>{
-    document.getElementById('loading-screen').style.display='none';
-    if(!data){ data=JSON.parse(JSON.stringify(DEFAULT)); renderCatsGrid(); renderUpcoming(); }
-  }, 6000);
   try {
-    const {initializeApp} = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js");
-    const {getFirestore, doc, getDoc, setDoc} = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js");
-    const app = initializeApp(FIREBASE_CONFIG);
-    const db = getFirestore(app);
-    _DATA_REF = doc(db, 'miaou', 'data');
-    _getDoc = getDoc; _setDoc = setDoc;
-    const snap = await getDoc(_DATA_REF);
-    if(snap.exists()){
-      const payload = snap.data();
-      data = payload.payload ? JSON.parse(payload.payload) : JSON.parse(JSON.stringify(DEFAULT));
-      undoStack = payload.undoLog ? JSON.parse(payload.undoLog) : [];
-      redoStack = payload.redoLog ? JSON.parse(payload.redoLog) : [];
+    const snap = await _getDoc(_DATA_REF);
+    if(snap.exists() && snap.data().payload){
+      const cloud = snap.data();
+      data = JSON.parse(cloud.payload);
+      localRevision = cloud.revision || 0;
+      try { localStorage.setItem(storageKey(), cloud.payload); } catch(err){}
     } else {
-      data = JSON.parse(JSON.stringify(DEFAULT));
-      undoStack = [];
-      redoStack = [];
-      await saveData();
+      data = deepClone(DEFAULT);
+      localRevision = 0;
+      await saveData({reason:'Initial setup', skipBackup:true, silent:true});
     }
   } catch(e) {
-    console.error('Firebase error:', e);
+    console.error('Load error:', e);
     try {
-      const s=localStorage.getItem('miaou_offline');
-      const u=localStorage.getItem('miaou_undo');
-      const r=localStorage.getItem('miaou_redo');
-      data=s?JSON.parse(s):JSON.parse(JSON.stringify(DEFAULT));
-      undoStack=u?JSON.parse(u):[];
-      redoStack=r?JSON.parse(r):[];
+      const s = localStorage.getItem(storageKey());
+      data = s ? JSON.parse(s) : deepClone(DEFAULT);
+    } catch(err) {
+      data = deepClone(DEFAULT);
     }
-    catch(e2){ data=JSON.parse(JSON.stringify(DEFAULT)); undoStack=[]; redoStack=[]; }
   }
-  clearTimeout(timeout);
   document.getElementById('loading-screen').style.display='none';
   renderCatsGrid();
   renderUpcoming();
-  updateUndoRedoButtons();
-  initInstallPrompt();
+  await loadBackups();
 }
 
-async function saveData(){
+async function loadBackups(){
+  const listEl=document.getElementById('backup-list');
+  if(!listEl) return;
+  if(!_db || !_collection){ listEl.innerHTML='<div class="backup-empty">Cloud backups are unavailable.</div>'; return; }
+  listEl.innerHTML='<div class="backup-empty">Loading backups…</div>';
   try {
-    const payload={ payload: JSON.stringify(data), undoLog: JSON.stringify(undoStack), redoLog: JSON.stringify(redoStack), updated: new Date().toISOString() };
-    if(_setDoc && _DATA_REF){
-      await _setDoc(_DATA_REF, payload);
+    const versionsRef = _collection(_db, 'miaou', 'data', 'versions');
+    const snap = await _getDocs(_query(versionsRef, _orderBy('revision','desc'), _limit(20)));
+    backups = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    if(!backups.length){
+      listEl.innerHTML='<div class="backup-empty">No cloud backups yet. The first backup appears after the next save.</div>';
+      return;
     }
-    localStorage.setItem('miaou_offline', JSON.stringify(data));
-    localStorage.setItem('miaou_undo', JSON.stringify(undoStack));
-    localStorage.setItem('miaou_redo', JSON.stringify(redoStack));
+    listEl.innerHTML = backups.map(b=>{
+      const when = b.backedUpAt && typeof b.backedUpAt.toDate==='function' ? b.backedUpAt.toDate().toLocaleString() : (b.updated || 'Saved earlier');
+      const by = b.savedBy || 'Unknown';
+      const reason = b.reason || 'Update';
+      return `<div class="backup-item">
+        <div class="backup-top">
+          <div>
+            <div class="backup-title">Revision ${b.revision || '—'}</div>
+            <div class="backup-meta">${reason}<br>${when}<br>${by}</div>
+          </div>
+        </div>
+        <div class="backup-actions">
+          <button class="btn-edit" onclick="restoreBackup('${b.id}')">Restore</button>
+        </div>
+      </div>`;
+    }).join('');
   } catch(e) {
-    console.error('Firebase save error:', e);
-    try {
-      localStorage.setItem('miaou_offline', JSON.stringify(data));
-      localStorage.setItem('miaou_undo', JSON.stringify(undoStack));
-      localStorage.setItem('miaou_redo', JSON.stringify(redoStack));
-    } catch(e2){}
+    console.error('Backup load error:', e);
+    listEl.innerHTML='<div class="backup-empty">Could not load cloud backups right now.</div>';
   }
 }
+
+async function restoreBackup(versionId){
+  const backup = backups.find(b=>b.id===versionId);
+  if(!backup || !backup.payload){ showToast('Backup not found'); return; }
+  askDelete('Restore this cloud backup? The current live version will be backed up first.', async ()=>{
+    try {
+      data = JSON.parse(backup.payload);
+      await saveData({reason:`Restored revision ${backup.revision || ''}`.trim()});
+      renderCatsGrid();
+      renderUpcoming();
+      if(currentCatId) renderCatDetail();
+      renderVetCatSections();
+      renderLitter();
+      await loadBackups();
+      closeModal('backup-modal');
+      showToast('Backup restored ✓');
+    } catch(e) {
+      console.error(e);
+      showToast('Restore failed');
+    }
+  });
+}
+
+async function reloadFromCloud(){
+  closeModal('conflict-modal');
+  await loadData();
+  renderVetCatSections();
+  renderLitter();
+  if(currentCatId) renderCatDetail();
+  showToast('Loaded latest cloud version');
+}
+
+async function saveData(meta={}){
+  const payload = JSON.stringify(data);
+  try {
+    if(_runTransaction && _DATA_REF && currentUserEmail){
+      const result = await _runTransaction(_db, async tx => {
+        const snap = await tx.get(_DATA_REF);
+        const remote = snap.exists() ? snap.data() : null;
+        const remoteRevision = remote?.revision || 0;
+        const remotePayload = remote?.payload || null;
+        if(remote && remoteRevision !== localRevision){
+          const err = new Error('revision_conflict');
+          err.remoteRevision = remoteRevision;
+          err.remotePayload = remotePayload;
+          throw err;
+        }
+        const nextRevision = remoteRevision + 1;
+        if(remotePayload && remotePayload !== payload && !meta.skipBackup){
+          const versionRef = _doc(_collection(_db, 'miaou', 'data', 'versions'));
+          tx.set(versionRef, {
+            payload: remotePayload,
+            revision: remoteRevision,
+            backedUpAt: _serverTimestamp(),
+            savedBy: currentUserEmail,
+            reason: meta.reason || 'Update'
+          });
+        }
+        tx.set(_DATA_REF, {
+          payload,
+          updated: new Date().toISOString(),
+          updatedBy: currentUserEmail,
+          revision: nextRevision,
+          lastAction: meta.reason || 'Update'
+        });
+        return { nextRevision };
+      });
+      localRevision = result.nextRevision;
+      await loadBackups();
+    }
+    localStorage.setItem(storageKey(), payload);
+  } catch(e) {
+    console.error('Save error:', e);
+    try { localStorage.setItem(storageKey(), payload); } catch(err) {}
+    if(e && e.message === 'revision_conflict'){
+      pendingCloudPayload = e.remotePayload || '';
+      document.getElementById('conflict-message').textContent = 'A newer cloud revision exists already, so this page did not overwrite it. Load the latest cloud version to continue safely.';
+      openModal('conflict-modal');
+      return;
+    }
+    if(!meta.silent) showToast('Saved locally only');
+  }
+}
+
+
+function shouldPreferRedirectSignIn(){
+  return isStandaloneMode();
+}
+
+function markRedirectPending(){
+  try { localStorage.setItem('miaou_google_redirect_pending', '1'); } catch(err) {}
+}
+
+function clearRedirectPending(){
+  try { localStorage.removeItem('miaou_google_redirect_pending'); } catch(err) {}
+}
+
+function setPostAuthTarget(){
+  try { localStorage.setItem('miaou_post_auth_target', 'index.html'); } catch(err) {}
+}
+
+function launchStandaloneAuthFlow(){
+  markRedirectPending();
+  setPostAuthTarget();
+  const nonce = Date.now();
+  window.location.href = `auth-return.html?start=1&t=${nonce}`;
+}
+
+async function completePendingRedirectResult(){
+  try {
+    const redirectResult = await _getRedirectResult(_auth);
+    if(redirectResult && redirectResult.user){
+      await completeSignedInUser(redirectResult.user);
+      return true;
+    }
+  } catch(err) {
+    console.error('Redirect result error:', err);
+    setAuthStatus(getFriendlyAuthError(err));
+  }
+  return false;
+}
+
+async function completeExistingSessionIfAny(){
+  const pendingRedirect = (() => { try { return localStorage.getItem('miaou_google_redirect_pending') === '1'; } catch(err) { return false; } })();
+
+  const waitedUser = await new Promise(resolve => {
+    let settled = false;
+    const finish = (user) => {
+      if(settled) return;
+      settled = true;
+      resolve(user || null);
+    };
+    const timeout = setTimeout(() => finish(_auth && _auth.currentUser ? _auth.currentUser : null), pendingRedirect ? 2500 : 800);
+    const unsub = _onAuthStateChanged(_auth, user => {
+      clearTimeout(timeout);
+      try { unsub(); } catch(err) {}
+      finish(user);
+    });
+  });
+
+  if(waitedUser){
+    await completeSignedInUser(waitedUser);
+    return true;
+  }
+
+  if(pendingRedirect){
+    setSignedOutUi();
+    document.getElementById('loading-screen').style.display='none';
+    setAuthStatus('Google sign in did not finish inside the installed app. Please tap Continue with Google again.');
+    return false;
+  }
+
+  return false;
+}
+
+async function signInWithGoogle(){
+  setAuthStatus('', false);
+  const btn = document.getElementById('google-signin-btn');
+  if(btn){ btn.disabled = true; btn.style.opacity = '0.7'; }
+  try {
+    const provider = new _GoogleAuthProvider();
+    provider.setCustomParameters({prompt:'select_account'});
+    setAuthStatus('Opening Google sign in…', false);
+
+    if(shouldPreferRedirectSignIn()){
+      launchStandaloneAuthFlow();
+      return;
+    }
+
+    await _signInWithPopup(_auth, provider);
+    return;
+  } catch(e) {
+    console.error('Sign in error:', e);
+    const code = String(e.code || '');
+    if(code.includes('popup')){
+      try {
+        const provider = new _GoogleAuthProvider();
+        provider.setCustomParameters({prompt:'select_account'});
+        setAuthStatus('Opening Google sign in…', false);
+        markRedirectPending();
+        setPostAuthTarget();
+        await _signInWithRedirect(_auth, provider);
+        return;
+      } catch(err) {
+        console.error('Redirect sign in error:', err);
+        setAuthStatus(getFriendlyAuthError(err));
+      }
+    } else {
+      setAuthStatus(getFriendlyAuthError(e));
+    }
+  } finally {
+    if(btn){ btn.disabled = false; btn.style.opacity = ''; }
+  }
+}
+
+async function signOutUser(){
+  if(!_auth) return;
+  clearRedirectPending();
+  await _signOut(_auth);
+}
+
+
+function openBackupModal(){
+  if(!currentUserEmail){
+    setSignedOutUi();
+    setAuthStatus('Please sign in first.');
+    return;
+  }
+  document.getElementById('backup-user-chip').textContent=`🔒 ${currentUserEmail}`;
+  loadBackups();
+  openModal('backup-modal');
+}
+
+
+async function bootstrap(){
+  document.getElementById('google-signin-btn').addEventListener('click', signInWithGoogle);
+  document.getElementById('auth-signout-btn').addEventListener('click', signOutUser);
+  document.getElementById('loading-screen').style.display='flex';
+  try {
+    await initFirebase();
+
+    const redirectCompleted = await completePendingRedirectResult();
+    if(redirectCompleted) return;
+
+    const resumed = await completeExistingSessionIfAny();
+    if(resumed) return;
+
+    currentUserEmail='';
+    data = deepClone(DEFAULT);
+    setSignedOutUi();
+    document.getElementById('loading-screen').style.display='none';
+  } catch(e) {
+    console.error('Firebase init error:', e);
+    setAuthStatus('Could not connect to Firebase right now.');
+    document.getElementById('loading-screen').style.display='none';
+    setSignedOutUi();
+  }
+}
+
 
 // ═══ NAV ═══
 function switchTab(name,btn){
@@ -953,7 +1215,6 @@ function switchTab(name,btn){
   if(name==='cats')showCatsList();
   if(name==='vet')renderVetSchedule();
   if(name==='litter')renderLitter();
-  updateUndoRedoButtons();
 }
 
 // ═══ HELPERS ═══
@@ -1156,12 +1417,8 @@ function makeDobEditable(catId){
   document.getElementById('dob-input-'+catId).focus();
 }
 function saveDob(catId,val){
-  const ci=catIndexById(catId);
-  const prev=data.cats[ci].dob||null;
-  const next=val||null;
-  if(prev===next){ renderCatDetail(); return; }
-  data.cats[ci].dob=next;
-  commitChange('Updated date of birth',[{type:'replace', path:['cats',ci,'dob'], oldValue:prev, newValue:next}]);renderCatDetail();showToast('Date of birth saved ✓');
+  data.cats.find(c=>c.id===catId).dob=val||null;
+  saveData({reason:'Updated date of birth'});renderCatDetail();showToast('Date of birth saved ✓');
 }
 function makeNameEditable(catId){
   const cat=data.cats.find(c=>c.id===catId);
@@ -1169,27 +1426,8 @@ function makeNameEditable(catId){
   el.outerHTML=`<input class="cat-name-input" id="editable-name-${catId}" value="${cat.name}" onblur="saveName('${catId}',this.value)" onkeydown="if(event.key==='Enter')this.blur()">`;
   document.getElementById('editable-name-'+catId).focus();
 }
-
-function saveName(catId,v){
-  if(!v.trim()) return renderCatDetail();
-  const ci=catIndexById(catId), cat=data.cats[ci], next=v.trim(), prev=cat.name;
-  if(prev===next) return renderCatDetail();
-  cat.name=next;
-  commitChange('Renamed '+next,[{type:'replace', path:['cats',ci,'name'], oldValue:prev, newValue:next}]);
-  renderCatDetail();
-}
-
-
-function promptRenameEmoji(catId){
-  const e=prompt('New emoji:');
-  if(!e) return;
-  const ci=catIndexById(catId), cat=data.cats[ci], prev=cat.emoji, next=e.trim().slice(0,2);
-  if(!next || prev===next) return;
-  cat.emoji=next;
-  commitChange('Changed cat emoji',[{type:'replace', path:['cats',ci,'emoji'], oldValue:prev, newValue:next}]);
-  renderCatDetail();
-}
-
+function saveName(catId,v){if(!v.trim())return renderCatDetail();data.cats.find(c=>c.id===catId).name=v.trim();saveData({reason:'Renamed cat'});renderCatDetail();}
+function promptRenameEmoji(catId){const e=prompt('New emoji:');if(!e)return;data.cats.find(c=>c.id===catId).emoji=e.trim().slice(0,2);saveData({reason:'Changed cat icon'});renderCatDetail();}
 
 // ═══ TIMELINE ═══
 function renderTimeline(cat){
@@ -1314,64 +1552,40 @@ function editVisit(visitId){
   document.getElementById('ot-name').value='';
   buildTreatmentPicker(v.treatments||[]);renderOnetimeList();openModal('visit-modal');
 }
-
 function saveVisit(){
   const cat=data.cats.find(c=>c.id===currentCatId);
-  const ci=catIndexById(currentCatId);
   const date=document.getElementById('visit-date').value;
   if(!date){showToast('Please enter a date');return;}
   let auto=0;selectedTreatments.forEach(tid=>{const t=tById(tid);if(t)auto+=t.price;});
   const ov=parseFloat(document.getElementById('visit-cost').value);
   const v={id:editingVisitId||uid(),date,weight:parseFloat(document.getElementById('visit-weight').value)||null,cost:isNaN(ov)?auto:ov,treatments:[...selectedTreatments],oneTimeTreatments:[...oneTimeTreatments],notes:document.getElementById('visit-notes').value.trim()};
-  const ops=[];
-  if(editingVisitId){
-    const vi=cat.visits.findIndex(x=>x.id===editingVisitId);
-    const prev=clone(cat.visits[vi]);
-    cat.visits[vi]=v;
-    ops.push({type:'replace', path:['cats',ci,'visits',vi], oldValue:prev, newValue:clone(v)});
-  } else {
-    const insertIndex=cat.visits.length;
-    cat.visits.push(v);
-    ops.push({type:'array-insert', path:['cats',ci,'visits'], index:insertIndex, value:clone(v)});
+  if(editingVisitId){const i=cat.visits.findIndex(x=>x.id===editingVisitId);cat.visits[i]=v;}
+  else cat.visits.push(v);
+  // Auto-create one-time follow-up schedule items
+  if(!editingVisitId){
     oneTimeTreatments.forEach(ot=>{
       const dueDate=addDuration(date,ot.repeatCount,ot.repeatUnit);
-      const sched={id:uid(),oneTime:true,oneTimeName:ot.name,dueDate,price:0,notes:`Follow-up from visit ${formatDate(date)}`,done:false};
-      const schedIndex=cat.schedules.length;
-      cat.schedules.push(sched);
-      ops.push({type:'array-insert', path:['cats',ci,'schedules'], index:schedIndex, value:clone(sched)});
+      cat.schedules.push({id:uid(),oneTime:true,oneTimeName:ot.name,dueDate,price:0,notes:`Follow-up from visit ${formatDate(date)}`,done:false});
     });
   }
-  commitChange(editingVisitId?'Updated visit':'Added visit', ops);
-  closeModal('visit-modal');renderCatDetail();showToast(editingVisitId?'Visit updated ✓':'Visit added ✓');
+  saveData({reason:editingVisitId?'Updated visit':'Added visit'});closeModal('visit-modal');renderCatDetail();showToast(editingVisitId?'Visit updated ✓':'Visit added ✓');
 }
-
-
 function deleteVisit(visitId){
   askDelete('Delete this visit? This action cannot be undone.',()=>{
-    const ci=catIndexById(currentCatId);
-    const cat=data.cats[ci];
-    const vi=cat.visits.findIndex(v=>v.id===visitId);
-    const removed=clone(cat.visits[vi]);
+    const cat=data.cats.find(c=>c.id===currentCatId);
     cat.visits=cat.visits.filter(v=>v.id!==visitId);
-    commitChange('Deleted visit',[{type:'array-remove', path:['cats',ci,'visits'], index:vi, value:removed}]);
-    renderCatDetail();showToast('Visit deleted');
+    saveData({reason:'Deleted visit'});renderCatDetail();showToast('Visit deleted');
   });
 }
 
-
 // ═══ ADD CAT ═══
 function showAddCatModal(){document.getElementById('new-cat-name').value='';document.getElementById('new-cat-dob').value='';document.getElementById('new-cat-emoji').value='🐱';openModal('add-cat-modal');}
-
 function addCat(){
   const name=document.getElementById('new-cat-name').value.trim();
   if(!name){showToast('Please enter a name');return;}
   const cat={id:uid(),name,emoji:document.getElementById('new-cat-emoji').value.trim()||'🐱',dob:document.getElementById('new-cat-dob').value||null,color:['#b85c38','#5c7a63','#c4a882','#8474a8','#4a7fa5','#a05c8c'][data.cats.length%6],visits:[],schedules:[]};
-  const index=data.cats.length;
-  data.cats.push(cat);
-  commitChange('Added cat '+name,[{type:'array-insert', path:['cats'], index:index, value:cat}]);
-  closeModal('add-cat-modal');renderCatsGrid();showToast(name+' added ✓');
+  data.cats.push(cat);saveData({reason:'Added cat'});closeModal('add-cat-modal');renderCatsGrid();showToast(name+' added ✓');
 }
-
 
 // ═══ VET SCHEDULE ═══
 function toggleDashboard(){document.getElementById('price-dashboard').classList.toggle('open');}
@@ -1400,23 +1614,18 @@ function renderTreatmentRows(){
     </div>`).join('')||'<div style="font-size:0.82rem;color:var(--text-muted);padding:6px 0">No treatments yet.</div>';
 }
 
-
 function addTreatmentInline(){
   const name=document.getElementById('new-t-name').value.trim();
   const price=parseFloat(document.getElementById('new-t-price').value);
   if(!name||isNaN(price)){showToast('Enter a name and price');return;}
   const repeatCount=parseInt(document.getElementById('new-t-repeat-count').value)||null;
   const repeatUnit=document.getElementById('new-t-repeat-unit').value||'months';
-  const treatment={id:uid(),name,price,repeatCount,repeatUnit};
-  const index=data.treatments.length;
-  data.treatments.push(treatment);
+  data.treatments.push({id:uid(),name,price,repeatCount,repeatUnit});
   document.getElementById('new-t-name').value='';
   document.getElementById('new-t-price').value='';
   document.getElementById('new-t-repeat-count').value='';
-  commitChange('Added treatment '+name,[{type:'array-insert', path:['treatments'], index:index, value:clone(treatment)}]);
-  renderTreatmentRows();showToast('Treatment added ✓');
+  saveData({reason:'Added treatment'});renderTreatmentRows();showToast('Treatment added ✓');
 }
-
 function openEditTreatment(tid){
   const t=tById(tid);if(!t)return;
   editingTreatmentId=tid;
@@ -1426,29 +1635,20 @@ function openEditTreatment(tid){
   document.getElementById('edit-t-repeat-unit').value=t.repeatUnit||'months';
   openModal('treatment-edit-modal');
 }
-
 function saveTreatmentEdit(){
-  const ti=treatmentIndexById(editingTreatmentId), t=data.treatments[ti]; if(!t)return;
-  const prev=clone(t);
+  const t=tById(editingTreatmentId);if(!t)return;
   t.name=document.getElementById('edit-t-name').value.trim()||t.name;
   t.price=parseFloat(document.getElementById('edit-t-price').value)||t.price;
   t.repeatCount=parseInt(document.getElementById('edit-t-repeat-count').value)||null;
   t.repeatUnit=document.getElementById('edit-t-repeat-unit').value||'months';
-  commitChange('Edited treatment '+t.name,[{type:'replace', path:['treatments',ti], oldValue:prev, newValue:clone(t)}]);
-  closeModal('treatment-edit-modal');renderTreatmentRows();renderVetCatSections();showToast('Updated ✓');
+  saveData({reason:'Updated treatment'});closeModal('treatment-edit-modal');renderTreatmentRows();renderVetCatSections();showToast('Updated ✓');
 }
-
-
 function deleteTreatment(tid){
   askDelete('Delete this treatment from the price list?',()=>{
-    const ti=treatmentIndexById(tid);
-    const removed=clone(data.treatments[ti]);
     data.treatments=data.treatments.filter(t=>t.id!==tid);
-    commitChange('Deleted treatment',[{type:'array-remove', path:['treatments'], index:ti, value:removed}]);
-    renderTreatmentRows();renderVetCatSections();showToast('Removed ✓');
+    saveData({reason:'Deleted treatment'});renderTreatmentRows();renderVetCatSections();showToast('Removed ✓');
   });
 }
-
 
 function renderVetSchedule(){renderTreatmentRows();renderVetCatSections();}
 
@@ -1497,15 +1697,10 @@ function renderVetCatSections(){
   }).join('');
 }
 
-
 function toggleSchedDone(catId,schedId){
-  const ci=catIndexById(catId), si=scheduleIndexById(catId,schedId), s=data.cats[ci].schedules[si];
-  const prev=!!s.done;
-  s.done=!s.done;
-  commitChange(s.done?'Marked schedule done':'Marked schedule pending',[{type:'replace', path:['cats',ci,'schedules',si,'done'], oldValue:prev, newValue:!!s.done}]);
-  renderVetCatSections();showToast(s.done?'Marked done ✓':'Marked pending');
+  const cat=data.cats.find(c=>c.id===catId),s=cat.schedules.find(x=>x.id===schedId);
+  s.done=!s.done;saveData({reason:s.done?'Completed scheduled item':'Reopened scheduled item'});renderVetCatSections();showToast(s.done?'Marked done ✓':'Marked pending');
 }
-
 function showAddSchedModal(catId){
   schedCatId=catId;editingSchedId=null;
   document.getElementById('sched-modal-title').textContent='Schedule Treatment';
@@ -1538,54 +1733,33 @@ function updateSchedPrice(){
   const tid=document.getElementById('sched-treatment').value,t=tById(tid);
   document.getElementById('sched-price').placeholder=t?'$'+t.price+' (default)':'Auto';
 }
-
 function saveSchedItem(){
   const treatmentId=document.getElementById('sched-treatment').value;
   const dueDate=document.getElementById('sched-date').value;
   if(!treatmentId||!dueDate){showToast('Pick a treatment and date');return;}
   const ov=parseFloat(document.getElementById('sched-price').value);
   const t=tById(treatmentId);
+  const item={id:editingSchedId||uid(),treatmentId,dueDate,price:isNaN(ov)?(t?t.price:0):ov,notes:document.getElementById('sched-notes').value.trim(),done:false};
   const cat=data.cats.find(c=>c.id===schedCatId);
-  const ci=catIndexById(schedCatId);
-  const existing=editingSchedId?cat.schedules.find(s=>s.id===editingSchedId):null;
-  const item={id:editingSchedId||uid(),treatmentId,dueDate,price:isNaN(ov)?(t?t.price:0):ov,notes:document.getElementById('sched-notes').value.trim(),done:existing?!!existing.done:false};
-  let ops=[];
-  if(editingSchedId){
-    const i=cat.schedules.findIndex(s=>s.id===editingSchedId);
-    const prev=clone(cat.schedules[i]);
-    cat.schedules[i]=item;
-    ops=[{type:'replace', path:['cats',ci,'schedules',i], oldValue:prev, newValue:clone(item)}];
-  }
-  else {
-    const index=cat.schedules.length;
-    cat.schedules.push(item);
-    ops=[{type:'array-insert', path:['cats',ci,'schedules'], index:index, value:clone(item)}];
-  }
-  commitChange(editingSchedId?'Updated scheduled item':'Added scheduled item', ops);
-  closeModal('sched-modal');renderVetCatSections();showToast(editingSchedId?'Updated ✓':'Scheduled ✓');
+  if(editingSchedId){const i=cat.schedules.findIndex(s=>s.id===editingSchedId);cat.schedules[i]=item;}
+  else cat.schedules.push(item);
+  saveData({reason:editingSchedId?'Updated scheduled item':'Added scheduled item'});closeModal('sched-modal');renderVetCatSections();showToast(editingSchedId?'Updated ✓':'Scheduled ✓');
 }
-
-
 function deleteSchedItem(catId,schedId){
   askDelete('Delete this scheduled item?',()=>{
-    const ci=catIndexById(catId);
-    const cat=data.cats[ci];
-    const si=cat.schedules.findIndex(s=>s.id===schedId);
-    const removed=clone(cat.schedules[si]);
+    const cat=data.cats.find(c=>c.id===catId);
     cat.schedules=cat.schedules.filter(s=>s.id!==schedId);
-    commitChange('Deleted scheduled item',[{type:'array-remove', path:['cats',ci,'schedules'], index:si, value:removed}]);
-    renderVetCatSections();
+    saveData({reason:'Deleted scheduled item'});renderVetCatSections();
     if(currentCatId===catId)renderCatUpcoming(cat);
     showToast('Removed ✓');
   });
 }
 
-
 // ═══ LITTER ═══
 function starsHtml(r){let s='';for(let i=1;i<=5;i++)s+=`<span class="${i<=r?'filled':'empty'}">★</span>`;return`<span class="stars">${s}</span>`;}
 function renderLitter(){
   const list=document.getElementById('litter-list');
-  const sortedLitters=data.litters.slice().sort((a,b)=>{const rd=(b.rating||0)-(a.rating||0); return rd!==0?rd:String(a.name||'').localeCompare(String(b.name||''));});
+  const sortedLitters=data.litters.slice().sort((a,b)=>(b.rating||0)-(a.rating||0)||String(a.name||'').localeCompare(String(b.name||'')));
   list.innerHTML=sortedLitters.map(l=>{
     const rev=l.smell||l.poo||l.pee;
     return`<div class="litter-card">
@@ -1623,38 +1797,20 @@ function editLitter(lid){
 }
 function setStar(n){currentStarRating=n;updateStarPicker(n);}
 function updateStarPicker(n){document.querySelectorAll('#star-picker .star-btn').forEach((b,i)=>b.classList.toggle('on',i<n));}
-
 function saveLitter(){
   const name=document.getElementById('litter-name').value.trim();
   if(!name){showToast('Please enter a brand name');return;}
   const litter={id:editingLitterId||uid(),name,rating:currentStarRating,price:document.getElementById('litter-price').value.trim(),pricePerL:parseFloat(document.getElementById('litter-ppl').value)||null,smell:document.getElementById('litter-smell').value.trim(),poo:document.getElementById('litter-poo').value.trim(),pee:document.getElementById('litter-pee').value.trim(),notes:document.getElementById('litter-notes').value.trim()};
-  let ops=[];
-  if(editingLitterId){
-    const i=litterIndexById(editingLitterId);
-    const prev=clone(data.litters[i]);
-    data.litters[i]=litter;
-    ops=[{type:'replace', path:['litters',i], oldValue:prev, newValue:clone(litter)}];
-  }
-  else {
-    const index=data.litters.length;
-    data.litters.push(litter);
-    ops=[{type:'array-insert', path:['litters'], index:index, value:clone(litter)}];
-  }
-  commitChange(editingLitterId?'Updated litter '+name:'Added litter '+name, ops);
-  closeModal('litter-modal');renderLitter();showToast('Saved ✓');
+  if(editingLitterId){const i=data.litters.findIndex(x=>x.id===editingLitterId);data.litters[i]=litter;}
+  else data.litters.push(litter);
+  saveData({reason:editingLitterId?'Updated litter review':'Added litter review'});closeModal('litter-modal');renderLitter();showToast('Saved ✓');
 }
-
-
 function deleteLitter(lid){
   askDelete('Delete this litter review?',()=>{
-    const li=litterIndexById(lid);
-    const removed=clone(data.litters[li]);
     data.litters=data.litters.filter(l=>l.id!==lid);
-    commitChange('Deleted litter review',[{type:'array-remove', path:['litters'], index:li, value:removed}]);
-    renderLitter();showToast('Removed ✓');
+    saveData({reason:'Deleted litter review'});renderLitter();showToast('Removed ✓');
   });
 }
-
 
 // ═══ MODALS ═══
 function openModal(id){document.getElementById(id).classList.add('open');}
@@ -1670,59 +1826,40 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Enter' && confirmDeleteAction) confirmDeleteAction();
 });
 
-
-// ═══ INSTALL PROMPT ═══
-function installBtn(show){
-  const btn=document.getElementById('install-btn');
-  if(!btn) return;
-  btn.style.display=show?'flex':'none';
-}
-async function promptInstallApp(){
-  if(!deferredInstallPrompt) return;
-  deferredInstallPrompt.prompt();
-  const choice = await deferredInstallPrompt.userChoice;
-  if(choice && choice.outcome==='accepted'){
-    showToast('Miaou installed ✓');
-    installBtn(false);
-  }
-  deferredInstallPrompt = null;
-}
-function initInstallPrompt(){
-  if(window.__miaouInstallReady) return;
-  window.__miaouInstallReady = true;
-  if('serviceWorker' in navigator){
-    window.addEventListener('load',()=>{
-      navigator.serviceWorker.register('./sw.js').catch(err=>console.error('SW register failed', err));
-    });
-  }
-  window.addEventListener('beforeinstallprompt', e=>{
-    e.preventDefault();
-    deferredInstallPrompt = e;
-    installBtn(true);
-    if(!sessionStorage.getItem('miaou_install_prompt_seen')){
-      sessionStorage.setItem('miaou_install_prompt_seen','1');
-      askConfirm({
-        title:'Install Miaou?',
-        message:'Add Miaou to your home screen for a faster app experience.',
-        icon:'🐾',
-        confirmLabel:'Install',
-        onConfirm:()=>{ promptInstallApp(); }
-      });
-    }
-  });
-  window.addEventListener('appinstalled', ()=>{
-    deferredInstallPrompt = null;
-    installBtn(false);
-    showToast('Installed ✓');
-  });
-}
-
 // ═══ TOAST ═══
 let toastTimer;
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2200);}
 
 // ═══ INIT ═══
-loadData();
+bootstrap();
 </script>
+
+<script>
+let deferredInstallPrompt = null;
+
+window.addEventListener('beforeinstallprompt', event => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  setTimeout(async () => {
+    try {
+      if(!deferredInstallPrompt) return;
+      const shouldInstall = window.confirm('Install Miaou on this device?');
+      if(!shouldInstall) return;
+      deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+    } catch(err) {
+      console.warn('Install prompt warning:', err);
+    }
+  }, 1200);
+});
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(err => console.warn('SW registration failed:', err));
+  });
+}
+</script>
+
 </body>
 </html>

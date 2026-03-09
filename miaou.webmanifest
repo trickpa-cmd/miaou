@@ -1,24 +1,20 @@
 {
   "name": "Miaou",
   "short_name": "Miaou",
-  "start_url": "./",
-  "scope": "./",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#faf5ee",
   "theme_color": "#b85c38",
-  "description": "Cat care tracker for visits, schedules, and litter reviews.",
   "icons": [
     {
-      "src": "./miaou-icon-192.png",
+      "src": "miaou-icon-192.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
-      "src": "./miaou-icon-512.png",
+      "src": "miaou-icon-512.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
   ]
 }
