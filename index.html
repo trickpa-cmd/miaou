@@ -927,6 +927,8 @@ async function completeSignedInUser(user){
   const userChanged = currentUserEmail !== email;
   currentUserEmail = email;
   clearRedirectPending();
+  try { localStorage.removeItem('miaou_auth_tab_opened'); } catch(_){}
+  try { sessionStorage.removeItem('miaou_auth_reload_done'); } catch(_){}
   setAuthStatus('', false);
   setSignedInUi();
   const signoutBtn = document.getElementById('auth-signout-btn');
@@ -1192,6 +1194,23 @@ function attachVisibilityRecheck(){
     if(currentUserEmail || !_auth) return;
     const immediate = _auth.currentUser;
     if(immediate){ await completeSignedInUser(immediate); return; }
+    const authTabOpened = (() => { try { return localStorage.getItem('miaou_auth_tab_opened') === '1'; } catch(_){ return false; } })();
+    const alreadyReloaded = (() => { try { return sessionStorage.getItem('miaou_auth_reload_done') === '1'; } catch(_){ return false; } })();
+    if(authTabOpened && !alreadyReloaded){
+      // Firebase cross-tab sync doesn't reach a standalone PWA window. Force a
+      // reload so Firebase re-reads IndexedDB (where the Chrome tab just wrote auth).
+      const user = await new Promise(resolve => {
+        let done = false;
+        const unsub = _onAuthStateChanged(_auth, u => {
+          if(done) return; done = true; try{ unsub(); }catch(e){} resolve(u || null);
+        });
+        setTimeout(() => { if(!done){ done = true; resolve(null); } }, 1500);
+      });
+      if(user){ await completeSignedInUser(user); return; }
+      try { sessionStorage.setItem('miaou_auth_reload_done', '1'); } catch(_){}
+      location.reload();
+      return;
+    }
     await new Promise(resolve => {
       let done = false;
       const unsub = _onAuthStateChanged(_auth, u => {
@@ -1236,6 +1255,7 @@ async function signInWithGoogle(){
     const authUrl = 'auth-return.html?start=1&t=' + Date.now();
     const authWin = window.open(authUrl, '_blank');
     if(authWin){
+      try { localStorage.setItem('miaou_auth_tab_opened', '1'); } catch(_){}
       setAuthStatus('Complete Google sign in in the browser tab that just opened, then return here.', false);
       if(btn){ btn.disabled = false; btn.style.opacity = ''; }
       return;
