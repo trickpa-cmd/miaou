@@ -10,6 +10,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 <style>
 :root {
   --cream: #faf5ee; --cream2: #f2ead8;
@@ -875,13 +878,11 @@ const FIREBASE_CONFIG = {
   appId: "1:152797535766:web:668885df602e2927e09f37"
 };
 
-let _getDoc, _setDoc, _DATA_REF, _db, _runTransaction, _serverTimestamp, _collection, _query, _orderBy, _limit, _getDocs, _doc;
-let _auth, _GoogleAuthProvider, _signInWithPopup, _signInWithRedirect, _getRedirectResult, _onAuthStateChanged, _signOut;
+let auth, db, DATA_REF;
 const ALLOWED_EMAILS=['ziadehpatrick@gmail.com','stefanie.a.hanna@gmail.com'];
 let currentUserEmail='';
 let localRevision=0;
 let backups=[];
-let _authPollTimer=null, _reloadingForAuth=false;
 pendingCloudPayload='';
 
 function uid(){return '_'+Math.random().toString(36).slice(2,9);}
@@ -912,62 +913,18 @@ function setSignedOutUi(){
   if(signoutBtn) signoutBtn.style.display='none';
 }
 
-async function completeSignedInUser(user){
-  const email = String(user && user.email || '').toLowerCase();
-  if(!isAllowedEmail(email)){
-    try { await _signOut(_auth); } catch(err) { console.warn('Forced sign out warning:', err); }
-    clearRedirectPending();
-    currentUserEmail = '';
-    data = deepClone(DEFAULT);
-    setSignedOutUi();
-    setAuthStatus('That Google account is not allowed for Miaou. Please use an approved account.');
-    document.getElementById('loading-screen').style.display='none';
-    return false;
-  }
-
-  const userChanged = currentUserEmail !== email;
-  currentUserEmail = email;
-  clearRedirectPending();
-  stopAuthPoll();
-  try { localStorage.removeItem('miaou_auth_tab_opened'); } catch(_){}
-  try { localStorage.removeItem('miaou_auth_complete'); } catch(_){}
-  try { sessionStorage.removeItem('miaou_auth_reload_done'); } catch(_){}
-  setAuthStatus('', false);
-  setSignedInUi();
-  const signoutBtn = document.getElementById('auth-signout-btn');
-  if(signoutBtn) signoutBtn.style.display = 'block';
-
-  if(userChanged || !data){
-    await loadData();
-    renderVetCatSections();
-    renderLitter();
-    if(currentCatId) renderCatDetail();
-  }
-
-  document.getElementById('loading-screen').style.display='none';
-  return true;
-}
-
-async function initFirebase(){
-  const {initializeApp} = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js");
-  const {getFirestore, doc, getDoc, setDoc, runTransaction, serverTimestamp, collection, query, orderBy, limit, getDocs} = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js");
-  const {getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence} = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js");
-  const app = initializeApp(FIREBASE_CONFIG);
-  _db = getFirestore(app);
-  _auth = getAuth(app);
-  try { await setPersistence(_auth, browserLocalPersistence); } catch(err) { console.warn('Auth persistence warning:', err); }
-  _doc = doc;
-  _DATA_REF = doc(_db, 'miaou', 'data');
-  _getDoc = getDoc; _setDoc = setDoc; _runTransaction = runTransaction; _serverTimestamp = serverTimestamp;
-  _collection = collection; _query = query; _orderBy = orderBy; _limit = limit; _getDocs = getDocs;
-  _GoogleAuthProvider = GoogleAuthProvider; _signInWithPopup = signInWithPopup; _signInWithRedirect = signInWithRedirect; _getRedirectResult = getRedirectResult; _onAuthStateChanged = onAuthStateChanged; _signOut = signOut;
+function initFirebase(){
+  if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+  db = firebase.firestore();
+  auth = firebase.auth();
+  DATA_REF = db.doc('miaou/data');
 }
 
 async function loadData(){
   document.getElementById('loading-screen').style.display='flex';
   try {
-    const snap = await _getDoc(_DATA_REF);
-    if(snap.exists() && snap.data().payload){
+    const snap = await DATA_REF.get();
+    if(snap.exists && snap.data().payload){
       const cloud = snap.data();
       data = JSON.parse(cloud.payload);
       localRevision = cloud.revision || 0;
@@ -995,11 +952,10 @@ async function loadData(){
 async function loadBackups(){
   const listEl=document.getElementById('backup-list');
   if(!listEl) return;
-  if(!_db || !_collection){ listEl.innerHTML='<div class="backup-empty">Cloud backups are unavailable.</div>'; return; }
+  if(!db){ listEl.innerHTML='<div class="backup-empty">Cloud backups are unavailable.</div>'; return; }
   listEl.innerHTML='<div class="backup-empty">Loading backups…</div>';
   try {
-    const versionsRef = _collection(_db, 'miaou', 'data', 'versions');
-    const snap = await _getDocs(_query(versionsRef, _orderBy('revision','desc'), _limit(20)));
+    const snap = await db.collection('miaou/data/versions').orderBy('revision','desc').limit(20).get();
     backups = snap.docs.map(d=>({id:d.id, ...d.data()}));
     if(!backups.length){
       listEl.innerHTML='<div class="backup-empty">No cloud backups yet. The first backup appears after the next save.</div>';
@@ -1061,10 +1017,10 @@ async function reloadFromCloud(){
 async function saveData(meta={}){
   const payload = JSON.stringify(data);
   try {
-    if(_runTransaction && _DATA_REF && currentUserEmail){
-      const result = await _runTransaction(_db, async tx => {
-        const snap = await tx.get(_DATA_REF);
-        const remote = snap.exists() ? snap.data() : null;
+    if(db && DATA_REF && currentUserEmail){
+      const result = await db.runTransaction(async tx => {
+        const snap = await tx.get(DATA_REF);
+        const remote = snap.exists ? snap.data() : null;
         const remoteRevision = remote?.revision || 0;
         const remotePayload = remote?.payload || null;
         if(remote && remoteRevision !== localRevision){
@@ -1075,16 +1031,16 @@ async function saveData(meta={}){
         }
         const nextRevision = remoteRevision + 1;
         if(remotePayload && remotePayload !== payload && !meta.skipBackup){
-          const versionRef = _doc(_collection(_db, 'miaou', 'data', 'versions'));
+          const versionRef = db.collection('miaou/data/versions').doc();
           tx.set(versionRef, {
             payload: remotePayload,
             revision: remoteRevision,
-            backedUpAt: _serverTimestamp(),
+            backedUpAt: firebase.firestore.FieldValue.serverTimestamp(),
             savedBy: currentUserEmail,
             reason: meta.reason || 'Update'
           });
         }
-        tx.set(_DATA_REF, {
+        tx.set(DATA_REF, {
           payload,
           updated: new Date().toISOString(),
           updatedBy: currentUserEmail,
@@ -1111,214 +1067,18 @@ async function saveData(meta={}){
 }
 
 
-function markRedirectPending(){
-  try { localStorage.setItem('miaou_google_redirect_pending', '1'); } catch(err) {}
-}
-
-function clearRedirectPending(){
-  try { localStorage.removeItem('miaou_google_redirect_pending'); } catch(err) {}
-}
-
-async function completePendingRedirectResult(){
-  try {
-    const redirectResult = await _getRedirectResult(_auth);
-    if(redirectResult && redirectResult.user){
-      await completeSignedInUser(redirectResult.user);
-      return true;
-    }
-  } catch(err) {
-    console.error('Redirect result error:', err);
-    setAuthStatus(getFriendlyAuthError(err));
-  }
-  return false;
-}
-
-async function completeExistingSessionIfAny(){
-  const pendingRedirect = (() => {
-    try {
-      const flagged = localStorage.getItem('miaou_google_redirect_pending') === '1';
-      const fromSignedInReturn = new URLSearchParams(window.location.search).get('signedin') === '1';
-      return flagged || fromSignedInReturn;
-    } catch(err) {
-      return false;
-    }
-  })();
-
-  const waitedUser = await new Promise(resolve => {
-    let settled = false;
-    const finish = (user) => {
-      if(settled) return;
-      settled = true;
-      resolve(user || null);
-    };
-    const timeout = setTimeout(() => finish(_auth && _auth.currentUser ? _auth.currentUser : null), pendingRedirect ? 10000 : 5000);
-    const unsub = _onAuthStateChanged(_auth, user => {
-      clearTimeout(timeout);
-      try { unsub(); } catch(err) {}
-      finish(user);
-    });
-  });
-
-  if(waitedUser){
-    await completeSignedInUser(waitedUser);
-    return true;
-  }
-
-  if(pendingRedirect){
-    setSignedOutUi();
-    document.getElementById('loading-screen').style.display='none';
-    setAuthStatus('Google sign in did not finish inside the installed app. Please tap Continue with Google again.');
-    return false;
-  }
-
-  return false;
-}
-
-function attachAuthStateWatcher(){
-  if(!_auth || !_onAuthStateChanged) return;
-  // Skip the very first emission — bootstrap's own onAuthStateChanged listener handles it.
-  // This watcher handles subsequent changes (session expiry, sign-in from another tab).
-  let firstEmit = true;
-  _onAuthStateChanged(_auth, async user => {
-    if(firstEmit){ firstEmit = false; return; }
-    if(user){
-      await completeSignedInUser(user);
-      return;
-    }
-    currentUserEmail='';
-    setSignedOutUi();
-  });
-}
-
-function attachVisibilityRecheck(){
-  // Recheck Firebase auth state whenever the PWA regains focus – handles the
-  // case where sign-in completed in a separate browser tab.
-  const recheck = async () => {
-    if(currentUserEmail || !_auth) return;
-    const immediate = _auth.currentUser;
-    if(immediate){ await completeSignedInUser(immediate); return; }
-    const authTabOpened = (() => { try { return localStorage.getItem('miaou_auth_tab_opened') === '1'; } catch(_){ return false; } })();
-    const alreadyReloaded = (() => { try { return sessionStorage.getItem('miaou_auth_reload_done') === '1'; } catch(_){ return false; } })();
-    if(authTabOpened && !alreadyReloaded && !_reloadingForAuth){
-      // Firebase cross-tab sync doesn't reach a standalone PWA window. Force a
-      // reload so Firebase re-reads IndexedDB (where the Chrome tab just wrote auth).
-      const user = await new Promise(resolve => {
-        let done = false;
-        const unsub = _onAuthStateChanged(_auth, u => {
-          if(done) return; done = true; try{ unsub(); }catch(e){} resolve(u || null);
-        });
-        setTimeout(() => { if(!done){ done = true; resolve(null); } }, 1500);
-      });
-      if(user){ await completeSignedInUser(user); return; }
-      _reloadingForAuth = true;
-      try { sessionStorage.setItem('miaou_auth_reload_done', '1'); } catch(_){}
-      location.reload();
-      return;
-    }
-    await new Promise(resolve => {
-      let done = false;
-      const unsub = _onAuthStateChanged(_auth, u => {
-        if(done) return; done = true; try{ unsub(); }catch(e){} resolve(u || null);
-      });
-      setTimeout(() => { if(!done){ done = true; resolve(null); } }, 5000);
-    }).then(u => { if(u) completeSignedInUser(u); });
-  };
-  document.addEventListener('visibilitychange', () => {
-    if(document.visibilityState === 'visible') recheck();
-  });
-  window.addEventListener('pageshow', e => {
-    if(e.persisted) recheck();
-  });
-  // BroadcastChannel: fired immediately by auth-return.html after sign-in completes
-  try {
-    const bc = new BroadcastChannel('miaou_auth');
-    bc.onmessage = e => { if(e.data && e.data.type === 'signed_in') setTimeout(recheck, 400); };
-  } catch(err){}
-  // localStorage fallback (BroadcastChannel not available on some older WebViews)
-  window.addEventListener('storage', e => {
-    if(e.key === 'miaou_auth_complete' && e.newValue === '1'){
-      try { localStorage.removeItem('miaou_auth_complete'); } catch(_){}
-      setTimeout(recheck, 400);
-    }
-    if(e.key === 'miaou_google_redirect_pending' && e.newValue === null){
-      setTimeout(recheck, 800);
-    }
-  });
-}
-
-function startAuthPoll(){
-  stopAuthPoll();
-  _authPollTimer = setInterval(() => {
-    if(currentUserEmail){ stopAuthPoll(); return; }
-    try {
-      if(localStorage.getItem('miaou_auth_complete') === '1'){
-        stopAuthPoll();
-        if(!_reloadingForAuth){
-          _reloadingForAuth = true;
-          try { sessionStorage.setItem('miaou_auth_reload_done','1'); } catch(_){}
-          location.reload();
-        }
-      }
-    } catch(_){}
-  }, 1200);
-}
-
-function stopAuthPoll(){
-  if(_authPollTimer){ clearInterval(_authPollTimer); _authPollTimer = null; }
-}
-
 async function signInWithGoogle(){
-  setAuthStatus('', false);
-  const btn = document.getElementById('google-signin-btn');
-  if(btn){ btn.disabled = true; btn.style.opacity = '0.7'; }
-  try {
-    const provider = new _GoogleAuthProvider();
-    provider.setCustomParameters({prompt:'select_account'});
-    if(!isStandaloneMode()){
-      // Desktop / mobile browser: popup is instant and reliable.
-      setAuthStatus('Opening Google sign in…', false);
-      try {
-        const result = await _signInWithPopup(_auth, provider);
-        if(result && result.user) await completeSignedInUser(result.user);
-        return;
-      } catch(popupErr){
-        const code = String(popupErr?.code || '');
-        if(!code.includes('popup_blocked') && !code.includes('popup_closed')) throw popupErr;
-        // Popup blocked/closed – fall through to redirect
-      }
-    }
-    // Standalone PWA (Android/iOS): open a new Chrome tab so the OAuth
-    // redirect cycle completes in Chrome. The PWA window stays alive and
-    // detects completion via localStorage polling + visibilitychange.
-    setAuthStatus('Opening Google sign in…', false);
-    try { localStorage.removeItem('miaou_auth_complete'); } catch(_){}
-    try { localStorage.setItem('miaou_auth_tab_opened', '1'); } catch(_){}
-    const authUrl = 'auth-return.html?start=1&t=' + Date.now();
-    const authWin = window.open(authUrl, '_blank');
-    if(authWin){
-      setAuthStatus('Complete Google sign in in the tab that just opened, then return here.', false);
-      if(btn){ btn.disabled = false; btn.style.opacity = ''; }
-      startAuthPoll();
-      return;
-    }
-    // window.open blocked – fall back to same-window redirect
-    try { localStorage.removeItem('miaou_auth_tab_opened'); } catch(_){}
-    markRedirectPending();
-    await _signInWithRedirect(_auth, provider);
-  } catch(e) {
+  setAuthStatus('Opening Google sign in…', false);
+  const provider = new firebase.auth.GoogleAuthProvider();
+  provider.setCustomParameters({prompt:'select_account'});
+  auth.signInWithPopup(provider).catch(e => {
     console.error('Sign in error:', e);
-    clearRedirectPending();
-    stopAuthPoll();
     setAuthStatus(getFriendlyAuthError(e));
-    if(btn){ btn.disabled = false; btn.style.opacity = ''; }
-  }
+  });
 }
 
 async function signOutUser(){
-  if(!_auth) return;
-  clearRedirectPending();
-  stopAuthPoll();
-  await _signOut(_auth);
+  await auth.signOut();
 }
 
 
@@ -1339,26 +1099,43 @@ async function bootstrap(){
   document.getElementById('auth-signout-btn').addEventListener('click', signOutUser);
   document.getElementById('loading-screen').style.display='flex';
   try {
-    await initFirebase();
-    attachAuthStateWatcher();
-    attachVisibilityRecheck();
-
-    const redirectCompleted = await completePendingRedirectResult();
-    if(redirectCompleted) return;
-
-    const resumed = await completeExistingSessionIfAny();
-    if(resumed) return;
-
-    currentUserEmail='';
-    data = deepClone(DEFAULT);
-    setSignedOutUi();
-    document.getElementById('loading-screen').style.display='none';
+    initFirebase();
   } catch(e) {
     console.error('Firebase init error:', e);
     setAuthStatus('Could not connect to Firebase right now.');
     document.getElementById('loading-screen').style.display='none';
     setSignedOutUi();
+    return;
   }
+  auth.onAuthStateChanged(async user => {
+    if(!user){
+      currentUserEmail='';
+      data=deepClone(DEFAULT);
+      setSignedOutUi();
+      document.getElementById('loading-screen').style.display='none';
+      return;
+    }
+    const email = String(user.email||'').toLowerCase();
+    if(!isAllowedEmail(email)){
+      await auth.signOut();
+      setSignedOutUi();
+      setAuthStatus('That Google account is not allowed for Miaou. Please use an approved account.');
+      document.getElementById('loading-screen').style.display='none';
+      return;
+    }
+    const isNewSession = currentUserEmail !== email;
+    currentUserEmail = email;
+    setAuthStatus('', false);
+    setSignedInUi();
+    const signoutBtn = document.getElementById('auth-signout-btn');
+    if(signoutBtn) signoutBtn.style.display='block';
+    if(isNewSession){
+      await loadData();
+      renderVetCatSections();
+      renderLitter();
+      if(currentCatId) renderCatDetail();
+    }
+  });
 }
 
 
