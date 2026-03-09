@@ -888,6 +888,38 @@ function setSignedOutUi(){
   if(signoutBtn) signoutBtn.style.display='none';
 }
 
+async function completeSignedInUser(user){
+  const email = String(user && user.email || '').toLowerCase();
+  if(!isAllowedEmail(email)){
+    try { await _signOut(_auth); } catch(err) { console.warn('Forced sign out warning:', err); }
+    clearRedirectPending();
+    currentUserEmail = '';
+    data = deepClone(DEFAULT);
+    setSignedOutUi();
+    setAuthStatus('That Google account is not allowed for Miaou. Please use an approved account.');
+    document.getElementById('loading-screen').style.display='none';
+    return false;
+  }
+
+  const userChanged = currentUserEmail !== email;
+  currentUserEmail = email;
+  clearRedirectPending();
+  setAuthStatus('', false);
+  setSignedInUi();
+  const signoutBtn = document.getElementById('auth-signout-btn');
+  if(signoutBtn) signoutBtn.style.display = 'block';
+
+  if(userChanged || !data){
+    await loadData();
+    renderVetCatSections();
+    renderLitter();
+    if(currentCatId) renderCatDetail();
+  }
+
+  document.getElementById('loading-screen').style.display='none';
+  return true;
+}
+
 async function initFirebase(){
   const {initializeApp} = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js");
   const {getFirestore, doc, getDoc, setDoc, runTransaction, serverTimestamp, collection, query, orderBy, limit, getDocs} = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js");
@@ -1135,7 +1167,13 @@ async function signInWithGoogle(){
       return;
     }
 
-    await _signInWithPopup(_auth, provider);
+    const popupResult = await _signInWithPopup(_auth, provider);
+    const popupUser = popupResult && popupResult.user ? popupResult.user : (_auth ? _auth.currentUser : null);
+    if(popupUser){
+      await completeSignedInUser(popupUser);
+      return;
+    }
+    setAuthStatus('Google sign in did not return a user. Please try again.');
     return;
   } catch(e) {
     console.error('Sign in error:', e);
