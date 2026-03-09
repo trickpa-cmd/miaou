@@ -418,12 +418,12 @@ body::before {
 <header class="app-header">
   <div class="header-title">🐾 Miaou</div>
   <div class="header-actions">
-    <button class="header-icon-btn" id="backup-btn" onclick="openBackupModal()" title="Cloud backups" style="display:none">☁️</button>
+    <button class="header-icon-btn" id="backup-btn" onclick="openBackupModal()" title="Cloud backups">☁️</button>
     <button class="header-add-btn" onclick="showAddCatModal()">+</button>
   </div>
 </header>
 
-<div class="auth-overlay" id="auth-overlay" style="display:none!important">
+<div class="auth-overlay open" id="auth-overlay">
   <div class="auth-card">
     <div class="auth-logo">🐾</div>
     <div class="auth-title">Sign in to Miaou</div>
@@ -881,6 +881,7 @@ const ALLOWED_EMAILS=['ziadehpatrick@gmail.com','stefanie.a.hanna@gmail.com'];
 let currentUserEmail='';
 let localRevision=0;
 let backups=[];
+let _authPollTimer=null, _reloadingForAuth=false;
 pendingCloudPayload='';
 
 function uid(){return '_'+Math.random().toString(36).slice(2,9);}
@@ -927,7 +928,9 @@ async function completeSignedInUser(user){
   const userChanged = currentUserEmail !== email;
   currentUserEmail = email;
   clearRedirectPending();
+  stopAuthPoll();
   try { localStorage.removeItem('miaou_auth_tab_opened'); } catch(_){}
+  try { localStorage.removeItem('miaou_auth_complete'); } catch(_){}
   try { sessionStorage.removeItem('miaou_auth_reload_done'); } catch(_){}
   setAuthStatus('', false);
   setSignedInUi();
@@ -1196,7 +1199,7 @@ function attachVisibilityRecheck(){
     if(immediate){ await completeSignedInUser(immediate); return; }
     const authTabOpened = (() => { try { return localStorage.getItem('miaou_auth_tab_opened') === '1'; } catch(_){ return false; } })();
     const alreadyReloaded = (() => { try { return sessionStorage.getItem('miaou_auth_reload_done') === '1'; } catch(_){ return false; } })();
-    if(authTabOpened && !alreadyReloaded){
+    if(authTabOpened && !alreadyReloaded && !_reloadingForAuth){
       // Firebase cross-tab sync doesn't reach a standalone PWA window. Force a
       // reload so Firebase re-reads IndexedDB (where the Chrome tab just wrote auth).
       const user = await new Promise(resolve => {
@@ -1207,6 +1210,7 @@ function attachVisibilityRecheck(){
         setTimeout(() => { if(!done){ done = true; resolve(null); } }, 1500);
       });
       if(user){ await completeSignedInUser(user); return; }
+      _reloadingForAuth = true;
       try { sessionStorage.setItem('miaou_auth_reload_done', '1'); } catch(_){}
       location.reload();
       return;
@@ -1242,32 +1246,69 @@ function attachVisibilityRecheck(){
   });
 }
 
+function startAuthPoll(){
+  stopAuthPoll();
+  _authPollTimer = setInterval(() => {
+    if(currentUserEmail){ stopAuthPoll(); return; }
+    try {
+      if(localStorage.getItem('miaou_auth_complete') === '1'){
+        stopAuthPoll();
+        if(!_reloadingForAuth){
+          _reloadingForAuth = true;
+          try { sessionStorage.setItem('miaou_auth_reload_done','1'); } catch(_){}
+          location.reload();
+        }
+      }
+    } catch(_){}
+  }, 1200);
+}
+
+function stopAuthPoll(){
+  if(_authPollTimer){ clearInterval(_authPollTimer); _authPollTimer = null; }
+}
+
 async function signInWithGoogle(){
   setAuthStatus('', false);
   const btn = document.getElementById('google-signin-btn');
   if(btn){ btn.disabled = true; btn.style.opacity = '0.7'; }
   try {
+    const provider = new _GoogleAuthProvider();
+    provider.setCustomParameters({prompt:'select_account'});
+    if(!isStandaloneMode()){
+      // Desktop / mobile browser: popup is instant and reliable.
+      setAuthStatus('Opening Google sign in…', false);
+      try {
+        const result = await _signInWithPopup(_auth, provider);
+        if(result && result.user) await completeSignedInUser(result.user);
+        return;
+      } catch(popupErr){
+        const code = String(popupErr?.code || '');
+        if(!code.includes('popup_blocked') && !code.includes('popup_closed')) throw popupErr;
+        // Popup blocked/closed – fall through to redirect
+      }
+    }
+    // Standalone PWA (Android/iOS): open a new Chrome tab so the OAuth
+    // redirect cycle completes in Chrome. The PWA window stays alive and
+    // detects completion via localStorage polling + visibilitychange.
     setAuthStatus('Opening Google sign in…', false);
-    // Open auth in a NEW browser tab, not the PWA window.
-    // On Android the OAuth redirect cycle completes in Chrome, not the PWA;
-    // opening it in a separate tab keeps the PWA alive so it can receive
-    // the BroadcastChannel / visibilitychange signal when sign-in finishes.
+    try { localStorage.removeItem('miaou_auth_complete'); } catch(_){}
+    try { localStorage.setItem('miaou_auth_tab_opened', '1'); } catch(_){}
     const authUrl = 'auth-return.html?start=1&t=' + Date.now();
     const authWin = window.open(authUrl, '_blank');
     if(authWin){
-      try { localStorage.setItem('miaou_auth_tab_opened', '1'); } catch(_){}
-      setAuthStatus('Complete Google sign in in the browser tab that just opened, then return here.', false);
+      setAuthStatus('Complete Google sign in in the tab that just opened, then return here.', false);
       if(btn){ btn.disabled = false; btn.style.opacity = ''; }
+      startAuthPoll();
       return;
     }
-    // window.open was blocked – fall back to same-window redirect
+    // window.open blocked – fall back to same-window redirect
+    try { localStorage.removeItem('miaou_auth_tab_opened'); } catch(_){}
     markRedirectPending();
-    const provider = new _GoogleAuthProvider();
-    provider.setCustomParameters({prompt:'select_account'});
     await _signInWithRedirect(_auth, provider);
   } catch(e) {
     console.error('Sign in error:', e);
     clearRedirectPending();
+    stopAuthPoll();
     setAuthStatus(getFriendlyAuthError(e));
     if(btn){ btn.disabled = false; btn.style.opacity = ''; }
   }
@@ -1276,6 +1317,7 @@ async function signInWithGoogle(){
 async function signOutUser(){
   if(!_auth) return;
   clearRedirectPending();
+  stopAuthPoll();
   await _signOut(_auth);
 }
 
@@ -1293,12 +1335,30 @@ function openBackupModal(){
 
 
 async function bootstrap(){
+  document.getElementById('google-signin-btn').addEventListener('click', signInWithGoogle);
+  document.getElementById('auth-signout-btn').addEventListener('click', signOutUser);
   document.getElementById('loading-screen').style.display='flex';
-  // Sign-in disabled — load directly from local storage.
-  currentUserEmail = 'ziadehpatrick@gmail.com';
-  await loadData();
-  renderVetCatSections();
-  renderLitter();
+  try {
+    await initFirebase();
+    attachAuthStateWatcher();
+    attachVisibilityRecheck();
+
+    const redirectCompleted = await completePendingRedirectResult();
+    if(redirectCompleted) return;
+
+    const resumed = await completeExistingSessionIfAny();
+    if(resumed) return;
+
+    currentUserEmail='';
+    data = deepClone(DEFAULT);
+    setSignedOutUi();
+    document.getElementById('loading-screen').style.display='none';
+  } catch(e) {
+    console.error('Firebase init error:', e);
+    setAuthStatus('Could not connect to Firebase right now.');
+    document.getElementById('loading-screen').style.display='none';
+    setSignedOutUi();
+  }
 }
 
 
