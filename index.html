@@ -418,12 +418,12 @@ body::before {
 <header class="app-header">
   <div class="header-title">🐾 Miaou</div>
   <div class="header-actions">
-    <button class="header-icon-btn" id="backup-btn" onclick="openBackupModal()" title="Cloud backups">☁️</button>
+    <button class="header-icon-btn" id="backup-btn" onclick="openBackupModal()" title="Cloud backups" style="display:none">☁️</button>
     <button class="header-add-btn" onclick="showAddCatModal()">+</button>
   </div>
 </header>
 
-<div class="auth-overlay open" id="auth-overlay">
+<div class="auth-overlay" id="auth-overlay" style="display:none!important">
   <div class="auth-card">
     <div class="auth-logo">🐾</div>
     <div class="auth-title">Sign in to Miaou</div>
@@ -1293,30 +1293,12 @@ function openBackupModal(){
 
 
 async function bootstrap(){
-  document.getElementById('google-signin-btn').addEventListener('click', signInWithGoogle);
-  document.getElementById('auth-signout-btn').addEventListener('click', signOutUser);
   document.getElementById('loading-screen').style.display='flex';
-  try {
-    await initFirebase();
-    attachAuthStateWatcher();
-    attachVisibilityRecheck();
-
-    const redirectCompleted = await completePendingRedirectResult();
-    if(redirectCompleted) return;
-
-    const resumed = await completeExistingSessionIfAny();
-    if(resumed) return;
-
-    currentUserEmail='';
-    data = deepClone(DEFAULT);
-    setSignedOutUi();
-    document.getElementById('loading-screen').style.display='none';
-  } catch(e) {
-    console.error('Firebase init error:', e);
-    setAuthStatus('Could not connect to Firebase right now.');
-    document.getElementById('loading-screen').style.display='none';
-    setSignedOutUi();
-  }
+  // Sign-in disabled — load directly from local storage.
+  currentUserEmail = 'ziadehpatrick@gmail.com';
+  await loadData();
+  renderVetCatSections();
+  renderLitter();
 }
 
 
