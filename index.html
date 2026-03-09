@@ -1186,9 +1186,8 @@ function attachAuthStateWatcher(){
 }
 
 function attachVisibilityRecheck(){
-  // When the user authenticates in a browser tab and switches back to the PWA,
-  // the PWA window never navigated so getRedirectResult is empty. We recheck
-  // auth state on focus/visibility restore so the session is picked up.
+  // Recheck Firebase auth state whenever the PWA regains focus – handles the
+  // case where sign-in completed in a separate browser tab.
   const recheck = async () => {
     if(currentUserEmail || !_auth) return;
     const immediate = _auth.currentUser;
@@ -1207,8 +1206,17 @@ function attachVisibilityRecheck(){
   window.addEventListener('pageshow', e => {
     if(e.persisted) recheck();
   });
-  // Cross-tab signal: auth-return.html or another tab cleared the pending flag
+  // BroadcastChannel: fired immediately by auth-return.html after sign-in completes
+  try {
+    const bc = new BroadcastChannel('miaou_auth');
+    bc.onmessage = e => { if(e.data && e.data.type === 'signed_in') setTimeout(recheck, 400); };
+  } catch(err){}
+  // localStorage fallback (BroadcastChannel not available on some older WebViews)
   window.addEventListener('storage', e => {
+    if(e.key === 'miaou_auth_complete' && e.newValue === '1'){
+      try { localStorage.removeItem('miaou_auth_complete'); } catch(_){}
+      setTimeout(recheck, 400);
+    }
     if(e.key === 'miaou_google_redirect_pending' && e.newValue === null){
       setTimeout(recheck, 800);
     }
@@ -1220,12 +1228,22 @@ async function signInWithGoogle(){
   const btn = document.getElementById('google-signin-btn');
   if(btn){ btn.disabled = true; btn.style.opacity = '0.7'; }
   try {
+    setAuthStatus('Opening Google sign in…', false);
+    // Open auth in a NEW browser tab, not the PWA window.
+    // On Android the OAuth redirect cycle completes in Chrome, not the PWA;
+    // opening it in a separate tab keeps the PWA alive so it can receive
+    // the BroadcastChannel / visibilitychange signal when sign-in finishes.
+    const authUrl = 'auth-return.html?start=1&t=' + Date.now();
+    const authWin = window.open(authUrl, '_blank');
+    if(authWin){
+      setAuthStatus('Complete Google sign in in the browser tab that just opened, then return here.', false);
+      if(btn){ btn.disabled = false; btn.style.opacity = ''; }
+      return;
+    }
+    // window.open was blocked – fall back to same-window redirect
+    markRedirectPending();
     const provider = new _GoogleAuthProvider();
     provider.setCustomParameters({prompt:'select_account'});
-    setAuthStatus('Opening Google sign in…', false);
-    markRedirectPending();
-    // Always use redirect (works in browser AND installed PWA).
-    // Page navigates away to Google — code below this line does not run.
     await _signInWithRedirect(_auth, provider);
   } catch(e) {
     console.error('Sign in error:', e);

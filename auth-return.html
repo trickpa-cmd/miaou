@@ -63,8 +63,19 @@ function isAllowedEmail(email){
   return ALLOWED_EMAILS.includes(String(email || '').toLowerCase());
 }
 function goHome(){
-  const target = localStorage.getItem('miaou_post_auth_target') || 'index.html';
-  window.location.replace(target + '?signedin=1&t=' + Date.now());
+  // Signal the PWA window that sign-in is complete so it rechecks auth state.
+  try {
+    const bc = new BroadcastChannel('miaou_auth');
+    bc.postMessage({type: 'signed_in'});
+    setTimeout(() => { try { bc.close(); } catch(_){} }, 3000);
+  } catch(err){}
+  try { localStorage.setItem('miaou_auth_complete', '1'); } catch(err){}
+  // Close this tab (works when opened via window.open from the PWA).
+  try { window.close(); } catch(err){}
+  // Fallback: navigate to app in case window.close() had no effect.
+  setTimeout(() => {
+    window.location.replace('index.html?signedin=1&t=' + Date.now());
+  }, 1500);
 }
 function markPending(){
   localStorage.setItem('miaou_google_redirect_pending', '1');
@@ -82,15 +93,26 @@ function friendlyError(error){
 }
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js';
-import { getAuth, GoogleAuthProvider, getRedirectResult, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js';
+import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js';
 
 const app = initializeApp(FIREBASE_CONFIG);
 const auth = getAuth(app);
 await setPersistence(auth, browserLocalPersistence);
 
-// auth-return.html is now a fallback result-handler only.
-// Sign-in is initiated directly from index.html via signInWithRedirect.
-// If Google happened to land here (old cached version), we still handle the result.
+async function startRedirect(){
+  try {
+    markPending();
+    setStatus('Opening Google…');
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({prompt:'select_account'});
+    await signInWithRedirect(auth, provider);
+  } catch(error){
+    console.error(error);
+    setStatus(friendlyError(error), true);
+    retryBtn.style.display = 'block';
+  }
+}
+
 async function handleResult(){
   try {
     const result = await getRedirectResult(auth);
@@ -147,7 +169,14 @@ async function handleResult(){
   }
 }
 
-await handleResult();
+retryBtn.addEventListener('click', startRedirect);
+
+const params = new URLSearchParams(window.location.search);
+if(params.get('start') === '1'){
+  await startRedirect();
+} else {
+  await handleResult();
+}
 </script>
 </body>
 </html>
