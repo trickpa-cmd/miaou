@@ -631,21 +631,31 @@ body::before {
       <div class="form-group"><label class="form-label">Price & Size</label><input type="text" class="form-input" id="litter-price" placeholder="e.g. 11$ / 5kg"></div>
       <div class="form-group"><label class="form-label">$/L</label><input type="number" step="0.01" class="form-input" id="litter-ppl"></div>
     </div>
-    <div class="form-group"><label class="form-label">Rating</label>
-      <div class="star-picker" id="star-picker">
-        <button class="star-btn" onclick="setStar(1)">★</button><button class="star-btn" onclick="setStar(2)">★</button>
-        <button class="star-btn" onclick="setStar(3)">★</button><button class="star-btn" onclick="setStar(4)">★</button>
-        <button class="star-btn" onclick="setStar(5)">★</button>
+    <div class="form-group"><label class="form-label">Smell</label>
+      <div class="star-picker" id="smell-picker">
+        <button class="star-btn" onclick="setLitterStar('smell',1)">★</button><button class="star-btn" onclick="setLitterStar('smell',2)">★</button>
+        <button class="star-btn" onclick="setLitterStar('smell',3)">★</button><button class="star-btn" onclick="setLitterStar('smell',4)">★</button>
+        <button class="star-btn" onclick="setLitterStar('smell',5)">★</button>
       </div>
     </div>
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">Smell</label><input type="text" class="form-input" id="litter-smell"></div>
-      <div class="form-group"><label class="form-label">Poo clumping</label><input type="text" class="form-input" id="litter-poo"></div>
+    <div class="form-group"><label class="form-label">Poo clumping</label>
+      <div class="star-picker" id="poo-picker">
+        <button class="star-btn" onclick="setLitterStar('poo',1)">★</button><button class="star-btn" onclick="setLitterStar('poo',2)">★</button>
+        <button class="star-btn" onclick="setLitterStar('poo',3)">★</button><button class="star-btn" onclick="setLitterStar('poo',4)">★</button>
+        <button class="star-btn" onclick="setLitterStar('poo',5)">★</button>
+      </div>
     </div>
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">Pee clumping</label><input type="text" class="form-input" id="litter-pee"></div>
-      <div class="form-group"><label class="form-label">Notes</label><input type="text" class="form-input" id="litter-notes"></div>
+    <div class="form-group"><label class="form-label">Pee clumping</label>
+      <div class="star-picker" id="pee-picker">
+        <button class="star-btn" onclick="setLitterStar('pee',1)">★</button><button class="star-btn" onclick="setLitterStar('pee',2)">★</button>
+        <button class="star-btn" onclick="setLitterStar('pee',3)">★</button><button class="star-btn" onclick="setLitterStar('pee',4)">★</button>
+        <button class="star-btn" onclick="setLitterStar('pee',5)">★</button>
+      </div>
     </div>
+    <div class="form-group"><label class="form-label">Overall Rating <span style="color:var(--text-muted);font-size:0.8rem">(auto-calculated)</span></label>
+      <div id="litter-auto-rating" style="padding:4px 0;font-size:0.9rem;color:var(--text-muted)">Rate smell, poo and pee to see total</div>
+    </div>
+    <div class="form-group"><label class="form-label">Notes</label><input type="text" class="form-input" id="litter-notes"></div>
     <button class="form-submit" onclick="saveLitter()">Save</button>
     <button class="form-cancel" onclick="closeModal('litter-modal')">Cancel</button>
   </div>
@@ -839,7 +849,7 @@ const DEFAULT={
 
 // ═══ STATE ═══
 let data, currentCatId=null, editingVisitId=null, editingSchedId=null, schedCatId=null;
-let editingTreatmentId=null, editingLitterId=null, currentStarRating=0;
+let editingTreatmentId=null, editingLitterId=null, currentSmellRating=0, currentPooRating=0, currentPeeRating=0;
 let selectedTreatments=new Set();
 
 // ═══ FIREBASE CONFIG ═══
@@ -1820,7 +1830,10 @@ function renderLitter(){
   const list=document.getElementById('litter-list');
   const sortedLitters=data.litters.slice().sort((a,b)=>(b.rating||0)-(a.rating||0)||String(a.name||'').localeCompare(String(b.name||'')));
   list.innerHTML=sortedLitters.map(l=>{
-    const rev=l.smell||l.poo||l.pee;
+    const smellR=typeof l.smell==='number'?l.smell:0;
+    const pooR=typeof l.poo==='number'?l.poo:0;
+    const peeR=typeof l.pee==='number'?l.pee:0;
+    const rev=smellR||pooR||peeR;
     return`<div class="litter-card">
       <div class="litter-header">
         <div><div class="litter-name">${escHtml(l.name)}</div>
@@ -1829,9 +1842,9 @@ function renderLitter(){
         ${l.rating?starsHtml(l.rating):'<span class="unreviewed-badge">Not rated</span>'}
       </div>
       ${rev?`<div class="litter-metrics">
-        <div class="metric"><div class="metric-label">Smell</div><div class="metric-value">${l.smell||'—'}</div></div>
-        <div class="metric"><div class="metric-label">Poo</div><div class="metric-value">${l.poo||'—'}</div></div>
-        <div class="metric"><div class="metric-label">Pee</div><div class="metric-value">${l.pee||'—'}</div></div>
+        <div class="metric"><div class="metric-label">Smell</div><div class="metric-value">${smellR?starsHtml(smellR):'—'}</div></div>
+        <div class="metric"><div class="metric-label">Poo</div><div class="metric-value">${pooR?starsHtml(pooR):'—'}</div></div>
+        <div class="metric"><div class="metric-label">Pee</div><div class="metric-value">${peeR?starsHtml(peeR):'—'}</div></div>
       </div>`:'<div style="color:var(--text-muted);font-size:0.8rem;padding:4px 0">Not yet reviewed</div>'}
       ${l.notes?`<div class="litter-notes">${escHtml(l.notes)}</div>`:''}
       <div class="litter-actions">
@@ -1840,26 +1853,41 @@ function renderLitter(){
       </div></div>`;
   }).join('')||'<div class="empty-state"><div class="empty-icon">🌿</div>No litters added yet.</div>';
 }
-function showAddLitterModal(){editingLitterId=null;currentStarRating=0;document.getElementById('litter-modal-title').textContent='Add Litter';['litter-name','litter-price','litter-ppl','litter-smell','litter-poo','litter-pee','litter-notes'].forEach(id=>document.getElementById(id).value='');updateStarPicker(0);openModal('litter-modal');}
+function showAddLitterModal(){editingLitterId=null;currentSmellRating=0;currentPooRating=0;currentPeeRating=0;document.getElementById('litter-modal-title').textContent='Add Litter';['litter-name','litter-price','litter-ppl','litter-notes'].forEach(id=>document.getElementById(id).value='');updateLitterPickers();openModal('litter-modal');}
 function editLitter(lid){
   const l=data.litters.find(x=>x.id===lid);if(!l)return;
-  editingLitterId=lid;currentStarRating=l.rating||0;
+  editingLitterId=lid;
+  currentSmellRating=typeof l.smell==='number'?l.smell:0;
+  currentPooRating=typeof l.poo==='number'?l.poo:0;
+  currentPeeRating=typeof l.pee==='number'?l.pee:0;
   document.getElementById('litter-modal-title').textContent='Edit '+l.name;
   document.getElementById('litter-name').value=l.name;
   document.getElementById('litter-price').value=l.price;
   document.getElementById('litter-ppl').value=l.pricePerL||'';
-  document.getElementById('litter-smell').value=l.smell||'';
-  document.getElementById('litter-poo').value=l.poo||'';
-  document.getElementById('litter-pee').value=l.pee||'';
   document.getElementById('litter-notes').value=l.notes||'';
-  updateStarPicker(l.rating||0);openModal('litter-modal');
+  updateLitterPickers();openModal('litter-modal');
 }
-function setStar(n){currentStarRating=n;updateStarPicker(n);}
-function updateStarPicker(n){document.querySelectorAll('#star-picker .star-btn').forEach((b,i)=>b.classList.toggle('on',i<n));}
+function setLitterStar(field,n){
+  if(field==='smell') currentSmellRating=n;
+  else if(field==='poo') currentPooRating=n;
+  else if(field==='pee') currentPeeRating=n;
+  updateLitterPickers();
+}
+function updateLitterPickers(){
+  document.querySelectorAll('#smell-picker .star-btn').forEach((b,i)=>b.classList.toggle('on',i<currentSmellRating));
+  document.querySelectorAll('#poo-picker .star-btn').forEach((b,i)=>b.classList.toggle('on',i<currentPooRating));
+  document.querySelectorAll('#pee-picker .star-btn').forEach((b,i)=>b.classList.toggle('on',i<currentPeeRating));
+  const rated=[currentSmellRating,currentPooRating,currentPeeRating].filter(r=>r>0);
+  const avg=rated.length?rated.reduce((a,b)=>a+b,0)/rated.length:0;
+  const el=document.getElementById('litter-auto-rating');
+  if(el) el.innerHTML=avg?starsHtml(Math.round(avg))+` <span style="color:var(--text-muted);font-size:0.8rem">${avg.toFixed(1)}/5</span>`:'Rate smell, poo and pee to see total';
+}
 function saveLitter(){
   const name=document.getElementById('litter-name').value.trim();
   if(!name){showToast('Please enter a brand name');return;}
-  const litter={id:editingLitterId||uid(),name,rating:currentStarRating,price:document.getElementById('litter-price').value.trim(),pricePerL:parseFloat(document.getElementById('litter-ppl').value)||null,smell:document.getElementById('litter-smell').value.trim(),poo:document.getElementById('litter-poo').value.trim(),pee:document.getElementById('litter-pee').value.trim(),notes:document.getElementById('litter-notes').value.trim()};
+  const _rated=[currentSmellRating,currentPooRating,currentPeeRating].filter(r=>r>0);
+  const autoRating=_rated.length?Math.round(_rated.reduce((a,b)=>a+b,0)/_rated.length):0;
+  const litter={id:editingLitterId||uid(),name,rating:autoRating,smell:currentSmellRating,poo:currentPooRating,pee:currentPeeRating,price:document.getElementById('litter-price').value.trim(),pricePerL:parseFloat(document.getElementById('litter-ppl').value)||null,notes:document.getElementById('litter-notes').value.trim()};
   if(editingLitterId){const i=data.litters.findIndex(x=>x.id===editingLitterId);data.litters[i]=litter;}
   else data.litters.push(litter);
   saveData({reason:editingLitterId?'Updated litter review':'Added litter review'});closeModal('litter-modal');renderLitter();showToast('Saved ✓');
