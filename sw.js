@@ -1,4 +1,4 @@
-const CACHE_NAME = 'miaou-v3';
+const CACHE_NAME = 'miaou-v4';
 const APP_FILES = [
   './',
   './index.html',
@@ -22,14 +22,13 @@ self.addEventListener('fetch', event => {
   const req = event.request;
   if(req.method !== 'GET') return;
 
-  const url = new URL(req.url);
   if(req.mode === 'navigate'){
     event.respondWith(
       fetch(req).then(res => {
         const copy = res.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put('./index.html', copy));
+        caches.open(CACHE_NAME).then(cache => cache.put(req, copy));
         return res;
-      }).catch(() => caches.match('./index.html'))
+      }).catch(() => caches.match(req).then(r => r || caches.match('./index.html')))
     );
     return;
   }

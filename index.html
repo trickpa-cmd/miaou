@@ -1121,7 +1121,15 @@ async function completePendingRedirectResult(){
 }
 
 async function completeExistingSessionIfAny(){
-  const pendingRedirect = (() => { try { return localStorage.getItem('miaou_google_redirect_pending') === '1'; } catch(err) { return false; } })();
+  const pendingRedirect = (() => {
+    try {
+      const flagged = localStorage.getItem('miaou_google_redirect_pending') === '1';
+      const fromSignedInReturn = new URLSearchParams(window.location.search).get('signedin') === '1';
+      return flagged || fromSignedInReturn;
+    } catch(err) {
+      return false;
+    }
+  })();
 
   const waitedUser = await new Promise(resolve => {
     let settled = false;
@@ -1130,7 +1138,7 @@ async function completeExistingSessionIfAny(){
       settled = true;
       resolve(user || null);
     };
-    const timeout = setTimeout(() => finish(_auth && _auth.currentUser ? _auth.currentUser : null), pendingRedirect ? 2500 : 800);
+    const timeout = setTimeout(() => finish(_auth && _auth.currentUser ? _auth.currentUser : null), pendingRedirect ? 8000 : 1500);
     const unsub = _onAuthStateChanged(_auth, user => {
       clearTimeout(timeout);
       try { unsub(); } catch(err) {}
@@ -1151,6 +1159,18 @@ async function completeExistingSessionIfAny(){
   }
 
   return false;
+}
+
+function attachAuthStateWatcher(){
+  if(!_auth || !_onAuthStateChanged) return;
+  _onAuthStateChanged(_auth, async user => {
+    if(user){
+      await completeSignedInUser(user);
+      return;
+    }
+    currentUserEmail='';
+    setSignedOutUi();
+  });
 }
 
 async function signInWithGoogle(){
@@ -1224,6 +1244,7 @@ async function bootstrap(){
   document.getElementById('loading-screen').style.display='flex';
   try {
     await initFirebase();
+    attachAuthStateWatcher();
 
     const redirectCompleted = await completePendingRedirectResult();
     if(redirectCompleted) return;
