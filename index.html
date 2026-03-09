@@ -1106,27 +1106,12 @@ async function saveData(meta={}){
 }
 
 
-function shouldPreferRedirectSignIn(){
-  return isStandaloneMode();
-}
-
 function markRedirectPending(){
   try { localStorage.setItem('miaou_google_redirect_pending', '1'); } catch(err) {}
 }
 
 function clearRedirectPending(){
   try { localStorage.removeItem('miaou_google_redirect_pending'); } catch(err) {}
-}
-
-function setPostAuthTarget(){
-  try { localStorage.setItem('miaou_post_auth_target', 'index.html'); } catch(err) {}
-}
-
-function launchStandaloneAuthFlow(){
-  markRedirectPending();
-  setPostAuthTarget();
-  const nonce = Date.now();
-  window.location.href = `auth-return.html?start=1&t=${nonce}`;
 }
 
 async function completePendingRedirectResult(){
@@ -1161,7 +1146,7 @@ async function completeExistingSessionIfAny(){
       settled = true;
       resolve(user || null);
     };
-    const timeout = setTimeout(() => finish(_auth && _auth.currentUser ? _auth.currentUser : null), pendingRedirect ? 8000 : 1500);
+    const timeout = setTimeout(() => finish(_auth && _auth.currentUser ? _auth.currentUser : null), pendingRedirect ? 10000 : 5000);
     const unsub = _onAuthStateChanged(_auth, user => {
       clearTimeout(timeout);
       try { unsub(); } catch(err) {}
@@ -1186,13 +1171,47 @@ async function completeExistingSessionIfAny(){
 
 function attachAuthStateWatcher(){
   if(!_auth || !_onAuthStateChanged) return;
+  // Skip the very first emission — bootstrap's own onAuthStateChanged listener handles it.
+  // This watcher handles subsequent changes (session expiry, sign-in from another tab).
+  let firstEmit = true;
   _onAuthStateChanged(_auth, async user => {
+    if(firstEmit){ firstEmit = false; return; }
     if(user){
       await completeSignedInUser(user);
       return;
     }
     currentUserEmail='';
     setSignedOutUi();
+  });
+}
+
+function attachVisibilityRecheck(){
+  // When the user authenticates in a browser tab and switches back to the PWA,
+  // the PWA window never navigated so getRedirectResult is empty. We recheck
+  // auth state on focus/visibility restore so the session is picked up.
+  const recheck = async () => {
+    if(currentUserEmail || !_auth) return;
+    const immediate = _auth.currentUser;
+    if(immediate){ await completeSignedInUser(immediate); return; }
+    await new Promise(resolve => {
+      let done = false;
+      const unsub = _onAuthStateChanged(_auth, u => {
+        if(done) return; done = true; try{ unsub(); }catch(e){} resolve(u || null);
+      });
+      setTimeout(() => { if(!done){ done = true; resolve(null); } }, 5000);
+    }).then(u => { if(u) completeSignedInUser(u); });
+  };
+  document.addEventListener('visibilitychange', () => {
+    if(document.visibilityState === 'visible') recheck();
+  });
+  window.addEventListener('pageshow', e => {
+    if(e.persisted) recheck();
+  });
+  // Cross-tab signal: auth-return.html or another tab cleared the pending flag
+  window.addEventListener('storage', e => {
+    if(e.key === 'miaou_google_redirect_pending' && e.newValue === null){
+      setTimeout(recheck, 800);
+    }
   });
 }
 
@@ -1204,40 +1223,14 @@ async function signInWithGoogle(){
     const provider = new _GoogleAuthProvider();
     provider.setCustomParameters({prompt:'select_account'});
     setAuthStatus('Opening Google sign in…', false);
-
-    if(shouldPreferRedirectSignIn()){
-      launchStandaloneAuthFlow();
-      return;
-    }
-
-    const popupResult = await _signInWithPopup(_auth, provider);
-    const popupUser = popupResult && popupResult.user ? popupResult.user : (_auth ? _auth.currentUser : null);
-    if(popupUser){
-      await completeSignedInUser(popupUser);
-      return;
-    }
-    setAuthStatus('Google sign in did not return a user. Please try again.');
-    return;
+    markRedirectPending();
+    // Always use redirect (works in browser AND installed PWA).
+    // Page navigates away to Google — code below this line does not run.
+    await _signInWithRedirect(_auth, provider);
   } catch(e) {
     console.error('Sign in error:', e);
-    const code = String(e.code || '');
-    if(code.includes('popup')){
-      try {
-        const provider = new _GoogleAuthProvider();
-        provider.setCustomParameters({prompt:'select_account'});
-        setAuthStatus('Opening Google sign in…', false);
-        markRedirectPending();
-        setPostAuthTarget();
-        await _signInWithRedirect(_auth, provider);
-        return;
-      } catch(err) {
-        console.error('Redirect sign in error:', err);
-        setAuthStatus(getFriendlyAuthError(err));
-      }
-    } else {
-      setAuthStatus(getFriendlyAuthError(e));
-    }
-  } finally {
+    clearRedirectPending();
+    setAuthStatus(getFriendlyAuthError(e));
     if(btn){ btn.disabled = false; btn.style.opacity = ''; }
   }
 }
@@ -1268,6 +1261,7 @@ async function bootstrap(){
   try {
     await initFirebase();
     attachAuthStateWatcher();
+    attachVisibilityRecheck();
 
     const redirectCompleted = await completePendingRedirectResult();
     if(redirectCompleted) return;
