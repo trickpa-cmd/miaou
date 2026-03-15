@@ -1883,21 +1883,6 @@ async function _driveUploadFile(name,mimeType,content,parentId){
   if(!res.ok){const t=await res.text();throw new Error('Upload error '+res.status+': '+t.slice(0,200));}
 }
 
-async function _driveCleanOldFolders(){
-  // Find and permanently delete any old Miaou-related root folders
-  const q=`mimeType='application/vnd.google-apps.folder' and trashed=false and (name='Miaou Backups' or name='Miaou' or name='miaou')`;
-  try{
-    const r=await _driveApiFetch('https://www.googleapis.com/drive/v3/files?q='+encodeURIComponent(q)+'&fields=files(id,name)&spaces=drive');
-    if(r.files&&r.files.length){
-      for(const f of r.files){
-        await fetch('https://www.googleapis.com/drive/v3/files/'+encodeURIComponent(f.id),{
-          method:'DELETE',headers:{'Authorization':'Bearer '+_driveToken}
-        });
-      }
-    }
-  }catch(e){console.warn('Cleanup old folders:', e);}
-}
-
 function _buildBackupHtml(){
   const now=new Date();
   const treatments=data.treatments||[];
@@ -1995,9 +1980,6 @@ async function driveBackup(){
   try{
     _driveStatus('\uD83D\uDD11 Authorizing Google Drive access\u2026');
     await _driveGetToken();
-
-    _driveStatus('\uD83E\uDDF9 Cleaning up old app folders\u2026');
-    await _driveCleanOldFolders();
 
     _driveStatus('\uD83D\uDCC4 Generating HTML & Excel backup\u2026');
     const html=_buildBackupHtml();
