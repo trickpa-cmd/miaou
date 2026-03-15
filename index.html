@@ -1829,11 +1829,19 @@ let _driveToken=null;
 
 async function _driveGetToken(){
   const provider=new firebase.auth.GoogleAuthProvider();
-  provider.addScope('https://www.googleapis.com/auth/drive.file');
+  provider.addScope('https://www.googleapis.com/auth/drive');
   if(currentUserEmail) provider.setCustomParameters({login_hint:currentUserEmail});
   const result=await auth.signInWithPopup(provider);
   if(!result.credential||!result.credential.accessToken) throw new Error('No access token received from Google. Please try again.');
   _driveToken=result.credential.accessToken;
+  // Verify Drive API is enabled with a lightweight call
+  const test=await fetch('https://www.googleapis.com/drive/v3/about?fields=user',{headers:{'Authorization':'Bearer '+_driveToken}});
+  if(!test.ok){
+    const t=await test.text();
+    if(t.includes('API has not been used')||t.includes('accessNotConfigured')||t.includes('PERMISSION_DENIED'))
+      throw new Error('Google Drive API is not enabled. Go to console.cloud.google.com → APIs → Enable "Google Drive API" for project miaou-57319.');
+    throw new Error('Drive API test failed ('+test.status+'): '+t.slice(0,200));
+  }
 }
 
 async function _driveApiFetch(url,opts={}){
@@ -1876,20 +1884,18 @@ async function _driveUploadFile(name,mimeType,content,parentId){
 }
 
 async function _driveCleanOldFolders(){
-  const oldNames=['Miaou Backups'];
-  for(const name of oldNames){
-    try{
-      const q=`name='${name}' and mimeType='application/vnd.google-apps.folder' and trashed=false`;
-      const r=await _driveApiFetch('https://www.googleapis.com/drive/v3/files?q='+encodeURIComponent(q)+'&fields=files(id)&spaces=drive');
-      if(r.files){
-        for(const f of r.files){
-          await fetch('https://www.googleapis.com/drive/v3/files/'+f.id,{
-            method:'DELETE',headers:{'Authorization':'Bearer '+_driveToken}
-          });
-        }
+  // Find and permanently delete any old Miaou-related root folders
+  const q=`mimeType='application/vnd.google-apps.folder' and trashed=false and (name='Miaou Backups' or name='Miaou' or name='miaou')`;
+  try{
+    const r=await _driveApiFetch('https://www.googleapis.com/drive/v3/files?q='+encodeURIComponent(q)+'&fields=files(id,name)&spaces=drive');
+    if(r.files&&r.files.length){
+      for(const f of r.files){
+        await fetch('https://www.googleapis.com/drive/v3/files/'+encodeURIComponent(f.id),{
+          method:'DELETE',headers:{'Authorization':'Bearer '+_driveToken}
+        });
       }
-    }catch(e){console.warn('Cleanup old folder "'+name+'":', e);}
-  }
+    }
+  }catch(e){console.warn('Cleanup old folders:', e);}
 }
 
 function _buildBackupHtml(){
