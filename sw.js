@@ -1,4 +1,4 @@
-const CACHE_NAME = 'miaou-v16';
+const CACHE_NAME = 'miaou-v17';
 const APP_FILES = [
   './',
   './index.html',

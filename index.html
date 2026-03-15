@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src https://firestore.googleapis.com https://www.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://fonts.googleapis.com https://fonts.gstatic.com; frame-src https://miaou-57319.firebaseapp.com https://accounts.google.com; img-src 'self' data:;">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src https://firestore.googleapis.com https://www.googleapis.com https://content.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://fonts.googleapis.com https://fonts.gstatic.com; frame-src https://miaou-57319.firebaseapp.com https://accounts.google.com; img-src 'self' data:;">
 <meta name="referrer" content="no-referrer">
 <title>🐾 Miaou</title>
 <link rel="manifest" href="miaou.webmanifest">
@@ -1853,8 +1853,10 @@ let _driveToken=null;
 async function _driveGetToken(){
   // Reuse existing valid token
   if(_driveToken){
-    const chk=await fetch('https://www.googleapis.com/drive/v3/about?fields=user',{headers:{'Authorization':'Bearer '+_driveToken}});
-    if(chk.ok) return;
+    try{
+      const chk=await fetch('https://www.googleapis.com/drive/v3/about?fields=user',{headers:{'Authorization':'Bearer '+_driveToken}});
+      if(chk.ok) return;
+    }catch(e){console.warn('Token check failed, re-auth:',e);}
     _driveToken=null;
   }
   const provider=new firebase.auth.GoogleAuthProvider();
@@ -1928,8 +1930,13 @@ async function _driveUploadFile(name,mimeType,content,parentId){
 }
 
 async function _buildBackupHtml(){
-  const resp=await fetch('./index.html');
-  let src=await resp.text();
+  let src;
+  try{
+    const resp=await fetch(location.href.replace(/#.*$/,''));
+    src=await resp.text();
+  }catch(e){
+    src='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
+  }
   const snapshot=JSON.stringify(data).replace(/<\//g,'<\\/');
   const stamp=new Date().toISOString();
   const tag='<scr'+'ipt>window.BACKUP_MODE=true;window.BACKUP_DATA='+snapshot+';window.BACKUP_DATE="'+stamp+'";<\\/scr'+'ipt>';
