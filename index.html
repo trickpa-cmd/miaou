@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src https://firestore.googleapis.com https://www.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://fonts.googleapis.com https://fonts.gstatic.com; frame-src https://miaou-57319.firebaseapp.com https://accounts.google.com; img-src 'self' data:;">
+<meta name="referrer" content="no-referrer">
 <title>🐾 Miaou</title>
 <link rel="manifest" href="miaou.webmanifest">
 <meta name="theme-color" content="#b85c38">
@@ -10,10 +12,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" crossorigin="anonymous"></script>
 <style>
 :root {
   --cream: #faf5ee; --cream2: #f2ead8;
@@ -1850,11 +1852,14 @@ async function _driveApiFetch(url,opts={}){
   return res.json();
 }
 
-async function _driveEnsureFolder(name){
-  const q=`name='${name}' and mimeType='application/vnd.google-apps.folder' and trashed=false`;
+async function _driveEnsureFolder(name,parentId){
+  const safeName=name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  const pClause=parentId?` and '${parentId}' in parents`:` and 'root' in parents`;
+  const q=`name='${safeName}' and mimeType='application/vnd.google-apps.folder' and trashed=false`+pClause;
   const r=await _driveApiFetch('https://www.googleapis.com/drive/v3/files?q='+encodeURIComponent(q)+'&fields=files(id,name)&spaces=drive');
   if(r.files&&r.files.length) return r.files[0].id;
   const body={name,mimeType:'application/vnd.google-apps.folder'};
+  if(parentId) body.parents=[parentId];
   const res=await fetch('https://www.googleapis.com/drive/v3/files',{
     method:'POST',headers:{'Authorization':'Bearer '+_driveToken,'Content-Type':'application/json'},
     body:JSON.stringify(body)
@@ -1888,45 +1893,188 @@ function _buildBackupHtml(){
   const treatments=data.treatments||[];
   const getT=id=>(treatments.find(t=>t.id===id)||{}).name||id;
   const fd=d=>{if(!d)return'—';const[y,m,dd]=d.split('-');return`${dd}/${m}/${y}`;};
-  let h=`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Miaou Backup – ${now.toLocaleString()}</title><style>body{font-family:Arial,sans-serif;max-width:1100px;margin:0 auto;padding:24px;background:#faf5ee;color:#2c2118}h1{color:#b85c38}h2{color:#b85c38;border-bottom:2px solid #e8dcc8;padding-bottom:6px;margin:36px 0 10px}h3{color:#5c7a63;margin:20px 0 8px}p.sub{color:#7a6a58;margin-bottom:24px}table{border-collapse:collapse;width:100%;margin-bottom:16px;font-size:.92em}th{background:#b85c38;color:#fff;padding:8px 10px;text-align:left}td{padding:7px 10px;border-bottom:1px solid #e8dcc8;vertical-align:top}tr:nth-child(even) td{background:#f2ead8}.cat-block{border-left:5px solid;padding:10px 16px;border-radius:6px;margin:28px 0 4px;background:#fff}.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.82em;font-weight:600}.overdue{background:#fde8e8;color:#c0392b}.done-b{background:#e8f8ed;color:#3a7d44}.upcoming{background:#e8f4fd;color:#1a6fa8}</style></head><body><h1>\uD83D\uDC3E Miaou Backup</h1><p class="sub">Generated: ${now.toLocaleString()}</p>`;
-  h+=`<h2>Cats Overview</h2><table><tr><th>Cat</th><th>DOB</th><th>Latest Weight</th><th>Last Visit</th><th>Total Cost</th><th>Open Schedules</th></tr>`;
+  const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+  const starsPct=(r)=>(Math.min(Math.max(r,0),5)/5*100).toFixed(2);
+  const starsSpan=(r)=>r?`<span class="stars-partial"><span class="stars-bg">★★★★★</span><span class="stars-fg" style="width:${starsPct(r)}%">★★★★★</span></span> <span class="rating-score">${Number(r).toFixed(1)}/5</span>`:'<span class="text-muted">Not rated</span>';
+
+  let h=`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>🐾 Miaou Backup – ${now.toLocaleString()}</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#faf5ee;--cream2:#f2ead8;--terra:#b85c38;--terra-light:#e8927c;--terra-dark:#8c3e22;--sage:#5c7a63;--sage-light:#8aab91;--sand:#c9a96e;--lavender:#8474a8;--warm-white:#fffdf9;--text:#2c2118;--text-muted:#7a6a58;--border:#e8dcc8;--shadow:rgba(44,33,24,0.10);--red:#c0392b;--orange:#d4700a;--green:#3a7d44;--radius:18px;--radius-sm:10px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);max-width:600px;margin:0 auto;padding:20px 16px 40px;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle at 20% 20%,rgba(184,92,56,0.07) 0%,transparent 50%),radial-gradient(circle at 80% 70%,rgba(92,122,99,0.07) 0%,transparent 50%);pointer-events:none;z-index:0}
+.app-header{background:var(--warm-white);border-bottom:1px solid var(--border);padding:14px 20px 12px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 12px var(--shadow);border-radius:var(--radius);margin-bottom:20px;position:relative;z-index:1}
+.header-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;color:var(--terra-dark);letter-spacing:-0.02em}
+.header-title span{color:var(--sand)}
+.backup-date{font-size:0.78rem;color:var(--text-muted)}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:700;color:var(--text);margin:24px 0 12px;position:relative;z-index:1}
+.cat-card{background:var(--warm-white);border-radius:var(--radius);padding:18px 16px 14px;border:1.5px solid var(--border);box-shadow:0 2px 10px var(--shadow);margin-bottom:12px;position:relative;z-index:1}
+.cat-header{display:flex;align-items:center;gap:12px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--cream2)}
+.cat-emoji{font-size:2rem}
+.cat-name{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:700}
+.cat-meta{font-size:0.78rem;color:var(--text-muted);margin-top:2px}
+.cat-weight{display:inline-block;padding:2px 8px;border-radius:20px;font-size:0.75rem;font-weight:600;margin-top:4px}
+.sub-title{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin:14px 0 8px;display:flex;align-items:center;gap:6px}
+.sub-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.visit-card{background:var(--cream);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px;border:1px solid var(--border)}
+.visit-date{font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--terra);margin-bottom:4px}
+.visit-weight{display:inline-block;background:var(--cream2);color:var(--text-muted);border-radius:20px;padding:2px 8px;font-size:0.72rem;font-weight:600;margin-right:4px}
+.visit-cost{display:inline-block;background:rgba(92,122,99,0.12);color:var(--sage);border-radius:20px;padding:2px 8px;font-size:0.72rem;font-weight:600}
+.tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:0.72rem;font-weight:600;margin:2px 2px 2px 0}
+.tag-treatment{background:rgba(184,92,56,0.10);color:var(--terra-dark)}
+.tag-onetime{background:rgba(92,122,99,0.12);color:var(--sage)}
+.visit-notes{font-size:0.82rem;color:var(--text);line-height:1.55;white-space:pre-line;margin-top:6px}
+.sched-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--cream2)}
+.sched-item:last-child{border-bottom:none}
+.sched-name{font-size:0.88rem;font-weight:600;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.sched-date{font-size:0.72rem;color:var(--text-muted)}
+.sched-note{font-size:0.72rem;color:var(--text-muted);font-style:italic}
+.sched-price{font-size:0.82rem;font-weight:700;color:var(--sage)}
+.status-pill{border-radius:20px;padding:2px 7px;font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap}
+.status-overdue{background:rgba(192,57,43,0.12);color:var(--red)}
+.status-soon{background:rgba(212,112,10,0.12);color:var(--orange)}
+.status-upcoming{background:rgba(58,125,68,0.10);color:var(--green)}
+.status-done{background:var(--cream2);color:var(--text-muted)}
+.litter-card{background:var(--warm-white);border:1.5px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:0 2px 10px var(--shadow);position:relative;z-index:1}
+.litter-name{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:700}
+.litter-price-tag{font-size:0.72rem;color:var(--text-muted);margin-top:2px}
+.litter-metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:8px}
+.metric{background:var(--cream);border-radius:8px;padding:7px 8px;text-align:center}
+.metric-label{font-size:0.65rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.05em}
+.metric-value{font-size:0.78rem;color:var(--text);font-weight:500;margin-top:2px}
+.litter-notes{font-size:0.78rem;color:var(--text-muted);margin-top:8px;font-style:italic}
+.ppl-badge{display:inline-block;background:rgba(132,116,168,0.12);color:var(--lavender);border-radius:20px;padding:2px 8px;font-size:0.7rem;font-weight:700}
+.stars-partial{position:relative;display:inline-flex;align-items:center;vertical-align:middle}
+.stars-bg{color:var(--border);white-space:nowrap;letter-spacing:1px}
+.stars-fg{position:absolute;top:0;left:0;overflow:hidden;white-space:nowrap;color:var(--sand);letter-spacing:1px;pointer-events:none}
+.rating-score{font-size:0.82rem;font-weight:700;color:var(--terra);white-space:nowrap}
+.text-muted{color:var(--text-muted);font-size:0.82rem}
+.treatment-table{width:100%;border-collapse:collapse;margin-top:6px;position:relative;z-index:1}
+.treatment-table th{background:var(--terra);color:#fff;padding:8px 10px;text-align:left;font-size:0.78rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em}
+.treatment-table td{padding:7px 10px;border-bottom:1px solid var(--border);font-size:0.85rem}
+.treatment-table tr:nth-child(even) td{background:var(--cream)}
+.onetime-badge{font-size:0.62rem;background:rgba(132,116,168,0.13);color:var(--lavender);border-radius:20px;padding:1px 7px;font-weight:600;margin-left:4px}
+.overview-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;position:relative;z-index:1}
+.overview-card{background:var(--warm-white);border-radius:var(--radius);padding:14px;border:1.5px solid var(--border);box-shadow:0 2px 10px var(--shadow);text-align:center}
+.overview-card .ov-emoji{font-size:1.8rem;margin-bottom:4px}
+.overview-card .ov-name{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:700}
+.overview-card .ov-detail{font-size:0.72rem;color:var(--text-muted);margin-top:2px}
+.overview-card .ov-weight{font-size:0.8rem;font-weight:600;margin-top:4px}
+</style></head><body>
+<header class="app-header">
+  <div class="header-title">🐾 Miaou</div>
+  <div class="backup-date">Backup: ${now.toLocaleString()}</div>
+</header>\n`;
+
+  // ── Cats Overview Grid ──
+  h+=`<div class="section-title">🐾 Cats Overview</div><div class="overview-grid">`;
   for(const cat of(data.cats||[])){
     const wt=cat.visits.filter(v=>v.weight).sort((a,b)=>b.date.localeCompare(a.date))[0];
-    const lv=cat.visits.slice().sort((a,b)=>b.date.localeCompare(a.date))[0];
-    h+=`<tr><td>${cat.emoji} <strong>${cat.name}</strong></td><td>${fd(cat.dob)}</td><td>${wt?wt.weight+' kg':'\u2014'}</td><td>${lv?fd(lv.date):'\u2014'}</td><td>$${cat.visits.reduce((s,v)=>s+(v.cost||0),0)}</td><td>${cat.schedules.filter(s=>!s.done).length}</td></tr>`;
+    const age=cat.dob?calcAge(cat.dob):null;
+    const pastels={'#e07b3a':'#fde8d8','#c07030':'#fde0c8','#5c5248':'#ede8e4','#8aacbf':'#ddeef5','#b85c38':'#fde8e0','#5c7a63':'#e0ede2','#c4a882':'#f5edd8','#8474a8':'#ede8f5'};
+    const bg=pastels[cat.color]||'#f5f0e8';
+    h+=`<div class="overview-card" style="border-top:4px solid ${cat.color}">
+      <div class="ov-emoji">${cat.emoji}</div>
+      <div class="ov-name">${esc(cat.name)}</div>
+      <div class="ov-detail">${age?age+' old':'Age unknown'} · ${cat.visits.length} visits · $${cat.visits.reduce((s,v)=>s+(v.cost||0),0)} spent</div>
+      ${wt?`<div class="ov-weight" style="color:${cat.color}">⚖️ ${wt.weight} kg</div>`:''}
+    </div>`;
   }
-  h+=`</table>`;
+  h+=`</div>`;
+
+  // ── Per-cat details ──
   for(const cat of(data.cats||[])){
-    h+=`<div class="cat-block" style="border-color:${cat.color}"><strong style="font-size:1.1em;color:${cat.color}">${cat.emoji} ${cat.name}</strong>${cat.dob?` &middot; Born ${fd(cat.dob)}`:''}</div>`;
-    if(cat.visits.length){
-      h+=`<h3>Vet Visits</h3><table><tr><th>Date</th><th>Weight</th><th>Cost</th><th>Treatments</th><th>Notes</th></tr>`;
-      for(const v of cat.visits.slice().sort((a,b)=>b.date.localeCompare(a.date))){
-        const tx=[...v.treatments.map(getT),...(v.oneTimeTreatments||[]).map(t=>t.name)].filter(Boolean).join(', ')||'\u2014';
-        h+=`<tr><td>${fd(v.date)}</td><td>${v.weight?v.weight+' kg':'\u2014'}</td><td>${v.cost?'$'+v.cost:'\u2014'}</td><td>${tx}</td><td style="white-space:pre-wrap">${(v.notes||'').replace(/</g,'&lt;')||'\u2014'}</td></tr>`;
-      }
-      h+=`</table>`;
-    }
-    if(cat.schedules.length){
-      h+=`<h3>Schedule</h3><table><tr><th>Treatment</th><th>Due Date</th><th>Price</th><th>Notes</th><th>Status</th></tr>`;
-      for(const s of cat.schedules.slice().sort((a,b)=>a.dueDate.localeCompare(b.dueDate))){
-        const tname=s.oneTime?(s.oneTimeName||'One-time'):getT(s.treatmentId);
+    const wt=cat.visits.filter(v=>v.weight).sort((a,b)=>b.date.localeCompare(a.date))[0];
+    const age=cat.dob?calcAge(cat.dob):null;
+    const total=cat.visits.reduce((s,v)=>s+(v.cost||0),0);
+    const pastels={'#e07b3a':'#fde8d8','#c07030':'#fde0c8','#5c5248':'#ede8e4','#8aacbf':'#ddeef5','#b85c38':'#fde8e0','#5c7a63':'#e0ede2','#c4a882':'#f5edd8','#8474a8':'#ede8f5'};
+    const bg=pastels[cat.color]||'#f5f0e8';
+
+    h+=`<div class="cat-card" style="border-top:4px solid ${cat.color}">
+      <div class="cat-header">
+        <span class="cat-emoji">${cat.emoji}</span>
+        <div style="flex:1">
+          <div class="cat-name">${esc(cat.name)}</div>
+          <div class="cat-meta">${cat.dob?'Born '+fd(cat.dob):'Age unknown'}${age?' · '+age:''} · <strong>$${total} spent</strong></div>
+          ${wt?`<span class="cat-weight" style="background:${bg};color:${cat.color}">⚖️ ${wt.weight} kg</span>`:''}
+        </div>
+      </div>`;
+
+    // Schedule
+    const scheds=cat.schedules.slice().sort((a,b)=>a.dueDate.localeCompare(b.dueDate));
+    if(scheds.length){
+      const pendingEst=scheds.filter(s=>!s.done).reduce((sum,s)=>{const t=tById(s.treatmentId);return sum+(s.price!==undefined?s.price:(t?t.price:0));},0);
+      h+=`<div class="sub-title">📅 Schedule${pendingEst?' · <span style="color:var(--sage)">Est. $'+pendingEst+' pending</span>':''}</div>`;
+      for(const s of scheds){
+        const isOT=!!s.oneTime;
+        const t=isOT?null:tById(s.treatmentId);
+        const name=isOT?s.oneTimeName:(t?t.name:'?');
+        const price=isOT?0:(s.price!==undefined?s.price:(t?t.price:0));
         const days=Math.round((new Date(s.dueDate)-now)/86400000);
-        let cls='upcoming',lbl='';
-        if(s.done){cls='done-b';lbl='Done';}else if(days<0){cls='overdue';lbl=(-days)+'d overdue';}else{lbl='In '+days+'d';}
-        h+=`<tr><td>${tname}</td><td>${fd(s.dueDate)}</td><td>${s.price?'$'+s.price:'\u2014'}</td><td>${(s.notes||'').replace(/</g,'&lt;')||'\u2014'}</td><td><span class="badge ${cls}">${lbl}</span></td></tr>`;
+        let cls='status-upcoming',lbl='In '+days+'d';
+        if(s.done){cls='status-done';lbl='Done';}
+        else if(days<0){cls='status-overdue';lbl=(-days)+'d overdue';}
+        else if(days<=7){cls='status-soon';lbl='In '+days+'d';}
+        h+=`<div class="sched-item">
+          <div style="flex:1"><div class="sched-name">${iconFor(name)} ${esc(name)}${isOT?'<span class="onetime-badge">one-time</span>':''} <span class="status-pill ${cls}">${lbl}</span></div>
+          <div class="sched-date">📅 ${fd(s.dueDate)}</div>
+          ${s.notes?`<div class="sched-note">${esc(s.notes)}</div>`:''}</div>
+          ${price?`<span class="sched-price">$${price}</span>`:''}
+        </div>`;
       }
-      h+=`</table>`;
     }
+
+    // Visits
+    const sorted=cat.visits.slice().sort((a,b)=>b.date.localeCompare(a.date));
+    if(sorted.length){
+      h+=`<div class="sub-title">🏥 Vet Visits (${sorted.length})</div>`;
+      for(const v of sorted){
+        const tags=(v.treatments||[]).map(tid=>{const t=tById(tid);return t?`<span class="tag tag-treatment">${iconFor(t.name)} ${t.name}</span>`:''}).join('');
+        const otTags=(v.oneTimeTreatments||[]).map(ot=>`<span class="tag tag-onetime">🔁 ${esc(ot.name)} · in ${ot.repeatCount} ${ot.repeatUnit}</span>`).join('');
+        h+=`<div class="visit-card">
+          <div class="visit-date">${fd(v.date)}</div>
+          ${v.weight?`<span class="visit-weight">⚖️ ${v.weight} kg</span>`:''} ${v.cost?`<span class="visit-cost">💳 $${v.cost}</span>`:''}
+          ${(tags||otTags)?`<div style="margin-top:4px">${tags}${otTags}</div>`:''}
+          ${v.notes?`<div class="visit-notes">${esc(v.notes)}</div>`:''}
+        </div>`;
+      }
+    }
+
+    h+=`</div>`;
   }
-  h+=`<h2>Litter Reviews</h2><table><tr><th>Litter</th><th>Rating</th><th>Price</th><th>$/L</th><th>Smell</th><th>Poo</th><th>Pee</th><th>Notes</th></tr>`;
-  for(const l of(data.litters||[])){
-    const stars=l.rating?'\u2605'.repeat(Math.round(l.rating))+'\u2606'.repeat(5-Math.round(l.rating)):'Not rated';
-    h+=`<tr><td><strong>${l.name}</strong></td><td>${stars} (${l.rating||0})</td><td>${l.price||'\u2014'}</td><td>${l.pricePerL?'$'+l.pricePerL+'/L':'\u2014'}</td><td>${l.smell||'\u2014'}</td><td>${l.poo||'\u2014'}</td><td>${l.pee||'\u2014'}</td><td>${l.notes||'\u2014'}</td></tr>`;
+
+  // ── Litter Reviews ──
+  h+=`<div class="section-title">🌿 Litter Reviews</div>`;
+  const sortedLitters=(data.litters||[]).slice().sort((a,b)=>(b.rating||0)-(a.rating||0));
+  for(const l of sortedLitters){
+    const smellR=typeof l.smell==='number'?l.smell:0;
+    const pooR=typeof l.poo==='number'?l.poo:0;
+    const peeR=typeof l.pee==='number'?l.pee:0;
+    const rev=smellR||pooR||peeR;
+    const _rv=[smellR,pooR,peeR].filter(r=>r>0);
+    const exactRating=_rv.length?_rv.reduce((a,b)=>a+b,0)/_rv.length:(l.rating||0);
+    h+=`<div class="litter-card">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">
+        <div><div class="litter-name">${esc(l.name)}</div>
+          <div class="litter-price-tag">${l.priceAmount&&l.sizeAmount?`${l.priceAmount}$ / ${l.sizeAmount}${l.sizeUnit||'L'}`:esc(l.price||'')}${l.pricePerL?` <span class="ppl-badge">$${Number(l.pricePerL).toFixed(2)}/L</span>`:''}</div>
+        </div>
+        <div>${starsSpan(exactRating)}</div>
+      </div>
+      ${rev?`<div class="litter-metrics">
+        <div class="metric"><div class="metric-label">Smell</div><div class="metric-value">${smellR?starsSpan(smellR):'—'}</div></div>
+        <div class="metric"><div class="metric-label">Poo</div><div class="metric-value">${pooR?starsSpan(pooR):'—'}</div></div>
+        <div class="metric"><div class="metric-label">Pee</div><div class="metric-value">${peeR?starsSpan(peeR):'—'}</div></div>
+      </div>`:''}
+      ${l.notes?`<div class="litter-notes">${esc(l.notes)}</div>`:''}
+    </div>`;
   }
-  h+=`</table>`;
-  h+=`<h2>Treatment Prices</h2><table><tr><th>Treatment</th><th>Price</th><th>Interval</th></tr>`;
+
+  // ── Treatment Prices ──
+  h+=`<div class="section-title">💊 Treatment Prices</div>
+  <table class="treatment-table"><tr><th>Treatment</th><th>Price</th><th>Interval</th></tr>`;
   for(const t of(data.treatments||[])){
-    h+=`<tr><td>${t.name}</td><td>${t.price?'$'+t.price:'\u2014'}</td><td>${t.repeatCount?'Every '+t.repeatCount+' '+t.repeatUnit:'\u2014'}</td></tr>`;
+    h+=`<tr><td>${iconFor(t.name)} ${esc(t.name)}</td><td style="font-weight:700;color:var(--sage)">$${t.price}</td><td>${t.repeatCount?'Every '+t.repeatCount+' '+t.repeatUnit:'—'}</td></tr>`;
   }
   h+=`</table></body></html>`;
   return h;
@@ -1935,35 +2083,75 @@ function _buildBackupHtml(){
 function _buildBackupExcel(){
   const wb=XLSX.utils.book_new();
   const getT=id=>((data.treatments||[]).find(t=>t.id===id)||{}).name||id;
-  const cs=[['Cat','DOB','Latest Weight (kg)','Last Visit','Total Cost ($)','Open Schedules']];
+  const bold={font:{bold:true}};
+  const hdr={font:{bold:true,color:{rgb:'FFFFFF'}},fill:{fgColor:{rgb:'B85C38'}},alignment:{horizontal:'center'}};
+
+  function styledSheet(aoa,colWidths){
+    const ws=XLSX.utils.aoa_to_sheet(aoa);
+    if(colWidths) ws['!cols']=colWidths.map(w=>({wch:w}));
+    return ws;
+  }
+
+  // ── Overview sheet ──
+  const ov=[['🐾 Miaou Backup — '+new Date().toLocaleString()],[''],['Cat','DOB','Latest Weight (kg)','Last Visit','Total Cost ($)','Open Schedules']];
   for(const c of(data.cats||[])){
     const wt=c.visits.filter(v=>v.weight).sort((a,b)=>b.date.localeCompare(a.date))[0];
     const lv=c.visits.slice().sort((a,b)=>b.date.localeCompare(a.date))[0];
-    cs.push([c.name,c.dob||'',wt?wt.weight:'',lv?lv.date:'',c.visits.reduce((s,v)=>s+(v.cost||0),0),c.schedules.filter(s=>!s.done).length]);
+    ov.push([c.emoji+' '+c.name,c.dob||'',wt?wt.weight:'',lv?lv.date:'',c.visits.reduce((s,v)=>s+(v.cost||0),0),c.schedules.filter(s=>!s.done).length]);
   }
-  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(cs),'Cats');
-  const vs=[['Cat','Date','Weight (kg)','Cost ($)','Treatments','Notes']];
+  XLSX.utils.book_append_sheet(wb,styledSheet(ov,[20,14,18,14,14,18]),'Overview');
+
+  // ── One sheet per cat ──
   for(const c of(data.cats||[])){
-    for(const v of c.visits.slice().sort((a,b)=>b.date.localeCompare(a.date))){
-      const tx=[...v.treatments.map(getT),...(v.oneTimeTreatments||[]).map(t=>t.name)].join(', ');
-      vs.push([c.name,v.date,v.weight||'',v.cost||'',tx,v.notes||'']);
-    }
+    const rows=[];
+    rows.push([c.emoji+' '+c.name+(c.dob?' — Born '+c.dob:'')]);
+    rows.push(['']);
+
+    // Visits sub-section
+    rows.push(['── VET VISITS ──','','','','']);
+    rows.push(['Date','Weight (kg)','Cost ($)','Treatments','Notes']);
+    const sorted=c.visits.slice().sort((a,b)=>b.date.localeCompare(a.date));
+    if(sorted.length){
+      for(const v of sorted){
+        const tx=[...v.treatments.map(getT),...(v.oneTimeTreatments||[]).map(t=>t.name)].join(', ');
+        rows.push([v.date,v.weight||'',v.cost||'',tx,v.notes||'']);
+      }
+    } else { rows.push(['No visits yet','','','','']); }
+
+    rows.push(['']);
+
+    // Schedule sub-section
+    rows.push(['── SCHEDULE ──','','','','']);
+    rows.push(['Treatment','Due Date','Price ($)','Notes','Status']);
+    const scheds=c.schedules.slice().sort((a,b)=>a.dueDate.localeCompare(b.dueDate));
+    if(scheds.length){
+      for(const s of scheds){
+        const tname=s.oneTime?(s.oneTimeName||'One-time'):getT(s.treatmentId);
+        let status='Pending';
+        if(s.done) status='Done';
+        else{const days=Math.round((new Date(s.dueDate)-new Date())/86400000);status=days<0?(-days)+'d overdue':'In '+days+'d';}
+        rows.push([tname,s.dueDate,s.price||'',s.notes||'',status]);
+      }
+    } else { rows.push(['No scheduled items','','','','']); }
+
+    // Safe sheet name (max 31 chars, no special chars)
+    let sheetName=(c.emoji+' '+c.name).replace(/[\\\/\*\?\[\]:]/g,'').slice(0,31);
+    XLSX.utils.book_append_sheet(wb,styledSheet(rows,[24,14,12,30,40]),sheetName);
   }
-  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(vs),'Visits');
-  const ss=[['Cat','Treatment','Due Date','Price ($)','Notes','Done']];
-  for(const c of(data.cats||[])){
-    for(const s of c.schedules.slice().sort((a,b)=>a.dueDate.localeCompare(b.dueDate))){
-      const tname=s.oneTime?(s.oneTimeName||'One-time'):getT(s.treatmentId);
-      ss.push([c.name,tname,s.dueDate,s.price||'',s.notes||'',s.done?'Yes':'No']);
-    }
+
+  // ── Litters sheet ──
+  const ls=[['🌿 Litter Reviews'],[''],['Litter','Rating','Price','$/L','Smell','Poo','Pee','Notes']];
+  for(const l of(data.litters||[])){
+    const r=l.rating?Number(l.rating).toFixed(1)+'/5':'—';
+    ls.push([l.name,r,l.price||'',l.pricePerL?'$'+l.pricePerL+'/L':'',typeof l.smell==='number'?l.smell+'/5':(l.smell||'—'),typeof l.poo==='number'?l.poo+'/5':(l.poo||'—'),typeof l.pee==='number'?l.pee+'/5':(l.pee||'—'),l.notes||'']);
   }
-  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(ss),'Schedule');
-  const ls=[['Litter','Rating (0-5)','Price','$/L','Smell','Poo','Pee','Notes']];
-  for(const l of(data.litters||[])) ls.push([l.name,l.rating||0,l.price||'',l.pricePerL||'',l.smell||'',l.poo||'',l.pee||'',l.notes||'']);
-  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(ls),'Litters');
-  const ts=[['Treatment','Price ($)','Interval Count','Interval Unit']];
-  for(const t of(data.treatments||[])) ts.push([t.name,t.price||'',t.repeatCount||'',t.repeatUnit||'']);
-  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(ts),'Treatments');
+  XLSX.utils.book_append_sheet(wb,styledSheet(ls,[20,10,16,10,10,10,10,30]),'Litters');
+
+  // ── Treatments sheet ──
+  const ts=[['💊 Treatment Prices'],[''],['Treatment','Price ($)','Interval']];
+  for(const t of(data.treatments||[])) ts.push([t.name,t.price||'',t.repeatCount?'Every '+t.repeatCount+' '+t.repeatUnit:'—']);
+  XLSX.utils.book_append_sheet(wb,styledSheet(ts,[28,12,20]),'Treatments');
+
   return wb;
 }
 
@@ -1987,7 +2175,9 @@ async function driveBackup(){
     const xlsxArr=XLSX.write(wb,{bookType:'xlsx',type:'array'});
 
     _driveStatus('\uD83D\uDCC1 Creating folder in Google Drive\u2026');
-    const rootId=await _driveEnsureFolder('Saved Backups');
+    const appsId=await _driveEnsureFolder('Apps Backups');
+    const miaouVsId=await _driveEnsureFolder('Miaou-VS',appsId);
+    const rootId=await _driveEnsureFolder('Saved Backups',miaouVsId);
     const now=new Date(),p=n=>String(n).padStart(2,'0');
     const stamp=now.getFullYear()+'-'+p(now.getMonth()+1)+'-'+p(now.getDate())+' '+p(now.getHours())+'-'+p(now.getMinutes())+'-'+p(now.getSeconds());
     const subId=await _driveCreateSubfolder(stamp,rootId);
@@ -1997,7 +2187,7 @@ async function driveBackup(){
     await _driveUploadFile('miaou-backup.xlsx','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',new Uint8Array(xlsxArr),subId);
 
     _driveStatus(null);
-    showToast('\u2713 Backed up to Drive: Saved Backups / '+stamp);
+    showToast('\u2713 Backed up to Drive: Miaou-VS / Saved Backups / '+stamp);
   }catch(e){
     console.error('Drive backup error:',e);
     _driveStatus(null);
