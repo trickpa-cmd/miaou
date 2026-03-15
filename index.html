@@ -886,16 +886,13 @@ const ALLOWED_EMAILS=['ziadehpatrick@gmail.com','stefanie.a.hanna@gmail.com'];
 let currentUserEmail='';
 let localRevision=0;
 let backups=[];
-pendingCloudPayload='';
+let pendingCloudPayload='';
 
 function uid(){return '_'+Math.random().toString(36).slice(2,9);}
 function storageKey(){return currentUserEmail?`miaou_offline_${currentUserEmail}`:'miaou_offline';}
 function deepClone(v){return JSON.parse(JSON.stringify(v));}
 function setAuthStatus(msg,isError=true){const el=document.getElementById('auth-status'); if(!el) return; el.textContent=msg||''; el.style.color=isError?'var(--red)':'var(--sage)';}
 function isAllowedEmail(email){return ALLOWED_EMAILS.includes(String(email||'').toLowerCase());}
-function isStandaloneMode(){
-  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-}
 function getFriendlyAuthError(error){
   const code = String(error?.code || '');
   if(code.includes('popup_blocked')) return 'Google sign in was blocked by the browser. Please try again.';
@@ -1833,24 +1830,38 @@ let _driveToken=null;
 async function _driveGetToken(){
   const provider=new firebase.auth.GoogleAuthProvider();
   provider.addScope('https://www.googleapis.com/auth/drive.file');
+  if(currentUserEmail) provider.setCustomParameters({login_hint:currentUserEmail});
   const result=await auth.signInWithPopup(provider);
+  if(!result.credential||!result.credential.accessToken) throw new Error('No access token received from Google. Please try again.');
   _driveToken=result.credential.accessToken;
 }
 
 async function _driveApiFetch(url,opts={}){
   const res=await fetch(url,{...opts,headers:{'Authorization':'Bearer '+_driveToken,...(opts.headers||{})}});
-  if(!res.ok){const t=await res.text();throw new Error('Drive '+res.status+': '+t.slice(0,200));}
+  if(!res.ok){const t=await res.text();throw new Error('Drive API error '+res.status+': '+t.slice(0,200));}
   return res.json();
 }
 
-async function _driveCreateFolder(name,parentId){
+async function _driveEnsureFolder(name){
+  const q=`name='${name}' and mimeType='application/vnd.google-apps.folder' and trashed=false`;
+  const r=await _driveApiFetch('https://www.googleapis.com/drive/v3/files?q='+encodeURIComponent(q)+'&fields=files(id,name)&spaces=drive');
+  if(r.files&&r.files.length) return r.files[0].id;
   const body={name,mimeType:'application/vnd.google-apps.folder'};
-  if(parentId) body.parents=[parentId];
   const res=await fetch('https://www.googleapis.com/drive/v3/files',{
     method:'POST',headers:{'Authorization':'Bearer '+_driveToken,'Content-Type':'application/json'},
     body:JSON.stringify(body)
   });
-  if(!res.ok){const t=await res.text();throw new Error('Folder '+res.status+': '+t.slice(0,200));}
+  if(!res.ok){const t=await res.text();throw new Error('Create folder error '+res.status+': '+t.slice(0,200));}
+  return (await res.json()).id;
+}
+
+async function _driveCreateSubfolder(name,parentId){
+  const body={name,mimeType:'application/vnd.google-apps.folder',parents:[parentId]};
+  const res=await fetch('https://www.googleapis.com/drive/v3/files',{
+    method:'POST',headers:{'Authorization':'Bearer '+_driveToken,'Content-Type':'application/json'},
+    body:JSON.stringify(body)
+  });
+  if(!res.ok){const t=await res.text();throw new Error('Create subfolder error '+res.status+': '+t.slice(0,200));}
   return (await res.json()).id;
 }
 
@@ -1861,7 +1872,24 @@ async function _driveUploadFile(name,mimeType,content,parentId){
   const res=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{
     method:'POST',headers:{'Authorization':'Bearer '+_driveToken},body:form
   });
-  if(!res.ok){const t=await res.text();throw new Error('Upload '+res.status+': '+t.slice(0,200));}
+  if(!res.ok){const t=await res.text();throw new Error('Upload error '+res.status+': '+t.slice(0,200));}
+}
+
+async function _driveCleanOldFolders(){
+  const oldNames=['Miaou Backups'];
+  for(const name of oldNames){
+    try{
+      const q=`name='${name}' and mimeType='application/vnd.google-apps.folder' and trashed=false`;
+      const r=await _driveApiFetch('https://www.googleapis.com/drive/v3/files?q='+encodeURIComponent(q)+'&fields=files(id)&spaces=drive');
+      if(r.files){
+        for(const f of r.files){
+          await fetch('https://www.googleapis.com/drive/v3/files/'+f.id,{
+            method:'DELETE',headers:{'Authorization':'Bearer '+_driveToken}
+          });
+        }
+      }
+    }catch(e){console.warn('Cleanup old folder "'+name+'":', e);}
+  }
 }
 
 function _buildBackupHtml(){
@@ -1959,24 +1987,29 @@ async function driveBackup(){
   const btn=document.getElementById('drive-backup-btn');
   if(btn){btn.disabled=true;btn.textContent='\u23F3';}
   try{
-    _driveStatus('\uD83D\uDD11 Authorizing Google Drive access…');
+    _driveStatus('\uD83D\uDD11 Authorizing Google Drive access\u2026');
     await _driveGetToken();
-    _driveStatus('\uD83D\uDCC4 Generating HTML & Excel backup…');
+
+    _driveStatus('\uD83E\uDDF9 Cleaning up old app folders\u2026');
+    await _driveCleanOldFolders();
+
+    _driveStatus('\uD83D\uDCC4 Generating HTML & Excel backup\u2026');
     const html=_buildBackupHtml();
     const wb=_buildBackupExcel();
     const xlsxArr=XLSX.write(wb,{bookType:'xlsx',type:'array'});
-    _driveStatus('\uD83D\uDCC1 Creating folder in Google Drive…');
-    const q=`name='Miaou Backups' and mimeType='application/vnd.google-apps.folder' and trashed=false`;
-    const ex=await _driveApiFetch('https://www.googleapis.com/drive/v3/files?q='+encodeURIComponent(q)+'&fields=files(id)&spaces=drive');
-    const rootId=(ex.files&&ex.files.length)?ex.files[0].id:await _driveCreateFolder('Miaou Backups',null);
+
+    _driveStatus('\uD83D\uDCC1 Creating folder in Google Drive\u2026');
+    const rootId=await _driveEnsureFolder('Saved Backups');
     const now=new Date(),p=n=>String(n).padStart(2,'0');
     const stamp=now.getFullYear()+'-'+p(now.getMonth()+1)+'-'+p(now.getDate())+' '+p(now.getHours())+'-'+p(now.getMinutes())+'-'+p(now.getSeconds());
-    const subId=await _driveCreateFolder(stamp,rootId);
-    _driveStatus('\u2B06\uFE0F Uploading files…');
+    const subId=await _driveCreateSubfolder(stamp,rootId);
+
+    _driveStatus('\u2B06\uFE0F Uploading files\u2026');
     await _driveUploadFile('miaou-backup.html','text/html',html,subId);
-    await _driveUploadFile('miaou-backup.xlsx','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',xlsxArr,subId);
+    await _driveUploadFile('miaou-backup.xlsx','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',new Uint8Array(xlsxArr),subId);
+
     _driveStatus(null);
-    showToast('\u2713 Saved to Drive: Miaou Backups / '+stamp);
+    showToast('\u2713 Backed up to Drive: Saved Backups / '+stamp);
   }catch(e){
     console.error('Drive backup error:',e);
     _driveStatus(null);

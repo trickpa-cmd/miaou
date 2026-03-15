@@ -1,8 +1,7 @@
-const CACHE_NAME = 'miaou-v11';
+const CACHE_NAME = 'miaou-v12';
 const APP_FILES = [
   './',
   './index.html',
-  './auth-return.html',
   './miaou.webmanifest',
   './miaou-icon-192.png',
   './miaou-icon-512.png'
