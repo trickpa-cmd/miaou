@@ -13,6 +13,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <style>
 :root {
   --cream: #faf5ee; --cream2: #f2ead8;
@@ -422,6 +423,7 @@ body::before {
   <div class="header-title">🐾 Miaou</div>
   <div class="header-actions">
     <button class="header-icon-btn" id="backup-btn" onclick="openBackupModal()" title="Cloud backups">☁️</button>
+    <button class="header-icon-btn" id="drive-backup-btn" onclick="driveBackup()" title="Backup to Google Drive">📤</button>
     <button class="header-add-btn" onclick="showAddCatModal()">+</button>
   </div>
 </header>
@@ -723,6 +725,7 @@ body::before {
 </div>
 
 <div class="toast" id="toast"></div>
+<div id="drive-progress" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#5c7a63;color:#fff;text-align:center;padding:10px 16px;font-size:0.9em;font-family:'DM Sans',sans-serif;letter-spacing:0.01em;"></div>
 
 <script>
 // ═══ ICONS ═══
@@ -1823,6 +1826,164 @@ window.addEventListener('beforeinstallprompt', event => {
     }
   }, 1200);
 });
+
+// ═══ DRIVE BACKUP ═══
+let _driveToken=null;
+
+async function _driveGetToken(){
+  const provider=new firebase.auth.GoogleAuthProvider();
+  provider.addScope('https://www.googleapis.com/auth/drive.file');
+  const result=await auth.signInWithPopup(provider);
+  _driveToken=result.credential.accessToken;
+}
+
+async function _driveApiFetch(url,opts={}){
+  const res=await fetch(url,{...opts,headers:{'Authorization':'Bearer '+_driveToken,...(opts.headers||{})}});
+  if(!res.ok){const t=await res.text();throw new Error('Drive '+res.status+': '+t.slice(0,200));}
+  return res.json();
+}
+
+async function _driveCreateFolder(name,parentId){
+  const body={name,mimeType:'application/vnd.google-apps.folder'};
+  if(parentId) body.parents=[parentId];
+  const res=await fetch('https://www.googleapis.com/drive/v3/files',{
+    method:'POST',headers:{'Authorization':'Bearer '+_driveToken,'Content-Type':'application/json'},
+    body:JSON.stringify(body)
+  });
+  if(!res.ok){const t=await res.text();throw new Error('Folder '+res.status+': '+t.slice(0,200));}
+  return (await res.json()).id;
+}
+
+async function _driveUploadFile(name,mimeType,content,parentId){
+  const form=new FormData();
+  form.append('metadata',new Blob([JSON.stringify({name,parents:[parentId]})],{type:'application/json'}));
+  form.append('file',new Blob([content],{type:mimeType}));
+  const res=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{
+    method:'POST',headers:{'Authorization':'Bearer '+_driveToken},body:form
+  });
+  if(!res.ok){const t=await res.text();throw new Error('Upload '+res.status+': '+t.slice(0,200));}
+}
+
+function _buildBackupHtml(){
+  const now=new Date();
+  const treatments=data.treatments||[];
+  const getT=id=>(treatments.find(t=>t.id===id)||{}).name||id;
+  const fd=d=>{if(!d)return'—';const[y,m,dd]=d.split('-');return`${dd}/${m}/${y}`;};
+  let h=`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Miaou Backup – ${now.toLocaleString()}</title><style>body{font-family:Arial,sans-serif;max-width:1100px;margin:0 auto;padding:24px;background:#faf5ee;color:#2c2118}h1{color:#b85c38}h2{color:#b85c38;border-bottom:2px solid #e8dcc8;padding-bottom:6px;margin:36px 0 10px}h3{color:#5c7a63;margin:20px 0 8px}p.sub{color:#7a6a58;margin-bottom:24px}table{border-collapse:collapse;width:100%;margin-bottom:16px;font-size:.92em}th{background:#b85c38;color:#fff;padding:8px 10px;text-align:left}td{padding:7px 10px;border-bottom:1px solid #e8dcc8;vertical-align:top}tr:nth-child(even) td{background:#f2ead8}.cat-block{border-left:5px solid;padding:10px 16px;border-radius:6px;margin:28px 0 4px;background:#fff}.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.82em;font-weight:600}.overdue{background:#fde8e8;color:#c0392b}.done-b{background:#e8f8ed;color:#3a7d44}.upcoming{background:#e8f4fd;color:#1a6fa8}</style></head><body><h1>\uD83D\uDC3E Miaou Backup</h1><p class="sub">Generated: ${now.toLocaleString()}</p>`;
+  h+=`<h2>Cats Overview</h2><table><tr><th>Cat</th><th>DOB</th><th>Latest Weight</th><th>Last Visit</th><th>Total Cost</th><th>Open Schedules</th></tr>`;
+  for(const cat of(data.cats||[])){
+    const wt=cat.visits.filter(v=>v.weight).sort((a,b)=>b.date.localeCompare(a.date))[0];
+    const lv=cat.visits.slice().sort((a,b)=>b.date.localeCompare(a.date))[0];
+    h+=`<tr><td>${cat.emoji} <strong>${cat.name}</strong></td><td>${fd(cat.dob)}</td><td>${wt?wt.weight+' kg':'\u2014'}</td><td>${lv?fd(lv.date):'\u2014'}</td><td>$${cat.visits.reduce((s,v)=>s+(v.cost||0),0)}</td><td>${cat.schedules.filter(s=>!s.done).length}</td></tr>`;
+  }
+  h+=`</table>`;
+  for(const cat of(data.cats||[])){
+    h+=`<div class="cat-block" style="border-color:${cat.color}"><strong style="font-size:1.1em;color:${cat.color}">${cat.emoji} ${cat.name}</strong>${cat.dob?` &middot; Born ${fd(cat.dob)}`:''}</div>`;
+    if(cat.visits.length){
+      h+=`<h3>Vet Visits</h3><table><tr><th>Date</th><th>Weight</th><th>Cost</th><th>Treatments</th><th>Notes</th></tr>`;
+      for(const v of cat.visits.slice().sort((a,b)=>b.date.localeCompare(a.date))){
+        const tx=[...v.treatments.map(getT),...(v.oneTimeTreatments||[]).map(t=>t.name)].filter(Boolean).join(', ')||'\u2014';
+        h+=`<tr><td>${fd(v.date)}</td><td>${v.weight?v.weight+' kg':'\u2014'}</td><td>${v.cost?'$'+v.cost:'\u2014'}</td><td>${tx}</td><td style="white-space:pre-wrap">${(v.notes||'').replace(/</g,'&lt;')||'\u2014'}</td></tr>`;
+      }
+      h+=`</table>`;
+    }
+    if(cat.schedules.length){
+      h+=`<h3>Schedule</h3><table><tr><th>Treatment</th><th>Due Date</th><th>Price</th><th>Notes</th><th>Status</th></tr>`;
+      for(const s of cat.schedules.slice().sort((a,b)=>a.dueDate.localeCompare(b.dueDate))){
+        const tname=s.oneTime?(s.oneTimeName||'One-time'):getT(s.treatmentId);
+        const days=Math.round((new Date(s.dueDate)-now)/86400000);
+        let cls='upcoming',lbl='';
+        if(s.done){cls='done-b';lbl='Done';}else if(days<0){cls='overdue';lbl=(-days)+'d overdue';}else{lbl='In '+days+'d';}
+        h+=`<tr><td>${tname}</td><td>${fd(s.dueDate)}</td><td>${s.price?'$'+s.price:'\u2014'}</td><td>${(s.notes||'').replace(/</g,'&lt;')||'\u2014'}</td><td><span class="badge ${cls}">${lbl}</span></td></tr>`;
+      }
+      h+=`</table>`;
+    }
+  }
+  h+=`<h2>Litter Reviews</h2><table><tr><th>Litter</th><th>Rating</th><th>Price</th><th>$/L</th><th>Smell</th><th>Poo</th><th>Pee</th><th>Notes</th></tr>`;
+  for(const l of(data.litters||[])){
+    const stars=l.rating?'\u2605'.repeat(Math.round(l.rating))+'\u2606'.repeat(5-Math.round(l.rating)):'Not rated';
+    h+=`<tr><td><strong>${l.name}</strong></td><td>${stars} (${l.rating||0})</td><td>${l.price||'\u2014'}</td><td>${l.pricePerL?'$'+l.pricePerL+'/L':'\u2014'}</td><td>${l.smell||'\u2014'}</td><td>${l.poo||'\u2014'}</td><td>${l.pee||'\u2014'}</td><td>${l.notes||'\u2014'}</td></tr>`;
+  }
+  h+=`</table>`;
+  h+=`<h2>Treatment Prices</h2><table><tr><th>Treatment</th><th>Price</th><th>Interval</th></tr>`;
+  for(const t of(data.treatments||[])){
+    h+=`<tr><td>${t.name}</td><td>${t.price?'$'+t.price:'\u2014'}</td><td>${t.repeatCount?'Every '+t.repeatCount+' '+t.repeatUnit:'\u2014'}</td></tr>`;
+  }
+  h+=`</table></body></html>`;
+  return h;
+}
+
+function _buildBackupExcel(){
+  const wb=XLSX.utils.book_new();
+  const getT=id=>((data.treatments||[]).find(t=>t.id===id)||{}).name||id;
+  const cs=[['Cat','DOB','Latest Weight (kg)','Last Visit','Total Cost ($)','Open Schedules']];
+  for(const c of(data.cats||[])){
+    const wt=c.visits.filter(v=>v.weight).sort((a,b)=>b.date.localeCompare(a.date))[0];
+    const lv=c.visits.slice().sort((a,b)=>b.date.localeCompare(a.date))[0];
+    cs.push([c.name,c.dob||'',wt?wt.weight:'',lv?lv.date:'',c.visits.reduce((s,v)=>s+(v.cost||0),0),c.schedules.filter(s=>!s.done).length]);
+  }
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(cs),'Cats');
+  const vs=[['Cat','Date','Weight (kg)','Cost ($)','Treatments','Notes']];
+  for(const c of(data.cats||[])){
+    for(const v of c.visits.slice().sort((a,b)=>b.date.localeCompare(a.date))){
+      const tx=[...v.treatments.map(getT),...(v.oneTimeTreatments||[]).map(t=>t.name)].join(', ');
+      vs.push([c.name,v.date,v.weight||'',v.cost||'',tx,v.notes||'']);
+    }
+  }
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(vs),'Visits');
+  const ss=[['Cat','Treatment','Due Date','Price ($)','Notes','Done']];
+  for(const c of(data.cats||[])){
+    for(const s of c.schedules.slice().sort((a,b)=>a.dueDate.localeCompare(b.dueDate))){
+      const tname=s.oneTime?(s.oneTimeName||'One-time'):getT(s.treatmentId);
+      ss.push([c.name,tname,s.dueDate,s.price||'',s.notes||'',s.done?'Yes':'No']);
+    }
+  }
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(ss),'Schedule');
+  const ls=[['Litter','Rating (0-5)','Price','$/L','Smell','Poo','Pee','Notes']];
+  for(const l of(data.litters||[])) ls.push([l.name,l.rating||0,l.price||'',l.pricePerL||'',l.smell||'',l.poo||'',l.pee||'',l.notes||'']);
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(ls),'Litters');
+  const ts=[['Treatment','Price ($)','Interval Count','Interval Unit']];
+  for(const t of(data.treatments||[])) ts.push([t.name,t.price||'',t.repeatCount||'',t.repeatUnit||'']);
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(ts),'Treatments');
+  return wb;
+}
+
+function _driveStatus(msg){
+  const el=document.getElementById('drive-progress');
+  if(!el) return;
+  if(msg){el.textContent=msg;el.style.display='block';}else{el.style.display='none';}
+}
+
+async function driveBackup(){
+  if(!currentUserEmail){showToast('Please sign in first');return;}
+  const btn=document.getElementById('drive-backup-btn');
+  if(btn){btn.disabled=true;btn.textContent='\u23F3';}
+  try{
+    _driveStatus('\uD83D\uDD11 Authorizing Google Drive access…');
+    await _driveGetToken();
+    _driveStatus('\uD83D\uDCC4 Generating HTML & Excel backup…');
+    const html=_buildBackupHtml();
+    const wb=_buildBackupExcel();
+    const xlsxArr=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+    _driveStatus('\uD83D\uDCC1 Creating folder in Google Drive…');
+    const q=`name='Miaou Backups' and mimeType='application/vnd.google-apps.folder' and trashed=false`;
+    const ex=await _driveApiFetch('https://www.googleapis.com/drive/v3/files?q='+encodeURIComponent(q)+'&fields=files(id)&spaces=drive');
+    const rootId=(ex.files&&ex.files.length)?ex.files[0].id:await _driveCreateFolder('Miaou Backups',null);
+    const now=new Date(),p=n=>String(n).padStart(2,'0');
+    const stamp=now.getFullYear()+'-'+p(now.getMonth()+1)+'-'+p(now.getDate())+' '+p(now.getHours())+'-'+p(now.getMinutes())+'-'+p(now.getSeconds());
+    const subId=await _driveCreateFolder(stamp,rootId);
+    _driveStatus('\u2B06\uFE0F Uploading files…');
+    await _driveUploadFile('miaou-backup.html','text/html',html,subId);
+    await _driveUploadFile('miaou-backup.xlsx','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',xlsxArr,subId);
+    _driveStatus(null);
+    showToast('\u2713 Saved to Drive: Miaou Backups / '+stamp);
+  }catch(e){
+    console.error('Drive backup error:',e);
+    _driveStatus(null);
+    showToast('Drive backup failed: '+(e.message||'unknown error'));
+  }
+  if(btn){btn.disabled=false;btn.textContent='\uD83D\uDCE4';}
+}
 
 if('serviceWorker' in navigator){
   window.addEventListener('load', () => {
