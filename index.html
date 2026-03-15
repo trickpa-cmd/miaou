@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src https://firestore.googleapis.com https://www.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://fonts.googleapis.com https://fonts.gstatic.com; frame-src https://miaou-57319.firebaseapp.com https://accounts.google.com; img-src 'self' data:;">
 <meta name="referrer" content="no-referrer">
-<title>🐾 Miaou</title>
+<title>ðŸ¾ Miaou</title>
 <link rel="manifest" href="miaou.webmanifest">
 <meta name="theme-color" content="#b85c38">
 <link rel="apple-touch-icon" href="miaou-icon-192.png">
@@ -159,7 +159,7 @@ body::before {
 .form-submit { width: 100%; padding: 13px; background: var(--terra); color: white; border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 600; cursor: pointer; margin-top: 6px; box-shadow: 0 3px 10px rgba(184,92,56,0.35); }
 .form-cancel { width: 100%; padding: 11px; background: none; color: var(--text-muted); border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; cursor: pointer; margin-top: 8px; }
 
-/* ══ VET SCHEDULE ══ */
+/* â•â• VET SCHEDULE â•â• */
 .vet-section-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin: 20px 0 8px; display: flex; align-items: center; gap: 6px; }
 .vet-section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
@@ -417,22 +417,22 @@ body::before {
 <body>
 
 <div id="loading-screen">
-  <div class="loading-paw">🐾</div>
-  <div class="loading-text">Loading your cats…</div>
+  <div class="loading-paw">ðŸ¾</div>
+  <div class="loading-text">Loading your catsâ€¦</div>
 </div>
 
 <header class="app-header">
-  <div class="header-title">🐾 Miaou</div>
+  <div class="header-title">ðŸ¾ Miaou</div>
   <div class="header-actions">
-    <button class="header-icon-btn" id="backup-btn" onclick="openBackupModal()" title="Cloud backups">☁️</button>
-    <button class="header-icon-btn" id="drive-backup-btn" onclick="driveBackup()" title="Backup to Google Drive">📤</button>
+    <button class="header-icon-btn" id="backup-btn" onclick="openBackupModal()" title="Cloud backups">â˜ï¸</button>
+    <button class="header-icon-btn" id="drive-backup-btn" onclick="driveBackup()" title="Backup to Google Drive">ðŸ“¤</button>
     <button class="header-add-btn" onclick="showAddCatModal()">+</button>
   </div>
 </header>
 
 <div class="auth-overlay open" id="auth-overlay">
   <div class="auth-card">
-    <div class="auth-logo">🐾</div>
+    <div class="auth-logo">ðŸ¾</div>
     <div class="auth-title">Sign in to Miaou</div>
     <div class="auth-text">Use Google sign in to access the shared records.</div>
     <button class="auth-btn" id="google-signin-btn" type="button">Continue with Google</button>
@@ -450,7 +450,7 @@ body::before {
       <div id="upcoming-section"></div>
     </div>
     <div id="cat-detail" class="detail-view">
-      <button class="back-btn" onclick="showCatsList()">← All Cats</button>
+      <button class="back-btn" onclick="showCatsList()">â† All Cats</button>
       <div class="detail-header" id="detail-header"></div>
       <div id="cat-upcoming-section"></div>
       <button class="add-visit-btn" onclick="showAddVisitModal()">+ Add Visit</button>
@@ -461,15 +461,15 @@ body::before {
   <!-- VET SCHEDULE -->
   <div id="tab-vet" class="section">
 
-    <div class="vet-section-label">💊 Treatment prices</div>
+    <div class="vet-section-label">ðŸ’Š Treatment prices</div>
 
     <div class="dashboard-panel" id="price-dashboard">
       <button class="dashboard-toggle" onclick="toggleDashboard()">
         <div class="dashboard-toggle-left">
-          <span>🗂</span>
+          <span>ðŸ—‚</span>
           <span class="dashboard-toggle-label">Edit Price List</span>
         </div>
-        <span class="dashboard-chevron">▼</span>
+        <span class="dashboard-chevron">â–¼</span>
       </button>
       <div class="dashboard-body">
         <div id="treatment-rows"></div>
@@ -477,7 +477,7 @@ body::before {
           <input class="add-treatment-input" id="new-t-name" placeholder="Treatment name" onkeydown="if(event.key==='Enter')addTreatmentInline()">
           <input class="add-treatment-price" id="new-t-price" type="number" step="0.5" placeholder="$0">
           <select class="form-select repeat-count-sel" id="new-t-repeat-count" style="width:72px;padding:8px 6px;font-size:0.82rem">
-            <option value="">—</option>
+            <option value="">â€”</option>
             <option value="1">1</option><option value="2">2</option><option value="3">3</option>
             <option value="4">4</option><option value="5">5</option><option value="6">6</option>
             <option value="7">7</option><option value="8">8</option><option value="9">9</option>
@@ -494,23 +494,23 @@ body::before {
       </div>
     </div>
 
-    <div class="vet-section-label">📅 Per-cat schedules</div>
+    <div class="vet-section-label">ðŸ“… Per-cat schedules</div>
     <div id="vet-cat-sections"></div>
   </div>
 
   <!-- LITTER -->
   <div id="tab-litter" class="section">
-    <div class="section-title">🌿 Litter Reviews</div>
+    <div class="section-title">ðŸŒ¿ Litter Reviews</div>
     <div id="litter-list"></div>
-    <button class="add-item-btn" onclick="showAddLitterModal()">＋ Add litter brand</button>
+    <button class="add-item-btn" onclick="showAddLitterModal()">ï¼‹ Add litter brand</button>
   </div>
 
 </main>
 
 <nav class="bottom-nav">
-  <button class="nav-tab active" onclick="switchTab('cats',this)"><span class="nav-icon">🐾</span>Cats</button>
-  <button class="nav-tab" onclick="switchTab('vet',this)"><span class="nav-icon">📅</span>Schedule</button>
-  <button class="nav-tab" onclick="switchTab('litter',this)"><span class="nav-icon">🌿</span>Litter</button>
+  <button class="nav-tab active" onclick="switchTab('cats',this)"><span class="nav-icon">ðŸ¾</span>Cats</button>
+  <button class="nav-tab" onclick="switchTab('vet',this)"><span class="nav-icon">ðŸ“…</span>Schedule</button>
+  <button class="nav-tab" onclick="switchTab('litter',this)"><span class="nav-icon">ðŸŒ¿</span>Litter</button>
 </nav>
 
 <!-- MODAL: VISIT -->
@@ -529,7 +529,7 @@ body::before {
       <span class="cost-summary-total" id="visit-cost-auto">$0</span>
     </div>
     <div class="form-group" style="margin-top:10px">
-      <label class="form-label">Override cost ($) <span style="font-weight:400;text-transform:none;font-size:0.7rem">— optional, leave blank to use total above</span></label>
+      <label class="form-label">Override cost ($) <span style="font-weight:400;text-transform:none;font-size:0.7rem">â€” optional, leave blank to use total above</span></label>
       <input type="number" step="0.5" class="form-input" id="visit-cost" placeholder="e.g. 45">
     </div>
     <div class="form-group"><label class="form-label">Notes</label><textarea class="form-textarea" id="visit-notes" placeholder="Observations, medications..."></textarea></div>
@@ -537,7 +537,7 @@ body::before {
     <!-- ONE-TIME TREATMENTS -->
     <div class="onetime-section">
       <div class="onetime-header">
-        <span class="onetime-title">🔁 One-time follow-ups</span>
+        <span class="onetime-title">ðŸ” One-time follow-ups</span>
         <span class="onetime-hint">Done today, repeat once later</span>
       </div>
       <div id="onetime-list"></div>
@@ -557,7 +557,7 @@ body::before {
             <option value="months">months</option>
             <option value="years">years</option>
           </select>
-          <button class="onetime-add-btn" onclick="addOneTime()">＋</button>
+          <button class="onetime-add-btn" onclick="addOneTime()">ï¼‹</button>
         </div>
       </div>
     </div>
@@ -575,7 +575,7 @@ body::before {
     <div class="form-group"><label class="form-label">Name</label><input type="text" class="form-input" id="new-cat-name" placeholder="Cat name"></div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Date of Birth</label><input type="date" class="form-input" id="new-cat-dob"></div>
-      <div class="form-group"><label class="form-label">Emoji</label><input type="text" class="form-input" id="new-cat-emoji" placeholder="🐱" maxlength="2"></div>
+      <div class="form-group"><label class="form-label">Emoji</label><input type="text" class="form-input" id="new-cat-emoji" placeholder="ðŸ±" maxlength="2"></div>
     </div>
     <button class="form-submit" onclick="addCat()">Add Cat</button>
     <button class="form-cancel" onclick="closeModal('add-cat-modal')">Cancel</button>
@@ -590,7 +590,7 @@ body::before {
     <div class="form-group">
       <label class="form-label">Treatment</label>
       <select class="form-select" id="sched-treatment" onchange="updateSchedPrice()">
-        <option value="">— pick a treatment —</option>
+        <option value="">â€” pick a treatment â€”</option>
       </select>
     </div>
     <div class="form-row">
@@ -614,7 +614,7 @@ body::before {
       <label class="form-label">Repeats every</label>
       <div class="repeat-picker">
         <select class="form-select repeat-count-sel" id="edit-t-repeat-count">
-          <option value="">—</option>
+          <option value="">â€”</option>
           <option value="1">1</option><option value="2">2</option><option value="3">3</option>
           <option value="4">4</option><option value="5">5</option><option value="6">6</option>
           <option value="7">7</option><option value="8">8</option><option value="9">9</option>
@@ -653,23 +653,23 @@ body::before {
     </div>
     <div class="form-group"><label class="form-label">Smell</label>
       <div class="star-picker" id="smell-picker">
-        <button class="star-btn" onclick="setLitterStar('smell',1)">★</button><button class="star-btn" onclick="setLitterStar('smell',2)">★</button>
-        <button class="star-btn" onclick="setLitterStar('smell',3)">★</button><button class="star-btn" onclick="setLitterStar('smell',4)">★</button>
-        <button class="star-btn" onclick="setLitterStar('smell',5)">★</button>
+        <button class="star-btn" onclick="setLitterStar('smell',1)">â˜…</button><button class="star-btn" onclick="setLitterStar('smell',2)">â˜…</button>
+        <button class="star-btn" onclick="setLitterStar('smell',3)">â˜…</button><button class="star-btn" onclick="setLitterStar('smell',4)">â˜…</button>
+        <button class="star-btn" onclick="setLitterStar('smell',5)">â˜…</button>
       </div>
     </div>
     <div class="form-group"><label class="form-label">Poo clumping</label>
       <div class="star-picker" id="poo-picker">
-        <button class="star-btn" onclick="setLitterStar('poo',1)">★</button><button class="star-btn" onclick="setLitterStar('poo',2)">★</button>
-        <button class="star-btn" onclick="setLitterStar('poo',3)">★</button><button class="star-btn" onclick="setLitterStar('poo',4)">★</button>
-        <button class="star-btn" onclick="setLitterStar('poo',5)">★</button>
+        <button class="star-btn" onclick="setLitterStar('poo',1)">â˜…</button><button class="star-btn" onclick="setLitterStar('poo',2)">â˜…</button>
+        <button class="star-btn" onclick="setLitterStar('poo',3)">â˜…</button><button class="star-btn" onclick="setLitterStar('poo',4)">â˜…</button>
+        <button class="star-btn" onclick="setLitterStar('poo',5)">â˜…</button>
       </div>
     </div>
     <div class="form-group"><label class="form-label">Pee clumping</label>
       <div class="star-picker" id="pee-picker">
-        <button class="star-btn" onclick="setLitterStar('pee',1)">★</button><button class="star-btn" onclick="setLitterStar('pee',2)">★</button>
-        <button class="star-btn" onclick="setLitterStar('pee',3)">★</button><button class="star-btn" onclick="setLitterStar('pee',4)">★</button>
-        <button class="star-btn" onclick="setLitterStar('pee',5)">★</button>
+        <button class="star-btn" onclick="setLitterStar('pee',1)">â˜…</button><button class="star-btn" onclick="setLitterStar('pee',2)">â˜…</button>
+        <button class="star-btn" onclick="setLitterStar('pee',3)">â˜…</button><button class="star-btn" onclick="setLitterStar('pee',4)">â˜…</button>
+        <button class="star-btn" onclick="setLitterStar('pee',5)">â˜…</button>
       </div>
     </div>
     <div class="form-group"><label class="form-label">Overall Rating <span style="color:var(--text-muted);font-size:0.8rem">(auto-calculated)</span></label>
@@ -684,7 +684,7 @@ body::before {
 
 <div class="confirm-overlay" id="confirm-modal">
   <div class="confirm-card" role="dialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-message">
-    <div class="confirm-icon">🗑</div>
+    <div class="confirm-icon">ðŸ—‘</div>
     <div class="confirm-title" id="confirm-title">Delete item?</div>
     <div class="confirm-message" id="confirm-message">Are you sure you want to delete this item?</div>
     <div class="confirm-actions">
@@ -700,7 +700,7 @@ body::before {
     <div class="modal-handle"></div>
     <div class="modal-title">Cloud Backups</div>
     <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;flex-wrap:wrap">
-      <span class="user-chip" id="backup-user-chip">🔒 Not signed in</span>
+      <span class="user-chip" id="backup-user-chip">ðŸ”’ Not signed in</span>
       <button class="header-icon-btn" type="button" onclick="signOutUser()" style="width:auto;height:auto;border-radius:12px;padding:8px 12px;font-size:0.8rem">Sign out</button>
     </div>
     <div class="form-group" style="margin-bottom:8px">
@@ -730,15 +730,15 @@ body::before {
 <div id="drive-progress" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#5c7a63;color:#fff;text-align:center;padding:10px 16px;font-size:0.9em;font-family:'DM Sans',sans-serif;letter-spacing:0.01em;"></div>
 
 <script>
-// ═══ ICONS ═══
-const ICONS={'Vaccin':'💉','Vaccine':'💉','Flea':'🦟','Barghout':'🦟','Nafas':'💨','Doud':'🪱','Worm':'🪱','Blood':'🩸','Fahes dam':'🩸','Benej':'💊','Ass':'🩹','Deworm':'🪱','Bravecto':'🛡️','Catch One':'🎯','Ebre':'💉','Xray':'🩻'};
-function iconFor(n){for(const k in ICONS)if(n&&n.toLowerCase().includes(k.toLowerCase()))return ICONS[k];return'💊';}
+// â•â•â• ICONS â•â•â•
+const ICONS={'Vaccin':'ðŸ’‰','Vaccine':'ðŸ’‰','Flea':'ðŸ¦Ÿ','Barghout':'ðŸ¦Ÿ','Nafas':'ðŸ’¨','Doud':'ðŸª±','Worm':'ðŸª±','Blood':'ðŸ©¸','Fahes dam':'ðŸ©¸','Benej':'ðŸ’Š','Ass':'ðŸ©¹','Deworm':'ðŸª±','Bravecto':'ðŸ›¡ï¸','Catch One':'ðŸŽ¯','Ebre':'ðŸ’‰','Xray':'ðŸ©»'};
+function iconFor(n){for(const k in ICONS)if(n&&n.toLowerCase().includes(k.toLowerCase()))return ICONS[k];return'ðŸ’Š';}
 
-// ═══ CAT SVG AVATARS ═══
+// â•â•â• CAT SVG AVATARS â•â•â•
 function catSVG(style, size=48){
   const s=size, r=s*0.5;
   if(style==='white'){
-    // Loupou — white/cream cat, soft blue eyes
+    // Loupou â€” white/cream cat, soft blue eyes
     return`<svg xmlns="http://www.w3.org/2000/svg" width="${s}" height="${s}" viewBox="0 0 48 48">
       <polygon points="7,20 13,5 20,17" fill="#f0ede8" stroke="#d8d3cc" stroke-width="1"/>
       <polygon points="41,20 35,5 28,17" fill="#f0ede8" stroke="#d8d3cc" stroke-width="1"/>
@@ -760,7 +760,7 @@ function catSVG(style, size=48){
     </svg>`;
   }
   if(style==='blackwhite'){
-    // Snickers — black/white/beige tuxedo mix
+    // Snickers â€” black/white/beige tuxedo mix
     return`<svg xmlns="http://www.w3.org/2000/svg" width="${s}" height="${s}" viewBox="0 0 48 48">
       <polygon points="7,20 13,5 20,17" fill="#2c2a27"/>
       <polygon points="41,20 35,5 28,17" fill="#c8b89a"/>
@@ -804,7 +804,7 @@ function catIconDetail(cat){
   return`<div class="detail-emoji" onclick="promptRenameEmoji('${cat.id}')" title="Tap to change emoji">${cat.emoji}</div>`;
 }
 
-// ═══ DEFAULT DATA ═══
+// â•â•â• DEFAULT DATA â•â•â•
 const DEFAULT={
   treatments:[
     {id:'t1',name:'Vaccine (yearly)',price:30,repeatCount:1,repeatUnit:'years'},
@@ -815,48 +815,48 @@ const DEFAULT={
     {id:'t6',name:'Benej',price:30,repeatCount:null,repeatUnit:'months'},
   ],
   cats:[
-    {id:'kitten1',name:'Afandeh',emoji:'🙀',catStyle:'',dob:'2025-09-13',color:'#e07b3a',
+    {id:'kitten1',name:'Afandeh',emoji:'ðŸ™€',catStyle:'',dob:'2025-09-13',color:'#e07b3a',
      schedules:[
        {id:'s1',treatmentId:'t1',dueDate:'2027-02-14',price:30,notes:'Yearly vaccine',done:false},
        {id:'s2',treatmentId:'t4',dueDate:'2026-04-01',price:15,notes:'Monthly deworm',done:false},
        {id:'s3',treatmentId:'t2',dueDate:'2026-04-08',price:8,notes:'Monthly flea',done:false},
      ],
      visits:[
-       {id:'v1',date:'2025-12-13',weight:1.5,cost:0,treatments:[],oneTimeTreatments:[{name:'Vaccine (1st dose)',repeatCount:3,repeatUnit:'weeks'},{name:'Deworm (1st dose)',repeatCount:10,repeatUnit:'days'}],notes:'Dawa bel dayne for 10 days, once daily after cleaning\nHabbet doud after 10 days → every month until 6 months → every 3 months'},
-       {id:'v2',date:'2025-12-24',weight:1.8,cost:0,treatments:[],oneTimeTreatments:[{name:'Deworm (2nd dose)',repeatCount:3,repeatUnit:'weeks'}],notes:'Still has ear mites — use dawa everyday'},
-       {id:'v3',date:'2026-01-03',weight:2.2,cost:0,treatments:[],oneTimeTreatments:[{name:'Vaccine (2nd dose)',repeatCount:3,repeatUnit:'weeks'}],notes:'Still has earmites — continue dawa only for 10 days'},
-       {id:'v4',date:'2026-01-24',weight:2.5,cost:40,treatments:[],oneTimeTreatments:[{name:'Vaccine (3rd dose)',repeatCount:3,repeatUnit:'weeks'},{name:'Deworm (3rd dose)',repeatCount:1,repeatUnit:'months'}],notes:'No more earmites ✓ — clean ears once per week'},
-       {id:'v5',date:'2026-02-14',weight:3.6,cost:30,treatments:['t1'],oneTimeTreatments:[],notes:'Vaccine (yearly) — rabies ✓'},
+       {id:'v1',date:'2025-12-13',weight:1.5,cost:0,treatments:[],oneTimeTreatments:[{name:'Vaccine (1st dose)',repeatCount:3,repeatUnit:'weeks'},{name:'Deworm (1st dose)',repeatCount:10,repeatUnit:'days'}],notes:'Dawa bel dayne for 10 days, once daily after cleaning\nHabbet doud after 10 days â†’ every month until 6 months â†’ every 3 months'},
+       {id:'v2',date:'2025-12-24',weight:1.8,cost:0,treatments:[],oneTimeTreatments:[{name:'Deworm (2nd dose)',repeatCount:3,repeatUnit:'weeks'}],notes:'Still has ear mites â€” use dawa everyday'},
+       {id:'v3',date:'2026-01-03',weight:2.2,cost:0,treatments:[],oneTimeTreatments:[{name:'Vaccine (2nd dose)',repeatCount:3,repeatUnit:'weeks'}],notes:'Still has earmites â€” continue dawa only for 10 days'},
+       {id:'v4',date:'2026-01-24',weight:2.5,cost:40,treatments:[],oneTimeTreatments:[{name:'Vaccine (3rd dose)',repeatCount:3,repeatUnit:'weeks'},{name:'Deworm (3rd dose)',repeatCount:1,repeatUnit:'months'}],notes:'No more earmites âœ“ â€” clean ears once per week'},
+       {id:'v5',date:'2026-02-14',weight:3.6,cost:30,treatments:['t1'],oneTimeTreatments:[],notes:'Vaccine (yearly) â€” rabies âœ“'},
        {id:'v6',date:'2026-02-28',weight:3.9,cost:0,treatments:[],oneTimeTreatments:[],notes:''},
      ]},
-    {id:'kitten2',name:'Snickers',emoji:'🐈',catStyle:'blackwhite',dob:'2025-08-08',color:'#5c5248',
+    {id:'kitten2',name:'Snickers',emoji:'ðŸˆ',catStyle:'blackwhite',dob:'2025-08-08',color:'#5c5248',
      schedules:[
        {id:'s1',treatmentId:'t1',dueDate:'2027-02-14',price:30,notes:'Yearly vaccine',done:false},
        {id:'s2',treatmentId:'t4',dueDate:'2026-04-01',price:15,notes:'Monthly deworm',done:false},
        {id:'s3',treatmentId:'t6',dueDate:'2026-03-10',price:30,notes:'Follow-up ligament check',done:false},
      ],
      visits:[
-       {id:'v1',date:'2025-12-13',weight:null,cost:0,treatments:[],oneTimeTreatments:[{name:'Vaccine (1st dose)',repeatCount:3,repeatUnit:'weeks'},{name:'Deworm (1st dose)',repeatCount:10,repeatUnit:'days'}],notes:'Dawa bel dayne for 10 days, once daily after cleaning\nHabbet doud after 10 days → every month until 6 months → every 3 months'},
-       {id:'v2',date:'2025-12-24',weight:2.4,cost:0,treatments:[],oneTimeTreatments:[{name:'Deworm (2nd dose)',repeatCount:3,repeatUnit:'weeks'}],notes:'Still has ear mites — use dawa everyday'},
-       {id:'v3',date:'2026-01-03',weight:2.6,cost:0,treatments:[],oneTimeTreatments:[{name:'Vaccine (2nd dose)',repeatCount:3,repeatUnit:'weeks'}],notes:'No earmites ✓ — clean ears twice per week'},
+       {id:'v1',date:'2025-12-13',weight:null,cost:0,treatments:[],oneTimeTreatments:[{name:'Vaccine (1st dose)',repeatCount:3,repeatUnit:'weeks'},{name:'Deworm (1st dose)',repeatCount:10,repeatUnit:'days'}],notes:'Dawa bel dayne for 10 days, once daily after cleaning\nHabbet doud after 10 days â†’ every month until 6 months â†’ every 3 months'},
+       {id:'v2',date:'2025-12-24',weight:2.4,cost:0,treatments:[],oneTimeTreatments:[{name:'Deworm (2nd dose)',repeatCount:3,repeatUnit:'weeks'}],notes:'Still has ear mites â€” use dawa everyday'},
+       {id:'v3',date:'2026-01-03',weight:2.6,cost:0,treatments:[],oneTimeTreatments:[{name:'Vaccine (2nd dose)',repeatCount:3,repeatUnit:'weeks'}],notes:'No earmites âœ“ â€” clean ears twice per week'},
        {id:'v4',date:'2026-01-24',weight:2.9,cost:40,treatments:[],oneTimeTreatments:[{name:'Vaccine (3rd dose)',repeatCount:3,repeatUnit:'weeks'},{name:'Deworm (3rd dose)',repeatCount:1,repeatUnit:'months'}],notes:'Clean ears once per week'},
-       {id:'v5',date:'2026-02-14',weight:2.9,cost:90,treatments:['t1'],oneTimeTreatments:[],notes:'Vaccine (yearly) — rabies ✓\nXray $30 — Ebre (injection) $30\nShould feel better within one day'},
-       {id:'v6',date:'2026-02-28',weight:3.0,cost:0,treatments:[],oneTimeTreatments:[],notes:'Checked — something wrong with ligament\n0.6mg today, 0.4mg for 5 days'},
+       {id:'v5',date:'2026-02-14',weight:2.9,cost:90,treatments:['t1'],oneTimeTreatments:[],notes:'Vaccine (yearly) â€” rabies âœ“\nXray $30 â€” Ebre (injection) $30\nShould feel better within one day'},
+       {id:'v6',date:'2026-02-28',weight:3.0,cost:0,treatments:[],oneTimeTreatments:[],notes:'Checked â€” something wrong with ligament\n0.6mg today, 0.4mg for 5 days'},
      ]},
-    {id:'biso',name:'Biso',emoji:'😾',catStyle:'',dob:null,color:'#c07030',
+    {id:'biso',name:'Biso',emoji:'ðŸ˜¾',catStyle:'',dob:null,color:'#c07030',
      schedules:[
        {id:'s1',treatmentId:'t1',dueDate:'2026-12-01',price:30,notes:'Yearly vaccine',done:false},
-       {id:'s2',treatmentId:'t4',dueDate:'2026-06-01',price:15,notes:'Worm Injection — 6 months',done:false},
-       {id:'s3',treatmentId:'t2',dueDate:'2026-01-01',price:8,notes:'⚠️ Missed — do as soon as possible',done:false},
+       {id:'s2',treatmentId:'t4',dueDate:'2026-06-01',price:15,notes:'Worm Injection â€” 6 months',done:false},
+       {id:'s3',treatmentId:'t2',dueDate:'2026-01-01',price:8,notes:'âš ï¸ Missed â€” do as soon as possible',done:false},
      ],
-     visits:[{id:'v1',date:'2025-12-01',weight:6.2,cost:45,treatments:['t1','t4'],notes:'Yearly check-up\nYearly vaccine ✓\nWorm Injection (6 months) ✓\nBarghout done ✓\n⚠️ Overweight — feed less wet food'}]},
-    {id:'loupou',name:'Loupou',emoji:'🐱',catStyle:'white',dob:null,color:'#8aacbf',
+     visits:[{id:'v1',date:'2025-12-01',weight:6.2,cost:45,treatments:['t1','t4'],notes:'Yearly check-up\nYearly vaccine âœ“\nWorm Injection (6 months) âœ“\nBarghout done âœ“\nâš ï¸ Overweight â€” feed less wet food'}]},
+    {id:'loupou',name:'Loupou',emoji:'ðŸ±',catStyle:'white',dob:null,color:'#8aacbf',
      schedules:[
        {id:'s1',treatmentId:'t1',dueDate:'2026-12-01',price:30,notes:'Yearly vaccine',done:false},
-       {id:'s2',treatmentId:'t4',dueDate:'2026-06-01',price:15,notes:'Worm Injection — 6 months',done:false},
-       {id:'s3',treatmentId:'t2',dueDate:'2026-01-01',price:8,notes:'⚠️ Missed — do as soon as possible',done:false},
+       {id:'s2',treatmentId:'t4',dueDate:'2026-06-01',price:15,notes:'Worm Injection â€” 6 months',done:false},
+       {id:'s3',treatmentId:'t2',dueDate:'2026-01-01',price:8,notes:'âš ï¸ Missed â€” do as soon as possible',done:false},
      ],
-     visits:[{id:'v1',date:'2025-12-01',weight:6.7,cost:45,treatments:['t1','t4'],notes:'Yearly check-up\nYearly vaccine ✓\nWorm Injection (6 months) ✓\nBarghout done ✓\nTondif dinen\n⚠️ Overweight'}]},
+     visits:[{id:'v1',date:'2025-12-01',weight:6.7,cost:45,treatments:['t1','t4'],notes:'Yearly check-up\nYearly vaccine âœ“\nWorm Injection (6 months) âœ“\nBarghout done âœ“\nTondif dinen\nâš ï¸ Overweight'}]},
   ],
   litters:[
     {id:'l1',name:'Thomas',rating:4,price:'11.2$ / 5kg',pricePerL:1.90,smell:'No smell',poo:'Great',pee:'Bi farfit chway',notes:''},
@@ -868,12 +868,12 @@ const DEFAULT={
   ]
 };
 
-// ═══ STATE ═══
+// â•â•â• STATE â•â•â•
 let data, currentCatId=null, editingVisitId=null, editingSchedId=null, schedCatId=null;
 let editingTreatmentId=null, editingLitterId=null, currentSmellRating=0, currentPooRating=0, currentPeeRating=0;
 let selectedTreatments=new Set();
 
-// ═══ FIREBASE CONFIG ═══
+// â•â•â• FIREBASE CONFIG â•â•â•
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyDGFwXOFdTGYGbHSKafoh6zoaQO8zABPmc",
   authDomain: "miaou-57319.firebaseapp.com",
@@ -906,11 +906,11 @@ function getFriendlyAuthError(error){
 }
 function setSignedInUi(){
   document.getElementById('auth-overlay').classList.remove('open');
-  document.getElementById('backup-user-chip').textContent=currentUserEmail?`🔒 ${currentUserEmail}`:'🔒 Not signed in';
+  document.getElementById('backup-user-chip').textContent=currentUserEmail?`ðŸ”’ ${currentUserEmail}`:'ðŸ”’ Not signed in';
 }
 function setSignedOutUi(){
   document.getElementById('auth-overlay').classList.add('open');
-  document.getElementById('backup-user-chip').textContent='🔒 Not signed in';
+  document.getElementById('backup-user-chip').textContent='ðŸ”’ Not signed in';
   const signoutBtn = document.getElementById('auth-signout-btn');
   if(signoutBtn) signoutBtn.style.display='none';
 }
@@ -955,7 +955,7 @@ async function loadBackups(){
   const listEl=document.getElementById('backup-list');
   if(!listEl) return;
   if(!db){ listEl.innerHTML='<div class="backup-empty">Cloud backups are unavailable.</div>'; return; }
-  listEl.innerHTML='<div class="backup-empty">Loading backups…</div>';
+  listEl.innerHTML='<div class="backup-empty">Loading backupsâ€¦</div>';
   try {
     const snap = await db.collection('miaou/data/versions').orderBy('revision','desc').limit(20).get();
     backups = snap.docs.map(d=>({id:d.id, ...d.data()}));
@@ -970,7 +970,7 @@ async function loadBackups(){
       return `<div class="backup-item">
         <div class="backup-top">
           <div>
-            <div class="backup-title">Revision ${b.revision || '—'}</div>
+            <div class="backup-title">Revision ${b.revision || 'â€”'}</div>
             <div class="backup-meta">${reason}<br>${when}<br>${by}</div>
           </div>
         </div>
@@ -999,7 +999,7 @@ async function restoreBackup(versionId){
       renderLitter();
       await loadBackups();
       closeModal('backup-modal');
-      showToast('Backup restored ✓');
+      showToast('Backup restored âœ“');
     } catch(e) {
       console.error(e);
       showToast('Restore failed');
@@ -1017,6 +1017,7 @@ async function reloadFromCloud(){
 }
 
 async function saveData(meta={}){
+  if(window.BACKUP_MODE){showToast('Read-only backup');return;}
   const payload = JSON.stringify(data);
   try {
     if(db && DATA_REF && currentUserEmail){
@@ -1070,7 +1071,7 @@ async function saveData(meta={}){
 
 
 async function signInWithGoogle(){
-  setAuthStatus('Opening Google sign in…', false);
+  setAuthStatus('Opening Google sign inâ€¦', false);
   const provider = new firebase.auth.GoogleAuthProvider();
   provider.setCustomParameters({prompt:'select_account'});
   auth.signInWithPopup(provider).catch(e => {
@@ -1090,13 +1091,23 @@ function openBackupModal(){
     setAuthStatus('Please sign in first.');
     return;
   }
-  document.getElementById('backup-user-chip').textContent=`🔒 ${currentUserEmail}`;
+  document.getElementById('backup-user-chip').textContent=`ðŸ”’ ${currentUserEmail}`;
   loadBackups();
   openModal('backup-modal');
 }
 
 
 async function bootstrap(){
+  // â”€â”€ Backup mode: read-only offline snapshot â”€â”€
+  if(window.BACKUP_MODE){
+    data=window.BACKUP_DATA;
+    document.getElementById('loading-screen').style.display='none';
+    document.getElementById('auth-overlay').classList.remove('open');
+    const ha=document.querySelector('.header-actions');
+    if(ha) ha.innerHTML='<span style="font-size:0.72rem;color:var(--text-muted);background:var(--cream2);padding:4px 12px;border-radius:20px;font-weight:600">ðŸ“‹ Backup'+(window.BACKUP_DATE?' Â· '+new Date(window.BACKUP_DATE).toLocaleDateString():'')+'</span>';
+    renderCatsGrid();renderUpcoming();renderVetCatSections();renderLitter();
+    return;
+  }
   document.getElementById('google-signin-btn').addEventListener('click', signInWithGoogle);
   document.getElementById('auth-signout-btn').addEventListener('click', signOutUser);
   document.getElementById('loading-screen').style.display='flex';
@@ -1109,6 +1120,11 @@ async function bootstrap(){
     setSignedOutUi();
     return;
   }
+  // â”€â”€ Check for Drive redirect result (mobile fallback) â”€â”€
+  try{
+    const rr=await auth.getRedirectResult();
+    if(rr&&rr.credential&&rr.credential.accessToken) _driveToken=rr.credential.accessToken;
+  }catch(e){console.warn('Redirect result:',e);}
   auth.onAuthStateChanged(async user => {
     if(!user){
       currentUserEmail='';
@@ -1137,11 +1153,16 @@ async function bootstrap(){
       renderLitter();
       if(currentCatId) renderCatDetail();
     }
+    // Resume pending Drive backup after mobile redirect
+    if(_driveToken&&sessionStorage.getItem('miaou_drive_pending')){
+      sessionStorage.removeItem('miaou_drive_pending');
+      setTimeout(()=>driveBackup(),600);
+    }
   });
 }
 
 
-// ═══ NAV ═══
+// â•â•â• NAV â•â•â•
 function switchTab(name,btn){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
@@ -1152,7 +1173,7 @@ function switchTab(name,btn){
   if(name==='litter')renderLitter();
 }
 
-// ═══ HELPERS ═══
+// â•â•â• HELPERS â•â•â•
 function calcAge(dob){if(!dob)return null;const d=new Date(dob),now=new Date();let m=(now.getFullYear()-d.getFullYear())*12+(now.getMonth()-d.getMonth());return m<24?m+' months':Math.floor(m/12)+' years';}
 function latestWeight(cat){const vs=cat.visits.filter(v=>v.weight);if(!vs.length)return null;return vs.slice().sort((a,b)=>b.date.localeCompare(a.date))[0].weight;}
 function lastVisit(cat){if(!cat.visits.length)return null;return cat.visits.slice().sort((a,b)=>b.date.localeCompare(a.date))[0];}
@@ -1169,7 +1190,7 @@ function statusFor(s){
   return{cls:'status-upcoming',label:`In ${days}d`};
 }
 
-// ═══ CATS LIST ═══
+// â•â•â• CATS LIST â•â•â•
 function renderCatsGrid(){
   const grid=document.getElementById('cats-grid');
   grid.innerHTML='';
@@ -1186,8 +1207,8 @@ function renderCatsGrid(){
       ${catIconCard(cat)}
       <div class="cat-name">${cat.name}</div>
       <div class="cat-age">${age?age+' old':'Age unknown'}</div>
-      ${wt?`<span class="cat-weight-badge" style="background:${bg};color:${cat.color}">⚖️ ${wt} kg</span>`:''}
-      ${next?`<span class="cat-next-badge">📅 ${tById(next.treatmentId)?.name||'?'} · ${formatDate(next.dueDate)}</span>`:''}
+      ${wt?`<span class="cat-weight-badge" style="background:${bg};color:${cat.color}">âš–ï¸ ${wt} kg</span>`:''}
+      ${next?`<span class="cat-next-badge">ðŸ“… ${tById(next.treatmentId)?.name||'?'} Â· ${formatDate(next.dueDate)}</span>`:''}
     `;
     card.onclick=()=>openCatDetail(cat.id);
     grid.appendChild(card);
@@ -1217,8 +1238,8 @@ function renderUpcoming(){
 
   if(!items.length){
     container.innerHTML=`
-      <div class="upcoming-header"><div class="upcoming-title">📅 Next 30 days</div></div>
-      <div class="upcoming-empty">🎉 Nothing due in the next 30 days!</div>`;
+      <div class="upcoming-header"><div class="upcoming-title">ðŸ“… Next 30 days</div></div>
+      <div class="upcoming-empty">ðŸŽ‰ Nothing due in the next 30 days!</div>`;
     return;
   }
 
@@ -1246,7 +1267,7 @@ function renderUpcoming(){
         <div class="upcoming-treatment">${iconFor(name)} ${name}
           <span class="status-pill ${st.cls}">${st.label}</span>
         </div>
-        <div class="upcoming-cat-name">${cat.emoji} ${cat.name}${s.notes?` · ${s.notes}`:''}</div>
+        <div class="upcoming-cat-name">${cat.emoji} ${cat.name}${s.notes?` Â· ${s.notes}`:''}</div>
       </div>
       <div class="upcoming-right">
         <span class="upcoming-date">${dateLabel}</span>
@@ -1257,7 +1278,7 @@ function renderUpcoming(){
 
   container.innerHTML=`
     <div class="upcoming-header">
-      <div class="upcoming-title">📅 Next 30 days</div>
+      <div class="upcoming-title">ðŸ“… Next 30 days</div>
       <span class="upcoming-total">Est. $${totalEst}</span>
     </div>
     ${rows}`;
@@ -1277,14 +1298,14 @@ function renderCatDetail(){
   const cat=data.cats.find(c=>c.id===currentCatId);if(!cat)return;
   const wt=latestWeight(cat),age=calcAge(cat.dob),total=totalCost(cat);
   const dobDisplay=cat.dob
-    ?`<span class="editable-dob" onclick="makeDobEditable('${cat.id}')" title="Tap to edit date of birth">📅 Born ${formatDate(cat.dob)}${age?' · '+age:''}</span>`
-    :`<span class="editable-dob" onclick="makeDobEditable('${cat.id}')" title="Tap to add date of birth">📅 <em style="color:var(--terra-light)">Add birth date</em></span>`;
+    ?`<span class="editable-dob" onclick="makeDobEditable('${cat.id}')" title="Tap to edit date of birth">ðŸ“… Born ${formatDate(cat.dob)}${age?' Â· '+age:''}</span>`
+    :`<span class="editable-dob" onclick="makeDobEditable('${cat.id}')" title="Tap to add date of birth">ðŸ“… <em style="color:var(--terra-light)">Add birth date</em></span>`;
   document.getElementById('detail-header').innerHTML=`
     ${catIconDetail(cat)}
     <div style="flex:1;min-width:0">
       <div class="detail-cat-name" id="editable-name-${cat.id}" onclick="makeNameEditable('${cat.id}')" title="Tap to rename">${cat.name}</div>
-      <div class="detail-cat-meta" id="dob-display-${cat.id}">${dobDisplay} · <strong>$${total} spent</strong></div>
-      ${wt?`<div class="detail-cat-weight" style="color:${cat.color}">⚖️ ${wt} kg</div>`:''}
+      <div class="detail-cat-meta" id="dob-display-${cat.id}">${dobDisplay} Â· <strong>$${total} spent</strong></div>
+      ${wt?`<div class="detail-cat-weight" style="color:${cat.color}">âš–ï¸ ${wt} kg</div>`:''}
     </div>`;
   renderCatUpcoming(cat);
   renderTimeline(cat);
@@ -1313,14 +1334,14 @@ function renderCatUpcoming(cat){
     const days=daysUntil(s.dueDate);
     const dateLabel=days===0?'Today':days===1?'Tomorrow':days<0?`${Math.abs(days)}d overdue`:formatDate(s.dueDate);
     return`<div class="cat-upcoming-item${s.done?' done-item':''}">
-      <div class="cat-upcoming-check${s.done?' checked':''}" onclick="toggleSchedDone('${cat.id}','${s.id}')">${s.done?'✓':''}</div>
+      <div class="cat-upcoming-check${s.done?' checked':''}" onclick="toggleSchedDone('${cat.id}','${s.id}')">${s.done?'âœ“':''}</div>
       <div class="cat-upcoming-body">
         <div class="cat-upcoming-name">
-          ${isOneTime?'🔁':iconFor(name)} ${escHtml(name)}
+          ${isOneTime?'ðŸ”':iconFor(name)} ${escHtml(name)}
           ${isOneTime?`<span class="onetime-schedule-badge">one-time</span>`:''}
           <span class="status-pill ${st.cls}">${st.label}</span>
         </div>
-        <div class="cat-upcoming-date">📅 ${dateLabel}</div>
+        <div class="cat-upcoming-date">ðŸ“… ${dateLabel}</div>
         ${s.notes?`<div class="cat-upcoming-note">${escHtml(s.notes)}</div>`:''}
       </div>
       <div class="cat-upcoming-right">
@@ -1331,7 +1352,7 @@ function renderCatUpcoming(cat){
 
   el.innerHTML=`<div class="cat-upcoming-block" style="border-top:3px solid ${cat.color}">
     <div class="cat-upcoming-block-header">
-      <span class="cat-upcoming-block-title">📅 Schedule</span>
+      <span class="cat-upcoming-block-title">ðŸ“… Schedule</span>
       ${pendingEst?`<span class="cat-upcoming-est">Est. $${pendingEst} pending</span>`:''}
     </div>
     ${pending.map(schedRow).join('')}
@@ -1339,7 +1360,7 @@ function renderCatUpcoming(cat){
       <div style="padding:8px 14px 4px;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);border-top:1px solid var(--cream2)">Completed</div>
       ${done.map(schedRow).join('')}
     `:''}
-    <button class="cat-upcoming-add-btn" onclick="showSchedModal('${cat.id}')">＋ Add treatment</button>
+    <button class="cat-upcoming-add-btn" onclick="showSchedModal('${cat.id}')">ï¼‹ Add treatment</button>
   </div>`;
 }
 function makeDobEditable(catId){
@@ -1348,12 +1369,12 @@ function makeDobEditable(catId){
   const total=totalCost(cat);
   meta.innerHTML=`<input type="date" class="form-input" id="dob-input-${catId}"
     value="${cat.dob||''}" style="width:160px;padding:4px 8px;font-size:0.82rem;display:inline-block;margin-bottom:2px"
-    onblur="saveDob('${catId}',this.value)" onkeydown="if(event.key==='Enter')this.blur()"> · <strong>$${total} spent</strong>`;
+    onblur="saveDob('${catId}',this.value)" onkeydown="if(event.key==='Enter')this.blur()"> Â· <strong>$${total} spent</strong>`;
   document.getElementById('dob-input-'+catId).focus();
 }
 function saveDob(catId,val){
   data.cats.find(c=>c.id===catId).dob=val||null;
-  saveData({reason:'Updated date of birth'});renderCatDetail();showToast('Date of birth saved ✓');
+  saveData({reason:'Updated date of birth'});renderCatDetail();showToast('Date of birth saved âœ“');
 }
 function makeNameEditable(catId){
   const cat=data.cats.find(c=>c.id===catId);
@@ -1364,27 +1385,27 @@ function makeNameEditable(catId){
 function saveName(catId,v){if(!v.trim())return renderCatDetail();data.cats.find(c=>c.id===catId).name=v.trim();saveData({reason:'Renamed cat'});renderCatDetail();}
 function promptRenameEmoji(catId){const e=prompt('New emoji:');if(!e)return;data.cats.find(c=>c.id===catId).emoji=e.trim().slice(0,2);saveData({reason:'Changed cat icon'});renderCatDetail();}
 
-// ═══ TIMELINE ═══
+// â•â•â• TIMELINE â•â•â•
 function renderTimeline(cat){
   const tl=document.getElementById('visit-timeline');
   const sorted=cat.visits.slice().sort((a,b)=>b.date.localeCompare(a.date));
-  if(!sorted.length){tl.innerHTML=`<div class="empty-state"><div class="empty-icon">🏥</div>No visits yet</div>`;return;}
+  if(!sorted.length){tl.innerHTML=`<div class="empty-state"><div class="empty-icon">ðŸ¥</div>No visits yet</div>`;return;}
   tl.innerHTML=sorted.map(v=>{
     const tags=(v.treatments||[]).map(tid=>{const t=tById(tid);return t?`<span class="visit-treatment-tag">${iconFor(t.name)} ${t.name}</span>`:''}).join('');
-    const otTags=(v.oneTimeTreatments||[]).map(ot=>`<span class="visit-onetime-tag">🔁 ${escHtml(ot.name)} · in ${ot.repeatCount} ${ot.repeatUnit}</span>`).join('');
+    const otTags=(v.oneTimeTreatments||[]).map(ot=>`<span class="visit-onetime-tag">ðŸ” ${escHtml(ot.name)} Â· in ${ot.repeatCount} ${ot.repeatUnit}</span>`).join('');
     return`<div class="visit-card"><div class="visit-date">${formatDate(v.date)}</div>
-      ${v.weight?`<span class="visit-weight">⚖️ ${v.weight} kg</span> `:''}
+      ${v.weight?`<span class="visit-weight">âš–ï¸ ${v.weight} kg</span> `:''}
       ${(tags||otTags)?`<div class="visit-treatments">${tags}${otTags}</div>`:''}
       ${v.notes?`<div class="visit-notes">${escHtml(v.notes)}</div>`:''}
-      ${v.cost?`<span class="visit-cost">💳 $${v.cost}</span>`:''}
+      ${v.cost?`<span class="visit-cost">ðŸ’³ $${v.cost}</span>`:''}
       <div class="visit-actions">
-        <button class="btn-edit" onclick="editVisit('${v.id}')">✏️ Edit</button>
-        <button class="btn-delete" onclick="deleteVisit('${v.id}')">🗑 Delete</button>
+        <button class="btn-edit" onclick="editVisit('${v.id}')">âœï¸ Edit</button>
+        <button class="btn-delete" onclick="deleteVisit('${v.id}')">ðŸ—‘ Delete</button>
       </div></div>`;
   }).join('');
 }
 
-// ═══ VISIT CRUD ═══
+// â•â•â• VISIT CRUD â•â•â•
 function buildTreatmentPicker(selectedIds){
   selectedTreatments=new Set(selectedIds||[]);
   const c=document.getElementById('visit-treatment-picker');
@@ -1394,7 +1415,7 @@ function buildTreatmentPicker(selectedIds){
       <div class="t-name"><span>${iconFor(t.name)}</span>${t.name}</div>
       <div style="display:flex;align-items:center;gap:8px">
         <span class="t-price">$${t.price}</span>
-        <div class="t-check" id="tcheck-${t.id}">${selectedTreatments.has(t.id)?'✓':''}</div>
+        <div class="t-check" id="tcheck-${t.id}">${selectedTreatments.has(t.id)?'âœ“':''}</div>
       </div>
     </div>`).join('');
   updateAutoTotal();
@@ -1403,7 +1424,7 @@ function toggleTreatment(tid){
   selectedTreatments.has(tid)?selectedTreatments.delete(tid):selectedTreatments.add(tid);
   const row=document.getElementById('trow-'+tid),chk=document.getElementById('tcheck-'+tid);
   row.classList.toggle('selected',selectedTreatments.has(tid));
-  chk.textContent=selectedTreatments.has(tid)?'✓':'';
+  chk.textContent=selectedTreatments.has(tid)?'âœ“':'';
   updateAutoTotal();
 }
 function updateAutoTotal(){
@@ -1417,10 +1438,10 @@ function renderOnetimeList(){
   if(!el)return;
   el.innerHTML=oneTimeTreatments.map((ot,i)=>`
     <div class="onetime-list-item">
-      <div class="onetime-list-item-left">🔁 ${escHtml(ot.name)}</div>
+      <div class="onetime-list-item-left">ðŸ” ${escHtml(ot.name)}</div>
       <div class="onetime-list-item-right">
         <span class="onetime-list-item-badge">in ${ot.repeatCount} ${ot.repeatUnit}</span>
-        <button class="onetime-remove-btn" onclick="removeOneTime(${i})">✕</button>
+        <button class="onetime-remove-btn" onclick="removeOneTime(${i})">âœ•</button>
       </div>
     </div>`).join('');
 }
@@ -1437,7 +1458,7 @@ function removeOneTime(i){
   askDelete('Delete this one time follow up?',()=>{
     oneTimeTreatments.splice(i,1);
     renderOnetimeList();
-    showToast('Removed ✓');
+    showToast('Removed âœ“');
   });
 }
 function addDuration(dateStr,count,unit){
@@ -1503,7 +1524,7 @@ function saveVisit(){
       cat.schedules.push({id:uid(),oneTime:true,oneTimeName:ot.name,dueDate,price:0,notes:`Follow-up from visit ${formatDate(date)}`,done:false});
     });
   }
-  saveData({reason:editingVisitId?'Updated visit':'Added visit'});closeModal('visit-modal');renderCatDetail();showToast(editingVisitId?'Visit updated ✓':'Visit added ✓');
+  saveData({reason:editingVisitId?'Updated visit':'Added visit'});closeModal('visit-modal');renderCatDetail();showToast(editingVisitId?'Visit updated âœ“':'Visit added âœ“');
 }
 function deleteVisit(visitId){
   askDelete('Delete this visit? This action cannot be undone.',()=>{
@@ -1513,21 +1534,21 @@ function deleteVisit(visitId){
   });
 }
 
-// ═══ ADD CAT ═══
-function showAddCatModal(){document.getElementById('new-cat-name').value='';document.getElementById('new-cat-dob').value='';document.getElementById('new-cat-emoji').value='🐱';openModal('add-cat-modal');}
+// â•â•â• ADD CAT â•â•â•
+function showAddCatModal(){document.getElementById('new-cat-name').value='';document.getElementById('new-cat-dob').value='';document.getElementById('new-cat-emoji').value='ðŸ±';openModal('add-cat-modal');}
 function addCat(){
   const name=document.getElementById('new-cat-name').value.trim();
   if(!name){showToast('Please enter a name');return;}
-  const cat={id:uid(),name,emoji:document.getElementById('new-cat-emoji').value.trim()||'🐱',dob:document.getElementById('new-cat-dob').value||null,color:['#b85c38','#5c7a63','#c4a882','#8474a8','#4a7fa5','#a05c8c'][data.cats.length%6],visits:[],schedules:[]};
-  data.cats.push(cat);saveData({reason:'Added cat'});closeModal('add-cat-modal');renderCatsGrid();showToast(name+' added ✓');
+  const cat={id:uid(),name,emoji:document.getElementById('new-cat-emoji').value.trim()||'ðŸ±',dob:document.getElementById('new-cat-dob').value||null,color:['#b85c38','#5c7a63','#c4a882','#8474a8','#4a7fa5','#a05c8c'][data.cats.length%6],visits:[],schedules:[]};
+  data.cats.push(cat);saveData({reason:'Added cat'});closeModal('add-cat-modal');renderCatsGrid();showToast(name+' added âœ“');
 }
 
-// ═══ VET SCHEDULE ═══
+// â•â•â• VET SCHEDULE â•â•â•
 function toggleDashboard(){document.getElementById('price-dashboard').classList.toggle('open');}
 
 function repeatLabel(t){
   if(!t.repeatCount)return'';
-  return`<span class="treatment-repeat-badge">↻ every ${t.repeatCount} ${t.repeatUnit}</span>`;
+  return`<span class="treatment-repeat-badge">â†» every ${t.repeatCount} ${t.repeatUnit}</span>`;
 }
 
 function renderTreatmentRows(){
@@ -1538,13 +1559,13 @@ function renderTreatmentRows(){
         <span>${iconFor(t.name)}</span>
         <div style="min-width:0">
           <span class="treatment-row-name">${escHtml(t.name)}</span>
-          ${t.repeatCount?`<br><span class="treatment-repeat-badge">↻ every ${t.repeatCount} ${t.repeatUnit}</span>`:''}
+          ${t.repeatCount?`<br><span class="treatment-repeat-badge">â†» every ${t.repeatCount} ${t.repeatUnit}</span>`:''}
         </div>
       </div>
       <div class="treatment-row-actions">
         <span class="treatment-row-price">$${t.price}</span>
-        <button class="icon-btn" onclick="openEditTreatment('${t.id}')">✏️</button>
-        <button class="icon-btn del" onclick="deleteTreatment('${t.id}')">🗑</button>
+        <button class="icon-btn" onclick="openEditTreatment('${t.id}')">âœï¸</button>
+        <button class="icon-btn del" onclick="deleteTreatment('${t.id}')">ðŸ—‘</button>
       </div>
     </div>`).join('')||'<div style="font-size:0.82rem;color:var(--text-muted);padding:6px 0">No treatments yet.</div>';
 }
@@ -1559,7 +1580,7 @@ function addTreatmentInline(){
   document.getElementById('new-t-name').value='';
   document.getElementById('new-t-price').value='';
   document.getElementById('new-t-repeat-count').value='';
-  saveData({reason:'Added treatment'});renderTreatmentRows();showToast('Treatment added ✓');
+  saveData({reason:'Added treatment'});renderTreatmentRows();showToast('Treatment added âœ“');
 }
 function openEditTreatment(tid){
   const t=tById(tid);if(!t)return;
@@ -1576,12 +1597,12 @@ function saveTreatmentEdit(){
   t.price=parseFloat(document.getElementById('edit-t-price').value)||t.price;
   t.repeatCount=parseInt(document.getElementById('edit-t-repeat-count').value)||null;
   t.repeatUnit=document.getElementById('edit-t-repeat-unit').value||'months';
-  saveData({reason:'Updated treatment'});closeModal('treatment-edit-modal');renderTreatmentRows();renderVetCatSections();showToast('Updated ✓');
+  saveData({reason:'Updated treatment'});closeModal('treatment-edit-modal');renderTreatmentRows();renderVetCatSections();showToast('Updated âœ“');
 }
 function deleteTreatment(tid){
   askDelete('Delete this treatment from the price list?',()=>{
     data.treatments=data.treatments.filter(t=>t.id!==tid);
-    saveData({reason:'Deleted treatment'});renderTreatmentRows();renderVetCatSections();showToast('Removed ✓');
+    saveData({reason:'Deleted treatment'});renderTreatmentRows();renderVetCatSections();showToast('Removed âœ“');
   });
 }
 
@@ -1599,21 +1620,21 @@ function renderVetCatSections(){
       const price=isOneTime?0:(s.price!==undefined?s.price:(t?t.price:0));
       const st=statusFor(s);
       return`<div class="schedule-item${s.done?' done':''}">
-        <button class="schedule-check-btn${s.done?' checked':''}" onclick="toggleSchedDone('${cat.id}','${s.id}')">${s.done?'✓':''}</button>
+        <button class="schedule-check-btn${s.done?' checked':''}" onclick="toggleSchedDone('${cat.id}','${s.id}')">${s.done?'âœ“':''}</button>
         <div class="schedule-item-body">
           <div class="schedule-item-name">
-            ${isOneTime?'🔁':iconFor(name)} ${name}
+            ${isOneTime?'ðŸ”':iconFor(name)} ${name}
             ${isOneTime?`<span class="onetime-schedule-badge">one-time</span>`:''}
             <span class="status-pill ${st.cls}">${st.label}</span>
           </div>
-          <div class="schedule-item-date">📅 ${formatDate(s.dueDate)}</div>
+          <div class="schedule-item-date">ðŸ“… ${formatDate(s.dueDate)}</div>
           ${s.notes?`<div class="schedule-item-notes">${escHtml(s.notes)}</div>`:''}
         </div>
         <div class="schedule-item-right">
           ${price?`<span class="schedule-item-price">$${price}</span>`:''}
           <div class="schedule-item-btns">
-            <button class="icon-btn" onclick="editSchedItem('${cat.id}','${s.id}')">✏️</button>
-            <button class="icon-btn del" onclick="deleteSchedItem('${cat.id}','${s.id}')">🗑</button>
+            <button class="icon-btn" onclick="editSchedItem('${cat.id}','${s.id}')">âœï¸</button>
+            <button class="icon-btn del" onclick="deleteSchedItem('${cat.id}','${s.id}')">ðŸ—‘</button>
           </div>
         </div>
       </div>`;
@@ -1627,14 +1648,14 @@ function renderVetCatSections(){
         </div>
       </div>
       <div class="vet-cat-body">${schedHtml}</div>
-      <button class="add-sched-btn" onclick="showAddSchedModal('${cat.id}')">＋ Add treatment</button>
+      <button class="add-sched-btn" onclick="showAddSchedModal('${cat.id}')">ï¼‹ Add treatment</button>
     </div>`;
   }).join('');
 }
 
 function toggleSchedDone(catId,schedId){
   const cat=data.cats.find(c=>c.id===catId),s=cat.schedules.find(x=>x.id===schedId);
-  s.done=!s.done;saveData({reason:s.done?'Completed scheduled item':'Reopened scheduled item'});renderVetCatSections();showToast(s.done?'Marked done ✓':'Marked pending');
+  s.done=!s.done;saveData({reason:s.done?'Completed scheduled item':'Reopened scheduled item'});renderVetCatSections();showToast(s.done?'Marked done âœ“':'Marked pending');
 }
 function showAddSchedModal(catId){
   schedCatId=catId;editingSchedId=null;
@@ -1657,10 +1678,10 @@ function editSchedItem(catId,schedId){
 }
 function buildSchedSelect(selectedId){
   const sel=document.getElementById('sched-treatment');
-  sel.innerHTML=`<option value="">— pick a treatment —</option>`+
+  sel.innerHTML=`<option value="">â€” pick a treatment â€”</option>`+
     data.treatments.map(t=>{
-      const rep=t.repeatCount?` · ↻ every ${t.repeatCount} ${t.repeatUnit}`:'';
-      return`<option value="${t.id}"${t.id===selectedId?' selected':''}>${iconFor(t.name)} ${t.name} — $${t.price}${rep}</option>`;
+      const rep=t.repeatCount?` Â· â†» every ${t.repeatCount} ${t.repeatUnit}`:'';
+      return`<option value="${t.id}"${t.id===selectedId?' selected':''}>${iconFor(t.name)} ${t.name} â€” $${t.price}${rep}</option>`;
     }).join('');
   updateSchedPrice();
 }
@@ -1678,7 +1699,7 @@ function saveSchedItem(){
   const cat=data.cats.find(c=>c.id===schedCatId);
   if(editingSchedId){const i=cat.schedules.findIndex(s=>s.id===editingSchedId);cat.schedules[i]=item;}
   else cat.schedules.push(item);
-  saveData({reason:editingSchedId?'Updated scheduled item':'Added scheduled item'});closeModal('sched-modal');renderVetCatSections();showToast(editingSchedId?'Updated ✓':'Scheduled ✓');
+  saveData({reason:editingSchedId?'Updated scheduled item':'Added scheduled item'});closeModal('sched-modal');renderVetCatSections();showToast(editingSchedId?'Updated âœ“':'Scheduled âœ“');
 }
 function deleteSchedItem(catId,schedId){
   askDelete('Delete this scheduled item?',()=>{
@@ -1686,12 +1707,12 @@ function deleteSchedItem(catId,schedId){
     cat.schedules=cat.schedules.filter(s=>s.id!==schedId);
     saveData({reason:'Deleted scheduled item'});renderVetCatSections();
     if(currentCatId===catId)renderCatUpcoming(cat);
-    showToast('Removed ✓');
+    showToast('Removed âœ“');
   });
 }
 
-// ═══ LITTER ═══
-function starsHtml(r){const pct=(Math.min(Math.max(r,0),5)/5*100).toFixed(2);return`<span class="stars-partial"><span class="stars-bg">★★★★★</span><span class="stars-fg" style="width:${pct}%">★★★★★</span></span>`;}
+// â•â•â• LITTER â•â•â•
+function starsHtml(r){const pct=(Math.min(Math.max(r,0),5)/5*100).toFixed(2);return`<span class="stars-partial"><span class="stars-bg">â˜…â˜…â˜…â˜…â˜…</span><span class="stars-fg" style="width:${pct}%">â˜…â˜…â˜…â˜…â˜…</span></span>`;}
 function renderLitter(){
   const list=document.getElementById('litter-list');
   const sortedLitters=data.litters.slice().sort((a,b)=>(b.rating||0)-(a.rating||0)||String(a.name||'').localeCompare(String(b.name||'')));
@@ -1710,16 +1731,16 @@ function renderLitter(){
         ${exactRating?`<div class="litter-rating-row"><span class="rating-score">${exactRating.toFixed(1)}/5</span>${starsHtml(exactRating)}</div>`:'<span class="unreviewed-badge">Not rated</span>'}
       </div>
       ${rev?`<div class="litter-metrics">
-        <div class="metric"><div class="metric-label">Smell</div><div class="metric-value">${smellR?starsHtml(smellR):'—'}</div></div>
-        <div class="metric"><div class="metric-label">Poo</div><div class="metric-value">${pooR?starsHtml(pooR):'—'}</div></div>
-        <div class="metric"><div class="metric-label">Pee</div><div class="metric-value">${peeR?starsHtml(peeR):'—'}</div></div>
+        <div class="metric"><div class="metric-label">Smell</div><div class="metric-value">${smellR?starsHtml(smellR):'â€”'}</div></div>
+        <div class="metric"><div class="metric-label">Poo</div><div class="metric-value">${pooR?starsHtml(pooR):'â€”'}</div></div>
+        <div class="metric"><div class="metric-label">Pee</div><div class="metric-value">${peeR?starsHtml(peeR):'â€”'}</div></div>
       </div>`:'<div style="color:var(--text-muted);font-size:0.8rem;padding:4px 0">Not yet reviewed</div>'}
       ${l.notes?`<div class="litter-notes">${escHtml(l.notes)}</div>`:''}
       <div class="litter-actions">
-        <button class="btn-edit" style="flex:2" onclick="editLitter('${l.id}')">✏️ Edit Review</button>
-        <button class="btn-delete" style="flex:1" onclick="deleteLitter('${l.id}')">🗑</button>
+        <button class="btn-edit" style="flex:2" onclick="editLitter('${l.id}')">âœï¸ Edit Review</button>
+        <button class="btn-delete" style="flex:1" onclick="deleteLitter('${l.id}')">ðŸ—‘</button>
       </div></div>`;
-  }).join('')||'<div class="empty-state"><div class="empty-icon">🌿</div>No litters added yet.</div>';
+  }).join('')||'<div class="empty-state"><div class="empty-icon">ðŸŒ¿</div>No litters added yet.</div>';
 }
 function showAddLitterModal(){editingLitterId=null;currentSmellRating=0;currentPooRating=0;currentPeeRating=0;document.getElementById('litter-modal-title').textContent='Add Litter';['litter-name','litter-price-amount','litter-size-amount','litter-notes'].forEach(id=>document.getElementById(id).value='');document.getElementById('litter-size-unit').value='L';const _pd=document.getElementById('litter-ppl-display');if(_pd)_pd.textContent='Enter price and size to calculate';updateLitterPickers();openModal('litter-modal');}
 function editLitter(lid){
@@ -1775,16 +1796,16 @@ function saveLitter(){
   const litter={id:editingLitterId||uid(),name,rating:autoRating,smell:currentSmellRating,poo:currentPooRating,pee:currentPeeRating,price:priceStr,priceAmount,sizeAmount,sizeUnit,pricePerL,notes:document.getElementById('litter-notes').value.trim()};
   if(editingLitterId){const i=data.litters.findIndex(x=>x.id===editingLitterId);data.litters[i]=litter;}
   else data.litters.push(litter);
-  saveData({reason:editingLitterId?'Updated litter review':'Added litter review'});closeModal('litter-modal');renderLitter();showToast('Saved ✓');
+  saveData({reason:editingLitterId?'Updated litter review':'Added litter review'});closeModal('litter-modal');renderLitter();showToast('Saved âœ“');
 }
 function deleteLitter(lid){
   askDelete('Delete this litter review?',()=>{
     data.litters=data.litters.filter(l=>l.id!==lid);
-    saveData({reason:'Deleted litter review'});renderLitter();showToast('Removed ✓');
+    saveData({reason:'Deleted litter review'});renderLitter();showToast('Removed âœ“');
   });
 }
 
-// ═══ MODALS ═══
+// â•â•â• MODALS â•â•â•
 function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
@@ -1798,11 +1819,11 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Enter' && confirmDeleteAction) confirmDeleteAction();
 });
 
-// ═══ TOAST ═══
+// â•â•â• TOAST â•â•â•
 let toastTimer;
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2200);}
 
-// ═══ INIT ═══
+// â•â•â• INIT â•â•â•
 bootstrap();
 </script>
 
@@ -1826,22 +1847,40 @@ window.addEventListener('beforeinstallprompt', event => {
   }, 1200);
 });
 
-// ═══ DRIVE BACKUP ═══
+// â•â•â• DRIVE BACKUP â•â•â•
 let _driveToken=null;
 
 async function _driveGetToken(){
+  // Reuse existing valid token
+  if(_driveToken){
+    const chk=await fetch('https://www.googleapis.com/drive/v3/about?fields=user',{headers:{'Authorization':'Bearer '+_driveToken}});
+    if(chk.ok) return;
+    _driveToken=null;
+  }
   const provider=new firebase.auth.GoogleAuthProvider();
   provider.addScope('https://www.googleapis.com/auth/drive');
   if(currentUserEmail) provider.setCustomParameters({login_hint:currentUserEmail});
-  const result=await auth.signInWithPopup(provider);
-  if(!result.credential||!result.credential.accessToken) throw new Error('No access token received from Google. Please try again.');
-  _driveToken=result.credential.accessToken;
-  // Verify Drive API is enabled with a lightweight call
+  try{
+    const result=await auth.signInWithPopup(provider);
+    if(!result.credential||!result.credential.accessToken) throw new Error('No access token');
+    _driveToken=result.credential.accessToken;
+  }catch(e){
+    const code=String(e?.code||'');
+    // Popup failed (mobile, PWA, blocked) â†’ fall back to redirect
+    if(code.includes('popup')||code.includes('cancelled')||code.includes('operation-not-supported')){
+      sessionStorage.setItem('miaou_drive_pending','1');
+      _driveStatus('ðŸ”„ Redirecting for Drive authorizationâ€¦');
+      auth.signInWithRedirect(provider);
+      throw new Error('DRIVE_REDIRECT');
+    }
+    throw e;
+  }
+  // Verify Drive API is enabled
   const test=await fetch('https://www.googleapis.com/drive/v3/about?fields=user',{headers:{'Authorization':'Bearer '+_driveToken}});
   if(!test.ok){
     const t=await test.text();
     if(t.includes('API has not been used')||t.includes('accessNotConfigured')||t.includes('PERMISSION_DENIED'))
-      throw new Error('Google Drive API is not enabled. Go to console.cloud.google.com → APIs → Enable "Google Drive API" for project miaou-57319.');
+      throw new Error('Google Drive API is not enabled. Go to console.cloud.google.com â†’ APIs â†’ Enable "Google Drive API" for project miaou-57319.');
     throw new Error('Drive API test failed ('+test.status+'): '+t.slice(0,200));
   }
 }
@@ -1888,196 +1927,13 @@ async function _driveUploadFile(name,mimeType,content,parentId){
   if(!res.ok){const t=await res.text();throw new Error('Upload error '+res.status+': '+t.slice(0,200));}
 }
 
-function _buildBackupHtml(){
-  const now=new Date();
-  const treatments=data.treatments||[];
-  const getT=id=>(treatments.find(t=>t.id===id)||{}).name||id;
-  const fd=d=>{if(!d)return'—';const[y,m,dd]=d.split('-');return`${dd}/${m}/${y}`;};
-  const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
-  const starsPct=(r)=>(Math.min(Math.max(r,0),5)/5*100).toFixed(2);
-  const starsSpan=(r)=>r?`<span class="stars-partial"><span class="stars-bg">★★★★★</span><span class="stars-fg" style="width:${starsPct(r)}%">★★★★★</span></span> <span class="rating-score">${Number(r).toFixed(1)}/5</span>`:'<span class="text-muted">Not rated</span>';
-
-  let h=`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>🐾 Miaou Backup – ${now.toLocaleString()}</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
-<style>
-:root{--cream:#faf5ee;--cream2:#f2ead8;--terra:#b85c38;--terra-light:#e8927c;--terra-dark:#8c3e22;--sage:#5c7a63;--sage-light:#8aab91;--sand:#c9a96e;--lavender:#8474a8;--warm-white:#fffdf9;--text:#2c2118;--text-muted:#7a6a58;--border:#e8dcc8;--shadow:rgba(44,33,24,0.10);--red:#c0392b;--orange:#d4700a;--green:#3a7d44;--radius:18px;--radius-sm:10px}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);max-width:600px;margin:0 auto;padding:20px 16px 40px;min-height:100vh}
-body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle at 20% 20%,rgba(184,92,56,0.07) 0%,transparent 50%),radial-gradient(circle at 80% 70%,rgba(92,122,99,0.07) 0%,transparent 50%);pointer-events:none;z-index:0}
-.app-header{background:var(--warm-white);border-bottom:1px solid var(--border);padding:14px 20px 12px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 12px var(--shadow);border-radius:var(--radius);margin-bottom:20px;position:relative;z-index:1}
-.header-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;color:var(--terra-dark);letter-spacing:-0.02em}
-.header-title span{color:var(--sand)}
-.backup-date{font-size:0.78rem;color:var(--text-muted)}
-.section-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:700;color:var(--text);margin:24px 0 12px;position:relative;z-index:1}
-.cat-card{background:var(--warm-white);border-radius:var(--radius);padding:18px 16px 14px;border:1.5px solid var(--border);box-shadow:0 2px 10px var(--shadow);margin-bottom:12px;position:relative;z-index:1}
-.cat-header{display:flex;align-items:center;gap:12px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--cream2)}
-.cat-emoji{font-size:2rem}
-.cat-name{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:700}
-.cat-meta{font-size:0.78rem;color:var(--text-muted);margin-top:2px}
-.cat-weight{display:inline-block;padding:2px 8px;border-radius:20px;font-size:0.75rem;font-weight:600;margin-top:4px}
-.sub-title{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin:14px 0 8px;display:flex;align-items:center;gap:6px}
-.sub-title::after{content:'';flex:1;height:1px;background:var(--border)}
-.visit-card{background:var(--cream);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px;border:1px solid var(--border)}
-.visit-date{font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--terra);margin-bottom:4px}
-.visit-weight{display:inline-block;background:var(--cream2);color:var(--text-muted);border-radius:20px;padding:2px 8px;font-size:0.72rem;font-weight:600;margin-right:4px}
-.visit-cost{display:inline-block;background:rgba(92,122,99,0.12);color:var(--sage);border-radius:20px;padding:2px 8px;font-size:0.72rem;font-weight:600}
-.tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:0.72rem;font-weight:600;margin:2px 2px 2px 0}
-.tag-treatment{background:rgba(184,92,56,0.10);color:var(--terra-dark)}
-.tag-onetime{background:rgba(92,122,99,0.12);color:var(--sage)}
-.visit-notes{font-size:0.82rem;color:var(--text);line-height:1.55;white-space:pre-line;margin-top:6px}
-.sched-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--cream2)}
-.sched-item:last-child{border-bottom:none}
-.sched-name{font-size:0.88rem;font-weight:600;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
-.sched-date{font-size:0.72rem;color:var(--text-muted)}
-.sched-note{font-size:0.72rem;color:var(--text-muted);font-style:italic}
-.sched-price{font-size:0.82rem;font-weight:700;color:var(--sage)}
-.status-pill{border-radius:20px;padding:2px 7px;font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap}
-.status-overdue{background:rgba(192,57,43,0.12);color:var(--red)}
-.status-soon{background:rgba(212,112,10,0.12);color:var(--orange)}
-.status-upcoming{background:rgba(58,125,68,0.10);color:var(--green)}
-.status-done{background:var(--cream2);color:var(--text-muted)}
-.litter-card{background:var(--warm-white);border:1.5px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:0 2px 10px var(--shadow);position:relative;z-index:1}
-.litter-name{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:700}
-.litter-price-tag{font-size:0.72rem;color:var(--text-muted);margin-top:2px}
-.litter-metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:8px}
-.metric{background:var(--cream);border-radius:8px;padding:7px 8px;text-align:center}
-.metric-label{font-size:0.65rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.05em}
-.metric-value{font-size:0.78rem;color:var(--text);font-weight:500;margin-top:2px}
-.litter-notes{font-size:0.78rem;color:var(--text-muted);margin-top:8px;font-style:italic}
-.ppl-badge{display:inline-block;background:rgba(132,116,168,0.12);color:var(--lavender);border-radius:20px;padding:2px 8px;font-size:0.7rem;font-weight:700}
-.stars-partial{position:relative;display:inline-flex;align-items:center;vertical-align:middle}
-.stars-bg{color:var(--border);white-space:nowrap;letter-spacing:1px}
-.stars-fg{position:absolute;top:0;left:0;overflow:hidden;white-space:nowrap;color:var(--sand);letter-spacing:1px;pointer-events:none}
-.rating-score{font-size:0.82rem;font-weight:700;color:var(--terra);white-space:nowrap}
-.text-muted{color:var(--text-muted);font-size:0.82rem}
-.treatment-table{width:100%;border-collapse:collapse;margin-top:6px;position:relative;z-index:1}
-.treatment-table th{background:var(--terra);color:#fff;padding:8px 10px;text-align:left;font-size:0.78rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em}
-.treatment-table td{padding:7px 10px;border-bottom:1px solid var(--border);font-size:0.85rem}
-.treatment-table tr:nth-child(even) td{background:var(--cream)}
-.onetime-badge{font-size:0.62rem;background:rgba(132,116,168,0.13);color:var(--lavender);border-radius:20px;padding:1px 7px;font-weight:600;margin-left:4px}
-.overview-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;position:relative;z-index:1}
-.overview-card{background:var(--warm-white);border-radius:var(--radius);padding:14px;border:1.5px solid var(--border);box-shadow:0 2px 10px var(--shadow);text-align:center}
-.overview-card .ov-emoji{font-size:1.8rem;margin-bottom:4px}
-.overview-card .ov-name{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:700}
-.overview-card .ov-detail{font-size:0.72rem;color:var(--text-muted);margin-top:2px}
-.overview-card .ov-weight{font-size:0.8rem;font-weight:600;margin-top:4px}
-</style></head><body>
-<header class="app-header">
-  <div class="header-title">🐾 Miaou</div>
-  <div class="backup-date">Backup: ${now.toLocaleString()}</div>
-</header>\n`;
-
-  // ── Cats Overview Grid ──
-  h+=`<div class="section-title">🐾 Cats Overview</div><div class="overview-grid">`;
-  for(const cat of(data.cats||[])){
-    const wt=cat.visits.filter(v=>v.weight).sort((a,b)=>b.date.localeCompare(a.date))[0];
-    const age=cat.dob?calcAge(cat.dob):null;
-    const pastels={'#e07b3a':'#fde8d8','#c07030':'#fde0c8','#5c5248':'#ede8e4','#8aacbf':'#ddeef5','#b85c38':'#fde8e0','#5c7a63':'#e0ede2','#c4a882':'#f5edd8','#8474a8':'#ede8f5'};
-    const bg=pastels[cat.color]||'#f5f0e8';
-    h+=`<div class="overview-card" style="border-top:4px solid ${cat.color}">
-      <div class="ov-emoji">${cat.emoji}</div>
-      <div class="ov-name">${esc(cat.name)}</div>
-      <div class="ov-detail">${age?age+' old':'Age unknown'} · ${cat.visits.length} visits · $${cat.visits.reduce((s,v)=>s+(v.cost||0),0)} spent</div>
-      ${wt?`<div class="ov-weight" style="color:${cat.color}">⚖️ ${wt.weight} kg</div>`:''}
-    </div>`;
-  }
-  h+=`</div>`;
-
-  // ── Per-cat details ──
-  for(const cat of(data.cats||[])){
-    const wt=cat.visits.filter(v=>v.weight).sort((a,b)=>b.date.localeCompare(a.date))[0];
-    const age=cat.dob?calcAge(cat.dob):null;
-    const total=cat.visits.reduce((s,v)=>s+(v.cost||0),0);
-    const pastels={'#e07b3a':'#fde8d8','#c07030':'#fde0c8','#5c5248':'#ede8e4','#8aacbf':'#ddeef5','#b85c38':'#fde8e0','#5c7a63':'#e0ede2','#c4a882':'#f5edd8','#8474a8':'#ede8f5'};
-    const bg=pastels[cat.color]||'#f5f0e8';
-
-    h+=`<div class="cat-card" style="border-top:4px solid ${cat.color}">
-      <div class="cat-header">
-        <span class="cat-emoji">${cat.emoji}</span>
-        <div style="flex:1">
-          <div class="cat-name">${esc(cat.name)}</div>
-          <div class="cat-meta">${cat.dob?'Born '+fd(cat.dob):'Age unknown'}${age?' · '+age:''} · <strong>$${total} spent</strong></div>
-          ${wt?`<span class="cat-weight" style="background:${bg};color:${cat.color}">⚖️ ${wt.weight} kg</span>`:''}
-        </div>
-      </div>`;
-
-    // Schedule
-    const scheds=cat.schedules.slice().sort((a,b)=>a.dueDate.localeCompare(b.dueDate));
-    if(scheds.length){
-      const pendingEst=scheds.filter(s=>!s.done).reduce((sum,s)=>{const t=tById(s.treatmentId);return sum+(s.price!==undefined?s.price:(t?t.price:0));},0);
-      h+=`<div class="sub-title">📅 Schedule${pendingEst?' · <span style="color:var(--sage)">Est. $'+pendingEst+' pending</span>':''}</div>`;
-      for(const s of scheds){
-        const isOT=!!s.oneTime;
-        const t=isOT?null:tById(s.treatmentId);
-        const name=isOT?s.oneTimeName:(t?t.name:'?');
-        const price=isOT?0:(s.price!==undefined?s.price:(t?t.price:0));
-        const days=Math.round((new Date(s.dueDate)-now)/86400000);
-        let cls='status-upcoming',lbl='In '+days+'d';
-        if(s.done){cls='status-done';lbl='Done';}
-        else if(days<0){cls='status-overdue';lbl=(-days)+'d overdue';}
-        else if(days<=7){cls='status-soon';lbl='In '+days+'d';}
-        h+=`<div class="sched-item">
-          <div style="flex:1"><div class="sched-name">${iconFor(name)} ${esc(name)}${isOT?'<span class="onetime-badge">one-time</span>':''} <span class="status-pill ${cls}">${lbl}</span></div>
-          <div class="sched-date">📅 ${fd(s.dueDate)}</div>
-          ${s.notes?`<div class="sched-note">${esc(s.notes)}</div>`:''}</div>
-          ${price?`<span class="sched-price">$${price}</span>`:''}
-        </div>`;
-      }
-    }
-
-    // Visits
-    const sorted=cat.visits.slice().sort((a,b)=>b.date.localeCompare(a.date));
-    if(sorted.length){
-      h+=`<div class="sub-title">🏥 Vet Visits (${sorted.length})</div>`;
-      for(const v of sorted){
-        const tags=(v.treatments||[]).map(tid=>{const t=tById(tid);return t?`<span class="tag tag-treatment">${iconFor(t.name)} ${t.name}</span>`:''}).join('');
-        const otTags=(v.oneTimeTreatments||[]).map(ot=>`<span class="tag tag-onetime">🔁 ${esc(ot.name)} · in ${ot.repeatCount} ${ot.repeatUnit}</span>`).join('');
-        h+=`<div class="visit-card">
-          <div class="visit-date">${fd(v.date)}</div>
-          ${v.weight?`<span class="visit-weight">⚖️ ${v.weight} kg</span>`:''} ${v.cost?`<span class="visit-cost">💳 $${v.cost}</span>`:''}
-          ${(tags||otTags)?`<div style="margin-top:4px">${tags}${otTags}</div>`:''}
-          ${v.notes?`<div class="visit-notes">${esc(v.notes)}</div>`:''}
-        </div>`;
-      }
-    }
-
-    h+=`</div>`;
-  }
-
-  // ── Litter Reviews ──
-  h+=`<div class="section-title">🌿 Litter Reviews</div>`;
-  const sortedLitters=(data.litters||[]).slice().sort((a,b)=>(b.rating||0)-(a.rating||0));
-  for(const l of sortedLitters){
-    const smellR=typeof l.smell==='number'?l.smell:0;
-    const pooR=typeof l.poo==='number'?l.poo:0;
-    const peeR=typeof l.pee==='number'?l.pee:0;
-    const rev=smellR||pooR||peeR;
-    const _rv=[smellR,pooR,peeR].filter(r=>r>0);
-    const exactRating=_rv.length?_rv.reduce((a,b)=>a+b,0)/_rv.length:(l.rating||0);
-    h+=`<div class="litter-card">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">
-        <div><div class="litter-name">${esc(l.name)}</div>
-          <div class="litter-price-tag">${l.priceAmount&&l.sizeAmount?`${l.priceAmount}$ / ${l.sizeAmount}${l.sizeUnit||'L'}`:esc(l.price||'')}${l.pricePerL?` <span class="ppl-badge">$${Number(l.pricePerL).toFixed(2)}/L</span>`:''}</div>
-        </div>
-        <div>${starsSpan(exactRating)}</div>
-      </div>
-      ${rev?`<div class="litter-metrics">
-        <div class="metric"><div class="metric-label">Smell</div><div class="metric-value">${smellR?starsSpan(smellR):'—'}</div></div>
-        <div class="metric"><div class="metric-label">Poo</div><div class="metric-value">${pooR?starsSpan(pooR):'—'}</div></div>
-        <div class="metric"><div class="metric-label">Pee</div><div class="metric-value">${peeR?starsSpan(peeR):'—'}</div></div>
-      </div>`:''}
-      ${l.notes?`<div class="litter-notes">${esc(l.notes)}</div>`:''}
-    </div>`;
-  }
-
-  // ── Treatment Prices ──
-  h+=`<div class="section-title">💊 Treatment Prices</div>
-  <table class="treatment-table"><tr><th>Treatment</th><th>Price</th><th>Interval</th></tr>`;
-  for(const t of(data.treatments||[])){
-    h+=`<tr><td>${iconFor(t.name)} ${esc(t.name)}</td><td style="font-weight:700;color:var(--sage)">$${t.price}</td><td>${t.repeatCount?'Every '+t.repeatCount+' '+t.repeatUnit:'—'}</td></tr>`;
-  }
-  h+=`</table></body></html>`;
-  return h;
+async function _buildBackupHtml(){
+  const resp=await fetch('./index.html');
+  let src=await resp.text();
+  const snapshot=JSON.stringify(data).replace(/<\//g,'<\\/');
+  const stamp=new Date().toISOString();
+  const tag='<scr'+'ipt>window.BACKUP_MODE=true;window.BACKUP_DATA='+snapshot+';window.BACKUP_DATE="'+stamp+'";<\\/scr'+'ipt>';
+  return src.replace('</head>',tag+'\n</head>');
 }
 
 function _buildBackupExcel(){
@@ -2092,8 +1948,8 @@ function _buildBackupExcel(){
     return ws;
   }
 
-  // ── Overview sheet ──
-  const ov=[['🐾 Miaou Backup — '+new Date().toLocaleString()],[''],['Cat','DOB','Latest Weight (kg)','Last Visit','Total Cost ($)','Open Schedules']];
+  // â”€â”€ Overview sheet â”€â”€
+  const ov=[['ðŸ¾ Miaou Backup â€” '+new Date().toLocaleString()],[''],['Cat','DOB','Latest Weight (kg)','Last Visit','Total Cost ($)','Open Schedules']];
   for(const c of(data.cats||[])){
     const wt=c.visits.filter(v=>v.weight).sort((a,b)=>b.date.localeCompare(a.date))[0];
     const lv=c.visits.slice().sort((a,b)=>b.date.localeCompare(a.date))[0];
@@ -2101,14 +1957,14 @@ function _buildBackupExcel(){
   }
   XLSX.utils.book_append_sheet(wb,styledSheet(ov,[20,14,18,14,14,18]),'Overview');
 
-  // ── One sheet per cat ──
+  // â”€â”€ One sheet per cat â”€â”€
   for(const c of(data.cats||[])){
     const rows=[];
-    rows.push([c.emoji+' '+c.name+(c.dob?' — Born '+c.dob:'')]);
+    rows.push([c.emoji+' '+c.name+(c.dob?' â€” Born '+c.dob:'')]);
     rows.push(['']);
 
     // Visits sub-section
-    rows.push(['── VET VISITS ──','','','','']);
+    rows.push(['â”€â”€ VET VISITS â”€â”€','','','','']);
     rows.push(['Date','Weight (kg)','Cost ($)','Treatments','Notes']);
     const sorted=c.visits.slice().sort((a,b)=>b.date.localeCompare(a.date));
     if(sorted.length){
@@ -2121,7 +1977,7 @@ function _buildBackupExcel(){
     rows.push(['']);
 
     // Schedule sub-section
-    rows.push(['── SCHEDULE ──','','','','']);
+    rows.push(['â”€â”€ SCHEDULE â”€â”€','','','','']);
     rows.push(['Treatment','Due Date','Price ($)','Notes','Status']);
     const scheds=c.schedules.slice().sort((a,b)=>a.dueDate.localeCompare(b.dueDate));
     if(scheds.length){
@@ -2139,17 +1995,17 @@ function _buildBackupExcel(){
     XLSX.utils.book_append_sheet(wb,styledSheet(rows,[24,14,12,30,40]),sheetName);
   }
 
-  // ── Litters sheet ──
-  const ls=[['🌿 Litter Reviews'],[''],['Litter','Rating','Price','$/L','Smell','Poo','Pee','Notes']];
+  // â”€â”€ Litters sheet â”€â”€
+  const ls=[['ðŸŒ¿ Litter Reviews'],[''],['Litter','Rating','Price','$/L','Smell','Poo','Pee','Notes']];
   for(const l of(data.litters||[])){
-    const r=l.rating?Number(l.rating).toFixed(1)+'/5':'—';
-    ls.push([l.name,r,l.price||'',l.pricePerL?'$'+l.pricePerL+'/L':'',typeof l.smell==='number'?l.smell+'/5':(l.smell||'—'),typeof l.poo==='number'?l.poo+'/5':(l.poo||'—'),typeof l.pee==='number'?l.pee+'/5':(l.pee||'—'),l.notes||'']);
+    const r=l.rating?Number(l.rating).toFixed(1)+'/5':'â€”';
+    ls.push([l.name,r,l.price||'',l.pricePerL?'$'+l.pricePerL+'/L':'',typeof l.smell==='number'?l.smell+'/5':(l.smell||'â€”'),typeof l.poo==='number'?l.poo+'/5':(l.poo||'â€”'),typeof l.pee==='number'?l.pee+'/5':(l.pee||'â€”'),l.notes||'']);
   }
   XLSX.utils.book_append_sheet(wb,styledSheet(ls,[20,10,16,10,10,10,10,30]),'Litters');
 
-  // ── Treatments sheet ──
-  const ts=[['💊 Treatment Prices'],[''],['Treatment','Price ($)','Interval']];
-  for(const t of(data.treatments||[])) ts.push([t.name,t.price||'',t.repeatCount?'Every '+t.repeatCount+' '+t.repeatUnit:'—']);
+  // â”€â”€ Treatments sheet â”€â”€
+  const ts=[['ðŸ’Š Treatment Prices'],[''],['Treatment','Price ($)','Interval']];
+  for(const t of(data.treatments||[])) ts.push([t.name,t.price||'',t.repeatCount?'Every '+t.repeatCount+' '+t.repeatUnit:'â€”']);
   XLSX.utils.book_append_sheet(wb,styledSheet(ts,[28,12,20]),'Treatments');
 
   return wb;
@@ -2170,7 +2026,7 @@ async function driveBackup(){
     await _driveGetToken();
 
     _driveStatus('\uD83D\uDCC4 Generating HTML & Excel backup\u2026');
-    const html=_buildBackupHtml();
+    const html=await _buildBackupHtml();
     const wb=_buildBackupExcel();
     const xlsxArr=XLSX.write(wb,{bookType:'xlsx',type:'array'});
 
@@ -2189,6 +2045,7 @@ async function driveBackup(){
     _driveStatus(null);
     showToast('\u2713 Backed up to Drive: Miaou-VS / Saved Backups / '+stamp);
   }catch(e){
+    if(e.message==='DRIVE_REDIRECT') return;
     console.error('Drive backup error:',e);
     _driveStatus(null);
     showToast('Drive backup failed: '+(e.message||'unknown error'));
