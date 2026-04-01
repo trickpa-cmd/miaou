@@ -921,17 +921,21 @@ async function loadData(){
 
 async function saveData(meta={}){
   const payload = JSON.stringify(data);
+  // Always save locally first
+  try { localStorage.setItem(STORAGE_KEY, payload); } catch(err){}
+  // Try Firebase
+  let firebaseOk = false;
   try {
     if(db && DATA_REF){
       await DATA_REF.set({ payload, updated: new Date().toISOString() });
+      firebaseOk = true;
     }
-    localStorage.setItem(STORAGE_KEY, payload);
-    if(!meta.skipSync) scheduleSheetsSync();
   } catch(e) {
-    console.error('Save error:', e);
-    try { localStorage.setItem(STORAGE_KEY, payload); } catch(err){}
+    console.error('Firebase save error:', e);
     if(!meta.silent) showToast('Saved locally only');
   }
+  // Always schedule sheets sync regardless of Firebase result
+  if(!meta.skipSync) scheduleSheetsSync();
 }
 
 let _syncTimer = null;
