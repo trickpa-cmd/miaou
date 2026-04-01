@@ -926,11 +926,19 @@ async function saveData(meta={}){
       await DATA_REF.set({ payload, updated: new Date().toISOString() });
     }
     localStorage.setItem(STORAGE_KEY, payload);
+    if(!meta.skipSync) scheduleSheetsSync();
   } catch(e) {
     console.error('Save error:', e);
     try { localStorage.setItem(STORAGE_KEY, payload); } catch(err){}
     if(!meta.silent) showToast('Saved locally only');
   }
+}
+
+let _syncTimer = null;
+function scheduleSheetsSync(){
+  if(!SHEETS_SCRIPT_URL || SHEETS_SCRIPT_URL.includes('PASTE_YOUR')) return;
+  clearTimeout(_syncTimer);
+  _syncTimer = setTimeout(()=>{ syncToSheets({silent:true}); }, 3000);
 }
 
 
@@ -1615,7 +1623,7 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 // After deploying your Apps Script, paste the Web App URL below:
 const SHEETS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyKh_83h0rZGZwO8w4MTr-mDc-ZVwalHGU6xp3OCSf9zpg_UbwcGVo-McwH1SDX3GCs/exec';
 
-async function syncToSheets(){
+async function syncToSheets(opts={}){
   if(!SHEETS_SCRIPT_URL || SHEETS_SCRIPT_URL.includes('PASTE_YOUR')){
     showToast('⚠️ Set your Apps Script URL first');
     return;
@@ -1631,9 +1639,9 @@ async function syncToSheets(){
     };
     const res = await fetch(SHEETS_SCRIPT_URL, { method:'POST', body: JSON.stringify(payload) });
     const text = await res.text();
-    showToast(text.includes('OK') ? '✓ Synced to Google Sheets' : 'Sync error — check console');
+    if(!opts.silent) showToast(text.includes('OK') ? '✓ Synced to Google Sheets' : 'Sync error — check console');
   } catch(e){
-    showToast('Sync failed: ' + e.message);
+    if(!opts.silent) showToast('Sync failed: ' + e.message);
     console.error(e);
   }
   if(btn){ btn.textContent='📊'; btn.disabled=false; }
