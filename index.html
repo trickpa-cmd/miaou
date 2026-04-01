@@ -3,19 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://firestore.googleapis.com https://www.googleapis.com https://content.googleapis.com https://oauth2.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://fonts.googleapis.com https://fonts.gstatic.com; frame-src https://miaou-57319.firebaseapp.com https://accounts.google.com; img-src 'self' data:;">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://firestore.googleapis.com https://fonts.googleapis.com https://fonts.gstatic.com https://script.google.com https://script.googleusercontent.com; img-src 'self' data:;">
 <meta name="referrer" content="no-referrer">
-<title>🐾 Miaou</title>
-<link rel="manifest" href="miaou.webmanifest">
+<title>Miaou</title>
 <meta name="theme-color" content="#b85c38">
-<link rel="apple-touch-icon" href="miaou-icon-192.png">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj4KICA8cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIyIiBmaWxsPSIjYjg1YzM4Ii8+CiAgPCEtLSBMZWZ0IGVhciAtLT4KICA8cG9seWdvbiBwb2ludHM9IjIyLDQ2IDM0LDE4IDQ2LDQ2IiBmaWxsPSIjZmFmNWVlIi8+CiAgPCEtLSBSaWdodCBlYXIgLS0+CiAgPHBvbHlnb24gcG9pbnRzPSI1NCw0NiA2NiwxOCA3OCw0NiIgZmlsbD0iI2ZhZjVlZSIvPgogIDwhLS0gRmFjZSAtLT4KICA8Y2lyY2xlIGN4PSI1MCIgY3k9IjYzIiByPSIyNiIgZmlsbD0iI2ZhZjVlZSIvPgogIDwhLS0gRXllcyAtLT4KICA8Y2lyY2xlIGN4PSI0MSIgY3k9IjU5IiByPSI0IiBmaWxsPSIjYjg1YzM4Ii8+CiAgPGNpcmNsZSBjeD0iNTkiIGN5PSI1OSIgcj0iNCIgZmlsbD0iI2I4NWMzOCIvPgogIDwhLS0gTm9zZSAtLT4KICA8Y2lyY2xlIGN4PSI1MCIgY3k9IjY5IiByPSIyLjUiIGZpbGw9IiNkNDgyNmEiLz4KPC9zdmc+">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj4KICA8cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIyIiBmaWxsPSIjYjg1YzM4Ii8+CiAgPCEtLSBMZWZ0IGVhciAtLT4KICA8cG9seWdvbiBwb2ludHM9IjIyLDQ2IDM0LDE4IDQ2LDQ2IiBmaWxsPSIjZmFmNWVlIi8+CiAgPCEtLSBSaWdodCBlYXIgLS0+CiAgPHBvbHlnb24gcG9pbnRzPSI1NCw0NiA2NiwxOCA3OCw0NiIgZmlsbD0iI2ZhZjVlZSIvPgogIDwhLS0gRmFjZSAtLT4KICA8Y2lyY2xlIGN4PSI1MCIgY3k9IjYzIiByPSIyNiIgZmlsbD0iI2ZhZjVlZSIvPgogIDwhLS0gRXllcyAtLT4KICA8Y2lyY2xlIGN4PSI0MSIgY3k9IjU5IiByPSI0IiBmaWxsPSIjYjg1YzM4Ii8+CiAgPGNpcmNsZSBjeD0iNTkiIGN5PSI1OSIgcj0iNCIgZmlsbD0iI2I4NWMzOCIvPgogIDwhLS0gTm9zZSAtLT4KICA8Y2lyY2xlIGN4PSI1MCIgY3k9IjY5IiByPSIyLjUiIGZpbGw9IiNkNDgyNmEiLz4KPC9zdmc+">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" crossorigin="anonymous"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" crossorigin="anonymous"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" crossorigin="anonymous"></script>
 <style>
 :root {
   --cream: #faf5ee; --cream2: #f2ead8;
@@ -51,6 +49,7 @@ body::before {
   display: flex; align-items: center; justify-content: space-between;
   box-shadow: 0 2px 12px var(--shadow);
 }
+.header-cat-icon { display:inline-flex; vertical-align:middle; margin-right:4px; position:relative; top:-1px; }
 .header-title { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 700; color: var(--terra-dark); letter-spacing: -0.02em; }
 .header-title span { color: var(--sand); }
 .header-add-btn {
@@ -310,7 +309,7 @@ body::before {
   display: none; flex-direction: column; align-items: center; justify-content: center;
   z-index: 9999; gap: 16px;
 }
-#loading-screen .loading-paw { font-size: 2.8rem; animation: pulse 1.2s ease-in-out infinite; }
+#loading-screen .loading-paw { display:flex; align-items:center; justify-content:center; animation: pulse 1.2s ease-in-out infinite; }
 #loading-screen .loading-text { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; color: var(--text-muted); }
 @keyframes pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.15);opacity:0.7} }
 
@@ -386,28 +385,21 @@ body::before {
 .header-icon-btn:hover { background: var(--cream2); border-color: var(--terra-light); }
 .header-add-btn { font-weight: 700; }
 .auth-overlay {
-  position: fixed; inset: 0; z-index: 1200; background: rgba(250,245,238,0.96);
+  position: fixed; inset: 0; z-index: 1200; background: var(--cream);
   display: none; align-items: center; justify-content: center; padding: 24px;
-  backdrop-filter: blur(8px);
 }
 .auth-overlay.open { display:flex; }
 .auth-card {
-  width: 100%; max-width: 380px; background: var(--warm-white); border: 1.5px solid var(--border);
-  border-radius: 24px; box-shadow: 0 12px 40px rgba(44,33,24,0.12); padding: 24px 22px;
+  width: 100%; max-width: 320px; background: var(--warm-white); border: 1.5px solid var(--border);
+  border-radius: 24px; box-shadow: 0 12px 40px rgba(44,33,24,0.12); padding: 32px 24px; text-align:center;
 }
-.auth-logo { font-size: 2.4rem; margin-bottom: 10px; text-align:center; }
-.auth-title { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 700; text-align: center; color: var(--terra-dark); }
-.auth-text { font-size: 0.92rem; color: var(--text-muted); text-align:center; line-height:1.55; margin: 8px 0 16px; }
-.auth-allowed { background: var(--cream); border: 1px solid var(--border); border-radius: 14px; padding: 12px 14px; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 14px; }
-.auth-btn { width:100%; padding: 12px 14px; border:none; border-radius: 12px; background: var(--terra); color:white; font: inherit; font-weight:600; cursor:pointer; box-shadow: 0 3px 10px rgba(184,92,56,0.35); }
-.auth-btn.secondary { background: transparent; color: var(--text-muted); border: 1.5px solid var(--border); box-shadow: none; margin-top: 8px; }
-.auth-status { min-height: 20px; font-size: 0.8rem; color: var(--red); text-align:center; margin-top: 10px; }
-.backup-list { display:flex; flex-direction:column; gap:10px; margin-top: 8px; }
-.backup-item { background: var(--cream); border: 1.5px solid var(--border); border-radius: 12px; padding: 12px; }
-.backup-top { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
-.backup-title { font-size:0.86rem; font-weight:700; color: var(--text); }
-.backup-meta { font-size:0.74rem; color: var(--text-muted); margin-top: 3px; line-height:1.45; }
-.backup-actions { display:flex; gap:8px; margin-top: 10px; }
+.auth-logo { margin-bottom: 14px; display:flex; align-items:center; justify-content:center; }
+.auth-title { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 700; color: var(--terra-dark); margin-bottom: 6px; }
+.auth-text { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 20px; }
+.auth-input { width:100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 12px; background: var(--cream); font: inherit; font-size: 1rem; color: var(--text); outline: none; text-align:center; letter-spacing: 0.1em; transition: border-color .2s; margin-bottom: 10px; display: block; }
+.auth-input:focus { border-color: var(--terra); }
+.auth-btn { width:100%; padding: 12px 14px; border:none; border-radius: 12px; background: var(--terra); color:white; font: inherit; font-size: 1rem; font-weight:600; cursor:pointer; box-shadow: 0 3px 10px rgba(184,92,56,0.35); }
+.auth-status { min-height: 20px; font-size: 0.82rem; color: var(--red); margin-top: 10px; }
 .backup-empty { color: var(--text-muted); font-size:0.85rem; text-align:center; padding: 18px 8px; }
 .conflict-note { background: rgba(192,57,43,0.08); border: 1px solid rgba(192,57,43,0.16); color: var(--red); border-radius: 12px; padding: 12px 14px; font-size:0.84rem; line-height:1.5; margin-bottom: 14px; }
 .user-chip { display:inline-flex; align-items:center; gap:6px; background: var(--cream); color: var(--text-muted); border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px; font-size:0.72rem; font-weight:600; }
@@ -417,26 +409,47 @@ body::before {
 <body>
 
 <div id="loading-screen">
-  <div class="loading-paw">🐾</div>
+  <div class="loading-paw"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="64" height="64">
+  <polygon points="22,46 34,18 46,46" fill="#b85c38"/>
+  <polygon points="54,46 66,18 78,46" fill="#b85c38"/>
+  <circle cx="50" cy="63" r="26" fill="#b85c38"/>
+  <circle cx="41" cy="59" r="4" fill="#faf5ee"/>
+  <circle cx="59" cy="59" r="4" fill="#faf5ee"/>
+  <circle cx="50" cy="69" r="2.5" fill="#e8927c"/>
+</svg></div>
   <div class="loading-text">Loading your cats…</div>
 </div>
 
 <header class="app-header">
-  <div class="header-title">🐾 Miaou</div>
+  <div class="header-title"><span class="header-cat-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="28" height="28">
+  <polygon points="22,46 34,18 46,46" fill="#b85c38"/>
+  <polygon points="54,46 66,18 78,46" fill="#b85c38"/>
+  <circle cx="50" cy="63" r="26" fill="#b85c38"/>
+  <circle cx="41" cy="59" r="4" fill="#faf5ee"/>
+  <circle cx="59" cy="59" r="4" fill="#faf5ee"/>
+  <circle cx="50" cy="69" r="2.5" fill="#e8927c"/>
+</svg></span> Miaou</div>
   <div class="header-actions">
-    <button class="header-icon-btn" id="backup-btn" onclick="openBackupModal()" title="Cloud backups">☁️</button>
-    <button class="header-icon-btn" id="drive-backup-btn" onclick="driveBackup()" title="Backup to Google Drive">📤</button>
+    <button class="header-icon-btn" id="sheets-sync-btn" onclick="syncToSheets()" title="Sync to Google Sheets">📊</button>
     <button class="header-add-btn" onclick="showAddCatModal()">+</button>
   </div>
 </header>
 
 <div class="auth-overlay open" id="auth-overlay">
   <div class="auth-card">
-    <div class="auth-logo">🐾</div>
-    <div class="auth-title">Sign in to Miaou</div>
-    <div class="auth-text">Use Google sign in to access the shared records.</div>
-    <button class="auth-btn" id="google-signin-btn" type="button">Continue with Google</button>
-    <button class="auth-btn secondary" id="auth-signout-btn" type="button" style="display:none">Sign out</button>
+    <div class="auth-logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="64" height="64">
+  <polygon points="22,46 34,18 46,46" fill="#b85c38"/>
+  <polygon points="54,46 66,18 78,46" fill="#b85c38"/>
+  <circle cx="50" cy="63" r="26" fill="#b85c38"/>
+  <circle cx="41" cy="59" r="4" fill="#faf5ee"/>
+  <circle cx="59" cy="59" r="4" fill="#faf5ee"/>
+  <circle cx="50" cy="69" r="2.5" fill="#e8927c"/>
+</svg></div>
+    <div class="auth-title">Miaou</div>
+    <div class="auth-text">Enter password to continue</div>
+    <input class="auth-input" type="password" id="pw-input" placeholder="••••••••"
+      onkeydown="if(event.key==='Enter')checkPassword()">
+    <button class="auth-btn" onclick="checkPassword()">Unlock</button>
     <div class="auth-status" id="auth-status"></div>
   </div>
 </div>
@@ -695,39 +708,12 @@ body::before {
 </div>
 
 
-<div class="modal-overlay" id="backup-modal">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-title">Cloud Backups</div>
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;flex-wrap:wrap">
-      <span class="user-chip" id="backup-user-chip">🔒 Not signed in</span>
-      <button class="header-icon-btn" type="button" onclick="signOutUser()" style="width:auto;height:auto;border-radius:12px;padding:8px 12px;font-size:0.8rem">Sign out</button>
-    </div>
-    <div class="form-group" style="margin-bottom:8px">
-      <div class="form-label">Automatic versioning</div>
-      <div style="font-size:0.84rem;color:var(--text-muted);line-height:1.55">Every cloud save keeps the previous state as a restore point. Conflicting saves are blocked so another device cannot silently overwrite your records.</div>
-    </div>
-    <div class="backup-list" id="backup-list"></div>
-    <button class="form-cancel" onclick="closeModal('backup-modal')">Close</button>
-  </div>
 </div>
 
-<div class="modal-overlay" id="conflict-modal">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-title">Cloud save blocked</div>
-    <div class="conflict-note" id="conflict-message">A newer cloud version was found, so this page did not overwrite it.</div>
-    <div class="form-group" style="margin-bottom:8px">
-      <div class="form-label">What happened</div>
-      <div style="font-size:0.84rem;color:var(--text-muted);line-height:1.55">Another tab or device saved a newer revision. This app kept your current page from overwriting it by mistake.</div>
-    </div>
-    <button class="form-submit" onclick="reloadFromCloud()">Load latest cloud version</button>
-    <button class="form-cancel" onclick="closeModal('conflict-modal')">Keep this page for now</button>
-  </div>
+
 </div>
 
 <div class="toast" id="toast"></div>
-<div id="drive-progress" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#5c7a63;color:#fff;text-align:center;padding:10px 16px;font-size:0.9em;font-family:'DM Sans',sans-serif;letter-spacing:0.01em;"></div>
 
 <script>
 // ═══ ICONS ═══
@@ -883,42 +869,31 @@ const FIREBASE_CONFIG = {
   appId: "1:152797535766:web:668885df602e2927e09f37"
 };
 
-let auth, db, DATA_REF;
-const ALLOWED_EMAILS=['ziadehpatrick@gmail.com','stefanie.a.hanna@gmail.com'];
-let currentUserEmail='';
-let localRevision=0;
-let backups=[];
-let pendingCloudPayload='';
+let db, DATA_REF;
+const MIAOU_PASSWORD = 'miaou!!!1';
+const STORAGE_KEY = 'miaou_offline';
 
 function uid(){return '_'+Math.random().toString(36).slice(2,9);}
-function storageKey(){return currentUserEmail?`miaou_offline_${currentUserEmail}`:'miaou_offline';}
 function deepClone(v){return JSON.parse(JSON.stringify(v));}
-function setAuthStatus(msg,isError=true){const el=document.getElementById('auth-status'); if(!el) return; el.textContent=msg||''; el.style.color=isError?'var(--red)':'var(--sage)';}
-function isAllowedEmail(email){return ALLOWED_EMAILS.includes(String(email||'').toLowerCase());}
-function getFriendlyAuthError(error){
-  const code = String(error?.code || '');
-  if(code.includes('popup_blocked')) return 'Google sign in was blocked by the browser. Please try again.';
-  if(code.includes('popup_closed')) return 'Google sign in was closed before it finished.';
-  if(code.includes('unauthorized-domain')) return 'This website domain is not authorized in Firebase yet. Add your live domain in Firebase Authentication then try again.';
-  if(code.includes('operation-not-allowed')) return 'Google sign in is not enabled in Firebase Authentication yet.';
-  if(code.includes('network-request-failed')) return 'Network issue while opening Google sign in. Please try again.';
-  return 'Google sign in did not complete. Please try again.';
-}
-function setSignedInUi(){
-  document.getElementById('auth-overlay').classList.remove('open');
-  document.getElementById('backup-user-chip').textContent=currentUserEmail?`🔒 ${currentUserEmail}`:'🔒 Not signed in';
-}
-function setSignedOutUi(){
-  document.getElementById('auth-overlay').classList.add('open');
-  document.getElementById('backup-user-chip').textContent='🔒 Not signed in';
-  const signoutBtn = document.getElementById('auth-signout-btn');
-  if(signoutBtn) signoutBtn.style.display='none';
+
+function checkPassword(){
+  const val = document.getElementById('pw-input').value;
+  const status = document.getElementById('auth-status');
+  if(val === MIAOU_PASSWORD){
+    sessionStorage.setItem('miaou_auth','1');
+    document.getElementById('auth-overlay').classList.remove('open');
+    status.textContent = '';
+    bootstrap();
+  } else {
+    status.textContent = 'Incorrect password';
+    document.getElementById('pw-input').value = '';
+    document.getElementById('pw-input').focus();
+  }
 }
 
 function initFirebase(){
   if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
   db = firebase.firestore();
-  auth = firebase.auth();
   DATA_REF = db.doc('miaou/data');
 }
 
@@ -927,239 +902,56 @@ async function loadData(){
   try {
     const snap = await DATA_REF.get();
     if(snap.exists && snap.data().payload){
-      const cloud = snap.data();
-      data = JSON.parse(cloud.payload);
-      localRevision = cloud.revision || 0;
-      try { localStorage.setItem(storageKey(), cloud.payload); } catch(err){}
+      data = JSON.parse(snap.data().payload);
+      try { localStorage.setItem(STORAGE_KEY, snap.data().payload); } catch(err){}
     } else {
       data = deepClone(DEFAULT);
-      localRevision = 0;
-      await saveData({reason:'Initial setup', skipBackup:true, silent:true});
+      await saveData({silent:true});
     }
   } catch(e) {
     console.error('Load error:', e);
     try {
-      const s = localStorage.getItem(storageKey());
+      const s = localStorage.getItem(STORAGE_KEY);
       data = s ? JSON.parse(s) : deepClone(DEFAULT);
-    } catch(err) {
-      data = deepClone(DEFAULT);
-    }
+    } catch(err) { data = deepClone(DEFAULT); }
   }
   document.getElementById('loading-screen').style.display='none';
   renderCatsGrid();
   renderUpcoming();
-  await loadBackups();
 }
 
-async function loadBackups(){
-  const listEl=document.getElementById('backup-list');
-  if(!listEl) return;
-  if(!db){ listEl.innerHTML='<div class="backup-empty">Cloud backups are unavailable.</div>'; return; }
-  listEl.innerHTML='<div class="backup-empty">Loading backups…</div>';
-  try {
-    const snap = await db.collection('miaou/data/versions').orderBy('revision','desc').limit(20).get();
-    backups = snap.docs.map(d=>({id:d.id, ...d.data()}));
-    if(!backups.length){
-      listEl.innerHTML='<div class="backup-empty">No cloud backups yet. The first backup appears after the next save.</div>';
-      return;
-    }
-    listEl.innerHTML = backups.map(b=>{
-      const when = b.backedUpAt && typeof b.backedUpAt.toDate==='function' ? b.backedUpAt.toDate().toLocaleString() : (b.updated || 'Saved earlier');
-      const by = b.savedBy || 'Unknown';
-      const reason = b.reason || 'Update';
-      return `<div class="backup-item">
-        <div class="backup-top">
-          <div>
-            <div class="backup-title">Revision ${b.revision || '—'}</div>
-            <div class="backup-meta">${reason}<br>${when}<br>${by}</div>
-          </div>
-        </div>
-        <div class="backup-actions">
-          <button class="btn-edit" onclick="restoreBackup('${b.id}')">Restore</button>
-        </div>
-      </div>`;
-    }).join('');
-  } catch(e) {
-    console.error('Backup load error:', e);
-    listEl.innerHTML='<div class="backup-empty">Could not load cloud backups right now.</div>';
-  }
-}
 
-async function restoreBackup(versionId){
-  const backup = backups.find(b=>b.id===versionId);
-  if(!backup || !backup.payload){ showToast('Backup not found'); return; }
-  askDelete('Restore this cloud backup? The current live version will be backed up first.', async ()=>{
-    try {
-      data = JSON.parse(backup.payload);
-      await saveData({reason:`Restored revision ${backup.revision || ''}`.trim()});
-      renderCatsGrid();
-      renderUpcoming();
-      if(currentCatId) renderCatDetail();
-      renderVetCatSections();
-      renderLitter();
-      await loadBackups();
-      closeModal('backup-modal');
-      showToast('Backup restored ✓');
-    } catch(e) {
-      console.error(e);
-      showToast('Restore failed');
-    }
-  });
-}
 
-async function reloadFromCloud(){
-  closeModal('conflict-modal');
-  await loadData();
-  renderVetCatSections();
-  renderLitter();
-  if(currentCatId) renderCatDetail();
-  showToast('Loaded latest cloud version');
-}
 
 async function saveData(meta={}){
-  if(window.BACKUP_MODE){showToast('Read-only backup');return;}
   const payload = JSON.stringify(data);
   try {
-    if(db && DATA_REF && currentUserEmail){
-      const result = await db.runTransaction(async tx => {
-        const snap = await tx.get(DATA_REF);
-        const remote = snap.exists ? snap.data() : null;
-        const remoteRevision = remote?.revision || 0;
-        const remotePayload = remote?.payload || null;
-        if(remote && remoteRevision !== localRevision){
-          const err = new Error('revision_conflict');
-          err.remoteRevision = remoteRevision;
-          err.remotePayload = remotePayload;
-          throw err;
-        }
-        const nextRevision = remoteRevision + 1;
-        if(remotePayload && remotePayload !== payload && !meta.skipBackup){
-          const versionRef = db.collection('miaou/data/versions').doc();
-          tx.set(versionRef, {
-            payload: remotePayload,
-            revision: remoteRevision,
-            backedUpAt: firebase.firestore.FieldValue.serverTimestamp(),
-            savedBy: currentUserEmail,
-            reason: meta.reason || 'Update'
-          });
-        }
-        tx.set(DATA_REF, {
-          payload,
-          updated: new Date().toISOString(),
-          updatedBy: currentUserEmail,
-          revision: nextRevision,
-          lastAction: meta.reason || 'Update'
-        });
-        return { nextRevision };
-      });
-      localRevision = result.nextRevision;
-      await loadBackups();
+    if(db && DATA_REF){
+      await DATA_REF.set({ payload, updated: new Date().toISOString() });
     }
-    localStorage.setItem(storageKey(), payload);
+    localStorage.setItem(STORAGE_KEY, payload);
   } catch(e) {
     console.error('Save error:', e);
-    try { localStorage.setItem(storageKey(), payload); } catch(err) {}
-    if(e && e.message === 'revision_conflict'){
-      pendingCloudPayload = e.remotePayload || '';
-      document.getElementById('conflict-message').textContent = 'A newer cloud revision exists already, so this page did not overwrite it. Load the latest cloud version to continue safely.';
-      openModal('conflict-modal');
-      return;
-    }
+    try { localStorage.setItem(STORAGE_KEY, payload); } catch(err){}
     if(!meta.silent) showToast('Saved locally only');
   }
 }
 
 
-async function signInWithGoogle(){
-  setAuthStatus('Opening Google sign in…', false);
-  const provider = new firebase.auth.GoogleAuthProvider();
-  provider.setCustomParameters({prompt:'select_account'});
-  auth.signInWithPopup(provider).catch(e => {
-    console.error('Sign in error:', e);
-    setAuthStatus(getFriendlyAuthError(e));
-  });
-}
-
-async function signOutUser(){
-  await auth.signOut();
-}
 
 
-function openBackupModal(){
-  if(!currentUserEmail){
-    setSignedOutUi();
-    setAuthStatus('Please sign in first.');
-    return;
-  }
-  document.getElementById('backup-user-chip').textContent=`🔒 ${currentUserEmail}`;
-  loadBackups();
-  openModal('backup-modal');
-}
+
+
 
 
 async function bootstrap(){
-  // ── Backup mode: read-only offline snapshot ──
-  if(window.BACKUP_MODE){
-    data=window.BACKUP_DATA;
-    document.getElementById('loading-screen').style.display='none';
-    document.getElementById('auth-overlay').classList.remove('open');
-    const ha=document.querySelector('.header-actions');
-    if(ha) ha.innerHTML='<span style="font-size:0.72rem;color:var(--text-muted);background:var(--cream2);padding:4px 12px;border-radius:20px;font-weight:600">📋 Backup'+(window.BACKUP_DATE?' · '+new Date(window.BACKUP_DATE).toLocaleDateString():'')+'</span>';
-    renderCatsGrid();renderUpcoming();renderVetCatSections();renderLitter();
-    return;
-  }
-  document.getElementById('google-signin-btn').addEventListener('click', signInWithGoogle);
-  document.getElementById('auth-signout-btn').addEventListener('click', signOutUser);
-  document.getElementById('loading-screen').style.display='flex';
-  try {
-    initFirebase();
-  } catch(e) {
-    console.error('Firebase init error:', e);
-    setAuthStatus('Could not connect to Firebase right now.');
-    document.getElementById('loading-screen').style.display='none';
-    setSignedOutUi();
-    return;
-  }
-  // ── Check for Drive redirect result (mobile fallback) ──
-  try{
-    const rr=await auth.getRedirectResult();
-    if(rr&&rr.credential&&rr.credential.accessToken) _driveToken=rr.credential.accessToken;
-  }catch(e){console.warn('Redirect result:',e);}
-  auth.onAuthStateChanged(async user => {
-    if(!user){
-      currentUserEmail='';
-      data=deepClone(DEFAULT);
-      setSignedOutUi();
-      document.getElementById('loading-screen').style.display='none';
-      return;
-    }
-    const email = String(user.email||'').toLowerCase();
-    if(!isAllowedEmail(email)){
-      await auth.signOut();
-      setSignedOutUi();
-      setAuthStatus('That Google account is not allowed for Miaou. Please use an approved account.');
-      document.getElementById('loading-screen').style.display='none';
-      return;
-    }
-    const isNewSession = currentUserEmail !== email;
-    currentUserEmail = email;
-    setAuthStatus('', false);
-    setSignedInUi();
-    const signoutBtn = document.getElementById('auth-signout-btn');
-    if(signoutBtn) signoutBtn.style.display='block';
-    if(isNewSession){
-      await loadData();
-      renderVetCatSections();
-      renderLitter();
-      if(currentCatId) renderCatDetail();
-    }
-    // Resume pending Drive backup after mobile redirect
-    if(_driveToken&&sessionStorage.getItem('miaou_drive_pending')){
-      sessionStorage.removeItem('miaou_drive_pending');
-      setTimeout(()=>driveBackup(),600);
-    }
-  });
+  try { initFirebase(); } catch(e){ console.error('Firebase init error:', e); }
+  await loadData();
+  renderVetCatSections();
+  renderLitter();
+  if(currentCatId) renderCatDetail();
 }
+
 
 
 // ═══ NAV ═══
@@ -1823,8 +1615,42 @@ document.addEventListener('keydown',e=>{
 let toastTimer;
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2200);}
 
+// ═══ SHEETS SYNC ═══
+// After deploying your Apps Script, paste the Web App URL below:
+const SHEETS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyKh_83h0rZGZwO8w4MTr-mDc-ZVwalHGU6xp3OCSf9zpg_UbwcGVo-McwH1SDX3GCs/exec';
+
+async function syncToSheets(){
+  if(!SHEETS_SCRIPT_URL || SHEETS_SCRIPT_URL.includes('PASTE_YOUR')){
+    showToast('⚠️ Set your Apps Script URL first');
+    return;
+  }
+  const btn = document.getElementById('sheets-sync-btn');
+  if(btn){ btn.textContent='⏳'; btn.disabled=true; }
+  try {
+    const payload = {
+      syncedAt: new Date().toISOString(),
+      cats: data.cats,
+      treatments: data.treatments,
+      litters: data.litters
+    };
+    const res = await fetch(SHEETS_SCRIPT_URL, { method:'POST', body: JSON.stringify(payload) });
+    const text = await res.text();
+    showToast(text.includes('OK') ? '✓ Synced to Google Sheets' : 'Sync error — check console');
+  } catch(e){
+    showToast('Sync failed: ' + e.message);
+    console.error(e);
+  }
+  if(btn){ btn.textContent='📊'; btn.disabled=false; }
+}
+
 // ═══ INIT ═══
-bootstrap();
+if(sessionStorage.getItem('miaou_auth')==='1'){
+  document.getElementById('auth-overlay').classList.remove('open');
+  bootstrap();
+} else {
+  document.getElementById('loading-screen').style.display='none';
+  setTimeout(()=>{ const p=document.getElementById('pw-input'); if(p) p.focus(); }, 100);
+}
 </script>
 
 <script>
@@ -1847,224 +1673,6 @@ window.addEventListener('beforeinstallprompt', event => {
   }, 1200);
 });
 
-// ═══ DRIVE BACKUP ═══
-let _driveToken=null;
-
-async function _driveGetToken(){
-  // Reuse existing valid token
-  if(_driveToken){
-    try{
-      const chk=await fetch('https://www.googleapis.com/drive/v3/about?fields=user',{headers:{'Authorization':'Bearer '+_driveToken}});
-      if(chk.ok) return;
-    }catch(e){console.warn('Token check failed, re-auth:',e);}
-    _driveToken=null;
-  }
-  const provider=new firebase.auth.GoogleAuthProvider();
-  provider.addScope('https://www.googleapis.com/auth/drive');
-  if(currentUserEmail) provider.setCustomParameters({login_hint:currentUserEmail});
-  try{
-    const result=await auth.signInWithPopup(provider);
-    if(!result.credential||!result.credential.accessToken) throw new Error('No access token');
-    _driveToken=result.credential.accessToken;
-  }catch(e){
-    const code=String(e?.code||'');
-    // Popup failed (mobile, PWA, blocked) → fall back to redirect
-    if(code.includes('popup')||code.includes('cancelled')||code.includes('operation-not-supported')){
-      sessionStorage.setItem('miaou_drive_pending','1');
-      _driveStatus('🔄 Redirecting for Drive authorization…');
-      auth.signInWithRedirect(provider);
-      throw new Error('DRIVE_REDIRECT');
-    }
-    throw e;
-  }
-  // Verify Drive API is enabled
-  const test=await fetch('https://www.googleapis.com/drive/v3/about?fields=user',{headers:{'Authorization':'Bearer '+_driveToken}});
-  if(!test.ok){
-    const t=await test.text();
-    if(t.includes('API has not been used')||t.includes('accessNotConfigured')||t.includes('PERMISSION_DENIED'))
-      throw new Error('Google Drive API is not enabled. Go to console.cloud.google.com → APIs → Enable "Google Drive API" for project miaou-57319.');
-    throw new Error('Drive API test failed ('+test.status+'): '+t.slice(0,200));
-  }
-}
-
-async function _driveApiFetch(url,opts={}){
-  const res=await fetch(url,{...opts,headers:{'Authorization':'Bearer '+_driveToken,...(opts.headers||{})}});
-  if(!res.ok){const t=await res.text();throw new Error('Drive API error '+res.status+': '+t.slice(0,200));}
-  return res.json();
-}
-
-async function _driveEnsureFolder(name,parentId){
-  const safeName=name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-  const pClause=parentId?` and '${parentId}' in parents`:` and 'root' in parents`;
-  const q=`name='${safeName}' and mimeType='application/vnd.google-apps.folder' and trashed=false`+pClause;
-  const r=await _driveApiFetch('https://www.googleapis.com/drive/v3/files?q='+encodeURIComponent(q)+'&fields=files(id,name)&spaces=drive');
-  if(r.files&&r.files.length) return r.files[0].id;
-  const body={name,mimeType:'application/vnd.google-apps.folder'};
-  if(parentId) body.parents=[parentId];
-  const res=await fetch('https://www.googleapis.com/drive/v3/files',{
-    method:'POST',headers:{'Authorization':'Bearer '+_driveToken,'Content-Type':'application/json'},
-    body:JSON.stringify(body)
-  });
-  if(!res.ok){const t=await res.text();throw new Error('Create folder error '+res.status+': '+t.slice(0,200));}
-  return (await res.json()).id;
-}
-
-async function _driveCreateSubfolder(name,parentId){
-  const body={name,mimeType:'application/vnd.google-apps.folder',parents:[parentId]};
-  const res=await fetch('https://www.googleapis.com/drive/v3/files',{
-    method:'POST',headers:{'Authorization':'Bearer '+_driveToken,'Content-Type':'application/json'},
-    body:JSON.stringify(body)
-  });
-  if(!res.ok){const t=await res.text();throw new Error('Create subfolder error '+res.status+': '+t.slice(0,200));}
-  return (await res.json()).id;
-}
-
-async function _driveUploadFile(name,mimeType,content,parentId){
-  const form=new FormData();
-  form.append('metadata',new Blob([JSON.stringify({name,parents:[parentId]})],{type:'application/json'}));
-  form.append('file',new Blob([content],{type:mimeType}));
-  const res=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{
-    method:'POST',headers:{'Authorization':'Bearer '+_driveToken},body:form
-  });
-  if(!res.ok){const t=await res.text();throw new Error('Upload error '+res.status+': '+t.slice(0,200));}
-}
-
-async function _buildBackupHtml(){
-  let src;
-  try{
-    const resp=await fetch(location.href.replace(/#.*$/,''));
-    src=await resp.text();
-  }catch(e){
-    src='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
-  }
-  const snapshot=JSON.stringify(data).replace(/<\//g,'<\\/');
-  const stamp=new Date().toISOString();
-  const tag='<scr'+'ipt>window.BACKUP_MODE=true;window.BACKUP_DATA='+snapshot+';window.BACKUP_DATE="'+stamp+'";<\\/scr'+'ipt>';
-  return src.replace('</head>',tag+'\n</head>');
-}
-
-function _buildBackupExcel(){
-  const wb=XLSX.utils.book_new();
-  const getT=id=>((data.treatments||[]).find(t=>t.id===id)||{}).name||id;
-  const bold={font:{bold:true}};
-  const hdr={font:{bold:true,color:{rgb:'FFFFFF'}},fill:{fgColor:{rgb:'B85C38'}},alignment:{horizontal:'center'}};
-
-  function styledSheet(aoa,colWidths){
-    const ws=XLSX.utils.aoa_to_sheet(aoa);
-    if(colWidths) ws['!cols']=colWidths.map(w=>({wch:w}));
-    return ws;
-  }
-
-  // ── Overview sheet ──
-  const ov=[['🐾 Miaou Backup — '+new Date().toLocaleString()],[''],['Cat','DOB','Latest Weight (kg)','Last Visit','Total Cost ($)','Open Schedules']];
-  for(const c of(data.cats||[])){
-    const wt=c.visits.filter(v=>v.weight).sort((a,b)=>b.date.localeCompare(a.date))[0];
-    const lv=c.visits.slice().sort((a,b)=>b.date.localeCompare(a.date))[0];
-    ov.push([c.emoji+' '+c.name,c.dob||'',wt?wt.weight:'',lv?lv.date:'',c.visits.reduce((s,v)=>s+(v.cost||0),0),c.schedules.filter(s=>!s.done).length]);
-  }
-  XLSX.utils.book_append_sheet(wb,styledSheet(ov,[20,14,18,14,14,18]),'Overview');
-
-  // ── One sheet per cat ──
-  for(const c of(data.cats||[])){
-    const rows=[];
-    rows.push([c.emoji+' '+c.name+(c.dob?' — Born '+c.dob:'')]);
-    rows.push(['']);
-
-    // Visits sub-section
-    rows.push(['── VET VISITS ──','','','','']);
-    rows.push(['Date','Weight (kg)','Cost ($)','Treatments','Notes']);
-    const sorted=c.visits.slice().sort((a,b)=>b.date.localeCompare(a.date));
-    if(sorted.length){
-      for(const v of sorted){
-        const tx=[...v.treatments.map(getT),...(v.oneTimeTreatments||[]).map(t=>t.name)].join(', ');
-        rows.push([v.date,v.weight||'',v.cost||'',tx,v.notes||'']);
-      }
-    } else { rows.push(['No visits yet','','','','']); }
-
-    rows.push(['']);
-
-    // Schedule sub-section
-    rows.push(['── SCHEDULE ──','','','','']);
-    rows.push(['Treatment','Due Date','Price ($)','Notes','Status']);
-    const scheds=c.schedules.slice().sort((a,b)=>a.dueDate.localeCompare(b.dueDate));
-    if(scheds.length){
-      for(const s of scheds){
-        const tname=s.oneTime?(s.oneTimeName||'One-time'):getT(s.treatmentId);
-        let status='Pending';
-        if(s.done) status='Done';
-        else{const days=Math.round((new Date(s.dueDate)-new Date())/86400000);status=days<0?(-days)+'d overdue':'In '+days+'d';}
-        rows.push([tname,s.dueDate,s.price||'',s.notes||'',status]);
-      }
-    } else { rows.push(['No scheduled items','','','','']); }
-
-    // Safe sheet name (max 31 chars, no special chars)
-    let sheetName=(c.emoji+' '+c.name).replace(/[\\\/\*\?\[\]:]/g,'').slice(0,31);
-    XLSX.utils.book_append_sheet(wb,styledSheet(rows,[24,14,12,30,40]),sheetName);
-  }
-
-  // ── Litters sheet ──
-  const ls=[['🌿 Litter Reviews'],[''],['Litter','Rating','Price','$/L','Smell','Poo','Pee','Notes']];
-  for(const l of(data.litters||[])){
-    const r=l.rating?Number(l.rating).toFixed(1)+'/5':'—';
-    ls.push([l.name,r,l.price||'',l.pricePerL?'$'+l.pricePerL+'/L':'',typeof l.smell==='number'?l.smell+'/5':(l.smell||'—'),typeof l.poo==='number'?l.poo+'/5':(l.poo||'—'),typeof l.pee==='number'?l.pee+'/5':(l.pee||'—'),l.notes||'']);
-  }
-  XLSX.utils.book_append_sheet(wb,styledSheet(ls,[20,10,16,10,10,10,10,30]),'Litters');
-
-  // ── Treatments sheet ──
-  const ts=[['💊 Treatment Prices'],[''],['Treatment','Price ($)','Interval']];
-  for(const t of(data.treatments||[])) ts.push([t.name,t.price||'',t.repeatCount?'Every '+t.repeatCount+' '+t.repeatUnit:'—']);
-  XLSX.utils.book_append_sheet(wb,styledSheet(ts,[28,12,20]),'Treatments');
-
-  return wb;
-}
-
-function _driveStatus(msg){
-  const el=document.getElementById('drive-progress');
-  if(!el) return;
-  if(msg){el.textContent=msg;el.style.display='block';}else{el.style.display='none';}
-}
-
-async function driveBackup(){
-  if(!currentUserEmail){showToast('Please sign in first');return;}
-  const btn=document.getElementById('drive-backup-btn');
-  if(btn){btn.disabled=true;btn.textContent='\u23F3';}
-  try{
-    _driveStatus('\uD83D\uDD11 Authorizing Google Drive access\u2026');
-    await _driveGetToken();
-
-    _driveStatus('\uD83D\uDCC4 Generating HTML & Excel backup\u2026');
-    const html=await _buildBackupHtml();
-    const wb=_buildBackupExcel();
-    const xlsxArr=XLSX.write(wb,{bookType:'xlsx',type:'array'});
-
-    _driveStatus('\uD83D\uDCC1 Creating folder in Google Drive\u2026');
-    const appsId=await _driveEnsureFolder('Apps Backups');
-    const miaouVsId=await _driveEnsureFolder('Miaou-VS',appsId);
-    const rootId=await _driveEnsureFolder('Saved Backups',miaouVsId);
-    const now=new Date(),p=n=>String(n).padStart(2,'0');
-    const stamp=now.getFullYear()+'-'+p(now.getMonth()+1)+'-'+p(now.getDate())+' '+p(now.getHours())+'-'+p(now.getMinutes())+'-'+p(now.getSeconds());
-    const subId=await _driveCreateSubfolder(stamp,rootId);
-
-    _driveStatus('\u2B06\uFE0F Uploading files\u2026');
-    await _driveUploadFile('miaou-backup.html','text/html',html,subId);
-    await _driveUploadFile('miaou-backup.xlsx','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',new Uint8Array(xlsxArr),subId);
-
-    _driveStatus(null);
-    showToast('\u2713 Backed up to Drive: Miaou-VS / Saved Backups / '+stamp);
-  }catch(e){
-    if(e.message==='DRIVE_REDIRECT') return;
-    console.error('Drive backup error:',e);
-    _driveStatus(null);
-    showToast('Drive backup failed: '+(e.message||'unknown error'));
-  }
-  if(btn){btn.disabled=false;btn.textContent='\uD83D\uDCE4';}
-}
-
-if('serviceWorker' in navigator){
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(err => console.warn('SW registration failed:', err));
-  });
-}
 </script>
 
 </body>
