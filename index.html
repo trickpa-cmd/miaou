@@ -1637,12 +1637,17 @@ async function syncToSheets(opts={}){
       treatments: data.treatments,
       litters: data.litters
     };
-    const res = await fetch(SHEETS_SCRIPT_URL, { method:'POST', body: JSON.stringify(payload) });
-    const text = await res.text();
-    if(!opts.silent) showToast(text.includes('OK') ? '✓ Synced to Google Sheets' : 'Sync error — check console');
+    // mode:'no-cors' is required for Google Apps Script — response will be opaque
+    await fetch(SHEETS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload)
+    });
+    if(!opts.silent) showToast('✓ Synced to Google Sheets');
   } catch(e){
     if(!opts.silent) showToast('Sync failed: ' + e.message);
-    console.error(e);
+    console.error('Sheets sync error:', e);
   }
   if(btn){ btn.textContent='📊'; btn.disabled=false; }
 }
