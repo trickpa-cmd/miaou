@@ -804,8 +804,6 @@ const DEFAULT={
     {id:'kitten1',name:'Afandeh',emoji:'🙀',catStyle:'',dob:'2025-09-13',color:'#e07b3a',
      schedules:[
        {id:'s1',treatmentId:'t1',dueDate:'2027-02-14',price:30,notes:'Yearly vaccine',done:false},
-       {id:'s2',treatmentId:'t4',dueDate:'2026-04-01',price:15,notes:'Monthly deworm',done:false},
-       {id:'s3',treatmentId:'t2',dueDate:'2026-04-08',price:8,notes:'Monthly flea',done:false},
      ],
      visits:[
        {id:'v1',date:'2025-12-13',weight:1.5,cost:0,treatments:[],oneTimeTreatments:[{name:'Vaccine (1st dose)',repeatCount:3,repeatUnit:'weeks'},{name:'Deworm (1st dose)',repeatCount:10,repeatUnit:'days'}],notes:'Dawa bel dayne for 10 days, once daily after cleaning\nHabbet doud after 10 days → every month until 6 months → every 3 months'},
@@ -814,12 +812,11 @@ const DEFAULT={
        {id:'v4',date:'2026-01-24',weight:2.5,cost:40,treatments:[],oneTimeTreatments:[{name:'Vaccine (3rd dose)',repeatCount:3,repeatUnit:'weeks'},{name:'Deworm (3rd dose)',repeatCount:1,repeatUnit:'months'}],notes:'No more earmites ✓ — clean ears once per week'},
        {id:'v5',date:'2026-02-14',weight:3.6,cost:30,treatments:['t1'],oneTimeTreatments:[],notes:'Vaccine (yearly) — rabies ✓'},
        {id:'v6',date:'2026-02-28',weight:3.9,cost:0,treatments:[],oneTimeTreatments:[],notes:''},
+       {id:'v7',date:'2026-03-14',weight:4,cost:90,treatments:[],oneTimeTreatments:[],notes:'Neutering'},
      ]},
     {id:'kitten2',name:'Snickers',emoji:'🐈',catStyle:'blackwhite',dob:'2025-08-08',color:'#5c5248',
      schedules:[
        {id:'s1',treatmentId:'t1',dueDate:'2027-02-14',price:30,notes:'Yearly vaccine',done:false},
-       {id:'s2',treatmentId:'t4',dueDate:'2026-04-01',price:15,notes:'Monthly deworm',done:false},
-       {id:'s3',treatmentId:'t6',dueDate:'2026-03-10',price:30,notes:'Follow-up ligament check',done:false},
      ],
      visits:[
        {id:'v1',date:'2025-12-13',weight:null,cost:0,treatments:[],oneTimeTreatments:[{name:'Vaccine (1st dose)',repeatCount:3,repeatUnit:'weeks'},{name:'Deworm (1st dose)',repeatCount:10,repeatUnit:'days'}],notes:'Dawa bel dayne for 10 days, once daily after cleaning\nHabbet doud after 10 days → every month until 6 months → every 3 months'},
@@ -828,29 +825,28 @@ const DEFAULT={
        {id:'v4',date:'2026-01-24',weight:2.9,cost:40,treatments:[],oneTimeTreatments:[{name:'Vaccine (3rd dose)',repeatCount:3,repeatUnit:'weeks'},{name:'Deworm (3rd dose)',repeatCount:1,repeatUnit:'months'}],notes:'Clean ears once per week'},
        {id:'v5',date:'2026-02-14',weight:2.9,cost:90,treatments:['t1'],oneTimeTreatments:[],notes:'Vaccine (yearly) — rabies ✓\nXray $30 — Ebre (injection) $30\nShould feel better within one day'},
        {id:'v6',date:'2026-02-28',weight:3.0,cost:0,treatments:[],oneTimeTreatments:[],notes:'Checked — something wrong with ligament\n0.6mg today, 0.4mg for 5 days'},
+       {id:'v7',date:'2026-03-14',weight:2.8,cost:120,treatments:[],oneTimeTreatments:[],notes:'Neutering + antibiotics 10$'},
      ]},
     {id:'biso',name:'Biso',emoji:'😾',catStyle:'',dob:null,color:'#c07030',
      schedules:[
-       {id:'s1',treatmentId:'t1',dueDate:'2026-12-01',price:30,notes:'Yearly vaccine',done:false},
-       {id:'s2',treatmentId:'t4',dueDate:'2026-06-01',price:15,notes:'Worm Injection — 6 months',done:false},
-       {id:'s3',treatmentId:'t2',dueDate:'2026-01-01',price:8,notes:'⚠️ Missed — do as soon as possible',done:false},
+       {id:'s1',treatmentId:'t4',dueDate:'2026-06-01',price:15,notes:'Worm Injection — 6 months',done:false},
+       {id:'s2',treatmentId:'t1',dueDate:'2026-12-01',price:30,notes:'Yearly vaccine',done:false},
      ],
-     visits:[{id:'v1',date:'2025-12-01',weight:6.2,cost:45,treatments:['t1','t4'],notes:'Yearly check-up\nYearly vaccine ✓\nWorm Injection (6 months) ✓\nBarghout done ✓\n⚠️ Overweight — feed less wet food'}]},
+     visits:[{id:'v1',date:'2025-12-01',weight:6.2,cost:45,treatments:['t1','t4'],oneTimeTreatments:[],notes:'Yearly check-up\nYearly vaccine ✓\nWorm Injection (6 months) ✓\nFlea done ✓\n⚠️ Overweight — feed less wet food'}]},
     {id:'loupou',name:'Loupou',emoji:'🐱',catStyle:'white',dob:null,color:'#8aacbf',
      schedules:[
-       {id:'s1',treatmentId:'t1',dueDate:'2026-12-01',price:30,notes:'Yearly vaccine',done:false},
-       {id:'s2',treatmentId:'t4',dueDate:'2026-06-01',price:15,notes:'Worm Injection — 6 months',done:false},
-       {id:'s3',treatmentId:'t2',dueDate:'2026-01-01',price:8,notes:'⚠️ Missed — do as soon as possible',done:false},
+       {id:'s1',treatmentId:'t4',dueDate:'2026-06-01',price:15,notes:'Worm Injection — 6 months',done:false},
+       {id:'s2',treatmentId:'t1',dueDate:'2026-12-01',price:30,notes:'Yearly vaccine',done:false},
      ],
-     visits:[{id:'v1',date:'2025-12-01',weight:6.7,cost:45,treatments:['t1','t4'],notes:'Yearly check-up\nYearly vaccine ✓\nWorm Injection (6 months) ✓\nBarghout done ✓\nTondif dinen\n⚠️ Overweight'}]},
+     visits:[{id:'v1',date:'2025-12-01',weight:6.7,cost:45,treatments:['t1','t4'],oneTimeTreatments:[],notes:'Yearly check-up\nYearly vaccine ✓\nWorm Injection (6 months) ✓\nFlea done ✓\nTondif dinen\n⚠️ Overweight'}]},
   ],
   litters:[
-    {id:'l1',name:'Thomas',rating:4,price:'11.2$ / 5kg',pricePerL:1.90,smell:'No smell',poo:'Great',pee:'Bi farfit chway',notes:''},
-    {id:'l2',name:'Champ',rating:3,price:'5.76$ / 7kg',pricePerL:0.70,smell:'No smell',poo:'Great',pee:'Bi farfit ktir',notes:''},
-    {id:'l3',name:'Prochoice',rating:0,price:'6.49$ / 10L',pricePerL:0.65,smell:'',poo:'',pee:'',notes:''},
-    {id:'l4',name:'Signor Gatto',rating:0,price:'6.99$ / 10L',pricePerL:0.70,smell:'',poo:'',pee:'',notes:''},
-    {id:'l5',name:'Kiki Kat',rating:0,price:'7.59$ / 10L',pricePerL:0.76,smell:'',poo:'',pee:'',notes:''},
-    {id:'l6',name:'Vancat',rating:0,price:'8.69$ / 10kg (12L)',pricePerL:0.72,smell:'',poo:'',pee:'',notes:''},
+    {id:'l1',name:'Thomas',rating:4.33,price:'11.2$ / 5kg',pricePerL:1.90,priceAmount:11.2,sizeAmount:5,sizeUnit:'kg',smell:5,poo:5,pee:3,notes:''},
+    {id:'l2',name:'Champ',rating:3.67,price:'5.76$ / 7kg',pricePerL:0.70,priceAmount:5.76,sizeAmount:7,sizeUnit:'kg',smell:5,poo:5,pee:1,notes:''},
+    {id:'l3',name:'Prochoice',rating:0,price:'6.49$ / 10L',pricePerL:0.65,priceAmount:6.49,sizeAmount:10,sizeUnit:'L',smell:0,poo:0,pee:0,notes:''},
+    {id:'l4',name:'Signor Gatto',rating:0,price:'6.99$ / 10L',pricePerL:0.70,priceAmount:6.99,sizeAmount:10,sizeUnit:'L',smell:0,poo:0,pee:0,notes:''},
+    {id:'l5',name:'Kiki Kat',rating:5,price:'7.59$ / 10L',pricePerL:0.76,priceAmount:7.59,sizeAmount:10,sizeUnit:'L',smell:5,poo:5,pee:5,notes:''},
+    {id:'l6',name:'Vancat',rating:0,price:'8.69$ / 10kg',pricePerL:0.74,priceAmount:8.69,sizeAmount:10,sizeUnit:'kg',smell:0,poo:0,pee:0,notes:''},
   ]
 };
 
